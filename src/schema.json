@@ -1,0 +1,192 @@
+{
+  "type": "object",
+  "properties": {
+    "game": {
+      "type": "object",
+      "properties": {
+        "difficulty": {
+          "type": "string"
+        },
+        "turns": {
+          "type": "integer"
+        },
+        "AI": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "difficulty",
+        "turns",
+        "AI"
+      ]
+    },
+    "techtree": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tech": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "researchreq": {
+            "type": "integer"
+          },
+          "prereq": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tech": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "tech"
+              ]
+            }
+          },
+          "unlocks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tech",
+          "desc",
+          "researchreq",
+          "prereq",
+          "unlocks"
+        ]
+      }
+    },
+    "hubs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "built by": {
+            "type": "string"
+          },
+          "generates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "resource",
+                "amount"
+              ]
+            }
+          },
+          "upgrades to": {
+            "type": "string"
+          },
+          "health": {
+            "type": "integer"
+          },
+          "defense": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "desc",
+          "built by",
+          "generates",
+          "upgrades to",
+          "health",
+          "defense"
+        ]
+      }
+    },
+    "civilizations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "repr": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "desc",
+          "repr"
+        ]
+      }
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "can attack": {
+            "type": "boolean"
+          },
+          "can build": {
+            "type": "boolean"
+          },
+          "attack": {
+            "type": "integer"
+          },
+          "defense": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "desc",
+          "can attack",
+          "can build",
+          "attack",
+          "defense"
+        ]
+      }
+    }
+  },
+  "required": [
+    "game",
+    "techtree",
+    "hubs",
+    "civilizations",
+    "units"
+  ]
+}

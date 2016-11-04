@@ -1,0 +1,48 @@
+Style Guide
+-----------
+First read the 3110 style guide[1]. This document provides some style
+guidelines *in addition to* the guidelines provided by the course style guide.
+
+1) Indent by 2 spaces
+2) Match expressions
+    a) The arrows in each branch of a match expression should be aligned whenever
+       this doesn't sacrifice readability.
+    b) If it is necessary to explicitly denote the extent of a branch expression,
+       parentheses are strongly preferred over `begin...end' blocks, e.g.:
+
+      NOT PREFERRED
+
+        match x with
+        | pat1 -> 
+        | pat2 -> begin
+            ...
+            ... end
+
+      PREFERRED
+
+        match x with
+        | pat1 -> 
+        | pat2 -> (
+            ...
+            ... )
+
+3) Let expressions
+    a) If a let expression is followed by the `in' keyword, `in' should go on the
+       end of the last line of the expression.
+    b) If a let expression must be broken into multiple lines, each line should
+       be indented two spaces, e.g.:
+
+        let f x y =
+          let a = ... in
+          let b =
+          ... in
+          e in
+
+4) Naming conventions
+    a) Function names should be snake case instead of camel case; e.g.
+       `is_empty' is preferred over `isEmpty'.
+    b) Module names should be camel case; e.g. `MyModule'.
+
+Links
+-----
+[1] https://www.cs.cornell.edu/Courses/cs3110/2016fa/handouts/style.html
