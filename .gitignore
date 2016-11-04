@@ -40,3 +40,5 @@ Thumbs.db
 #################
 *.byte
 _build/
+.merlin
+ms0.html
