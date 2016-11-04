@@ -1,0 +1,57 @@
+{
+  "game": {
+    "difficulty": "ezpz",
+    "turns": 100,
+    "AI": 3
+  },
+  "techtree": [
+    {
+      "tech": "wood",
+      "desc": "Literally wood.",
+      "researchreq": 10,
+      "prereq": [
+        {
+          "tech": "iron"
+        }
+      ],
+      "unlocks": [
+        {
+          "component": "forestry"
+        }
+      ]
+    }
+  ],
+  "hubs": [
+    {
+      "name": "town hall",
+      "desc": "Where shit happens",
+      "built by": "settler",
+      "generates": [
+        {
+          "resource": "happiness",
+          "amount": 1
+        }
+      ],
+      "upgrades to": "none",
+      "health": 100,
+      "defense": 0
+    }
+  ],
+  "civilizations": [
+    {
+      "name": "Jojo",
+      "desc": "P wavy dude",
+      "repr": "j"
+    }
+  ],
+  "units": [
+    {
+      "name": "Worker",
+      "desc": "Ur mum lol",
+      "can attack": false,
+      "can build": true,
+      "attack": 0,
+      "defense": 0
+    }
+  ]
+}
