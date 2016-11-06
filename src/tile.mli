@@ -40,21 +40,33 @@ type tile
 
 (* [terrain] returns the type of terrain associated with the tile given by
  * it's [id] *)
-  val terrain: id -> terrain
+  val get_terrain: id -> terrain
 
   (* [is_settled] returns bool indentified in tile given by it's [id] [settled]*)
   val is_settled:  id -> bool
 
-  (* [hub] returns the type of hub associated with the tile given by
+  (* [get_hub] returns the type of hub associated with the tile given by
    * it's [id] *)
-  val hub: id -> hub option
+  val get_hub: id -> hub option
 
-  (* [units] returns the type of hub associated with the tile given by
+  (* [get_bits] returns the type of hub associated with the tile given by
    * it's [id] *)
-  val units: id -> unit list
+  val get_bits: id -> bit list
 
+  (* [get_tile] returns the tile from the given
+   * [id] *)
+  val get_tile: id -> tile
 
+  (* [create_tile] returns a newly created tile with the given parameters
+   *)
+  val create_tile: id -> terrain -> bool -> hub option -> bit list -> tile
 
+  (* [set_hub] updates the hub in the given tile
+  *)
+  val set_hub: id -> hub option -> tile
 
+  (* [set_bits] updates the bits in the given tile
+  *)
+  val set_bits: id -> bit list -> tile
 
 end
