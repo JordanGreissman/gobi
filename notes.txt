@@ -11,6 +11,8 @@
   through u.pos or u.get_pos()?
 
 - best way to structure multiple inheritance?
+update: I(David) have no idea how to do this and will be going to OH for it
+
 module type Identifiable = sig
   type t
   val id : t
