@@ -1,20 +1,23 @@
-open Ast
 open Resource
 
 module type Hub : Describable = struct 
 
-	type hub
+	(* string - id *)
+	type cluster
 
-	(* = { 
-		cluster_id : string;
-		production_type : resource;
-		production_amount : int
-		unit_population : unit list;
-		tile : tile;
-	} *)
+	(* string *)
+	type production_type
+
+	(* int *)
+	type production_amount
+
+	(* bit list *)
+	type bits
+
+	type tile
 
 	(* Returns a new hub based on parameters and adds it to the cluster *)
-	val new_hub    : resource -> unit list -> hub
+	val new_hub    : resource -> bit list -> hub
 
 	(* Returns a new hub based on parameters and adds it to the cluster *)
 	val remove_hub : hub -> hub list
@@ -23,30 +26,21 @@ module type Hub : Describable = struct
 	val change_production : int -> hub
 
 	(* Add units to a hub, affecting production *)
-	val add_units : unit_list -> hub
+	val add_units : bit list -> hub
 
 	(* Remove units to a hub, affecting production *)
-	val remove_units : unit_list -> hub
+	val remove_units : bit list -> hub
 
 end
 
-module type Unit : Describable = struct 
+module type Bit : Describable = struct 
 
+	(* ( attack: int, defense: int) *)
   type power_level 
 
-	(*{
-		total : int; (* sum of attack / defense *)
-		attack : int;
-		defense : int; 
-	}*)
+	type tile
 
-	type unit 
-
-	(*{
-		hub : hub;
-		tile : tile;
-		power_level : power_level;
-	}*)
+	type hub
 
 	(* Create a unit with a certain power level, starting at a cluster's town hall
 	 * hub *)
@@ -58,30 +52,35 @@ module type Unit : Describable = struct
 
 	(* Increase / decrease the defense value of a unit, using + / - values. 
 	 * This affects total power levels *)
-	val change_defense : int -> unit
+	val change_defense : int -> bit
 
 	(* Move a unit to a new tile, affecting both structures *)
-	val move_to_tile : tile -> unit
+	val move_to_tile : tile -> bit
 
 	(* Move a unit to a new hub, affecting borth structures and hub production *)
-	val move_to_hub : hub -> unit
+	val move_to_hub : hub -> bit
 
 end
 
 module type Cluster : Describable = struct 
 
-	type cluster 
+	(* string *)
+	type name
 
-	(*{
-		name : string
-		tiles : tile list;
-		town_hall : hub
-		units : unit list;
-		hubs : hub list;
-	}*)
+	(* tile list *)
+	type tiles
+
+	(* hub *)
+	type town_hall
+
+	(* bit list *)
+	type bits
+
+	(* hub list *)
+	type hubs 
 
 	(* creates a new cluster based on existing units on a settled tile *)
-	val create_cluster : tile -> unit list -> cluster
+	val create_cluster : tile -> bit list -> cluster
 
 end
 
