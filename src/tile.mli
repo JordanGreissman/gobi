@@ -27,8 +27,7 @@ module type Tile = sig
 
   (* [id] is a type for id'ing tiles. Each id needs to be unique
  *)
-type id
-
+  type id
 
 
 (* [tile] describes the type of a specific tile on the map
@@ -36,14 +35,14 @@ type id
 type tile
     (*
     {id: id; terrain: terrain; settled: bool; hub: hub option;
-             units: unit list}*)
+             bits: bit list}*)
 
 (* [terrain] returns the type of terrain associated with the tile given by
  * it's [id] *)
   val get_terrain: id -> terrain
 
   (* [is_settled] returns bool indentified in tile given by it's [id] [settled]*)
-  val is_settled:  id -> bool
+  val get_settled:  id -> bool
 
   (* [get_hub] returns the type of hub associated with the tile given by
    * it's [id] *)
@@ -68,5 +67,9 @@ type tile
   (* [set_bits] updates the bits in the given tile
   *)
   val set_bits: id -> bit list -> tile
+
+  (* [set_settled] updates the settled bool in the given tile
+  *)
+  val set_settled: id -> bool -> tile
 
 end
