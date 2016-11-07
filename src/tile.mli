@@ -1,16 +1,26 @@
 open Cluster
 open Unit
 
-
-
 (* A [Tile] is a module containing all the information about
  * tiles *)
 module type Tile = sig
 
+  module type Terrain = sig
+    type info = {
+      (* put info about the terrain types here *)
+    }
 
-(* [terrianInformation] is a record holding information about the terrain
-*)
-  type terrain_information
+    type t =
+      | Flatland of info
+      | Forest of info
+      | Desert of info
+      | Mountain of info
+  end
+
+  type t
+
+  (** [terrain_info] is a record holding information about the terrain *)
+  type terrain_info
 
 
     (*{movementObstruction: bool; costToMove: int;
@@ -20,10 +30,6 @@ module type Tile = sig
 (* [terrian] describes the type land on a specific tile
 *)
   type terrain
-
-    (*
-  | Flatland of terrainInformation | Forest of terrainInformation
-  | Mountain of terrainInformation | Desert of terrainInformation*)
 
   (* [id] is a type for id'ing tiles. Each id needs to be unique
  *)
@@ -68,5 +74,4 @@ type tile
   (* [set_bits] updates the bits in the given tile
   *)
   val set_bits: id -> bit list -> tile
-
 end
