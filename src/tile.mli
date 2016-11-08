@@ -19,24 +19,19 @@ type terrain =
   | Forest of terrain_info
   | Desert of terrain_info
 
-(* TODO: Should setters return some kind of indication of whether or not the
- * set operation was successful? What could go wrong? *)
-
+(** getters and setters *)
 val get_terrain : t -> terrain
-val set_terrain : t -> terrain -> unit
+val set_terrain : t -> terrain -> t
 
-(* [is_settled] returns bool indentified in tile given by it's [id] [settled]*)
 val is_settled : t -> bool
-val settle : t -> unit
-val unsettle : t -> unit
+val settle : t -> t
+val unsettle : t -> t
 
-(* [get_hub] returns the type of hub associated with the tile given by
-  * it's [id] *)
 val get_hub : t -> Hub.t option
-val set_hub : t -> Hub.t option -> unit
+val set_hub : t -> Hub.t option -> t
 
-val get_entity : t -> entity list
-val set_entity: t -> unit
+val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
+val set_entity : t -> Entity.t option -> t
 
 (** [create_tile] returns a newly created tile with the given parameters *)
-val create_tile : t -> terrain -> bool -> hub option -> entity list -> tile
+val create_tile : t -> terrain -> bool -> Hub.t option -> Entity.t list -> t
