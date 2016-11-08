@@ -1,16 +1,16 @@
 open Resource
 
-module type Cluster : Describable = struct 
+module type Cluster = struct 
 
 	type t = {
 		name: string;
-		town_hall: tile;
+		town_hall: hub;
 		tiles: tile list;
 		hubs: hub list;
 	}
 
 	(* creates a new cluster based on existing units on a settled tile *)
-	val create_cluster : tile -> bit list -> cluster
+	val create_cluster : tile -> t
 
 end
 

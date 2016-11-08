@@ -1,6 +1,7 @@
-open Resource
+open Entity
+open Cluster
 
-module type Hub : Describable = struct 
+module type Hub = struct 
 
 	type t = {
 		name: string;
@@ -11,11 +12,12 @@ module type Hub : Describable = struct
 		tile: tile;
 	}
 
-	(* Returns a new hub based on parameters and adds it to the cluster *)
-	val new_hub : name -> production_type -> cluster -> tile -> t
+	(* Returns a new hub with a name and production_type string on a 
+	 * certain tile and cluster and adds it to the cluster *)
+	val new_hub : string -> string -> cluster -> tile -> t
 
 	(* Returns a new hub based on parameters and removes it from the cluster *)
-	val remove_hub : hub -> t list
+	val remove_hub : t -> t list
 
 	(* Change the multiplier for the production output *)
 	val change_production_amount : int -> t

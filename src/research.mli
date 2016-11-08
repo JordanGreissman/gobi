@@ -1,56 +1,62 @@
-module type Unlockable : Describable = struct
+module type Resource = struct 
 
-	(* string - name of research element *)
-	type name
+	type t = {
+		name: string;
+		amount: int;
+	}
 
-	(* string - resource needed to unlock *)
-	type resource
+	(* create a resource with a name *)
+	val create_resource : string -> t
 
-	(* int - amount of resource needed to unlock *)
-	type unlockable_amount
-
-	(* bool - if is unlocked *)
-	type unlocked
-
-	(* culmination of all of the above *)
-	type unlockable
-
-	(* create unlockable *)
-	val create_unlockable : name -> resource -> unlockable_amount -> unlockable
-
-	(* returns true if unlockable is unlocked *)
-	val is_unlocked : unlockable -> bool
+	(* increase / decrese the amount of a particular resource *)
+	val change_resource_amount : t -> int -> t
 
 end
 
-module type Research : Describable = struct 
+module type Unlockable = struct
 
-	type unlockable tree = Leaf | Node of unlockable * unlockable tree list
+	(* culmination of all of the above *)
+	type t = {
+		name: string;
+		resource: string;
+		cost: int;
+		is_unlocked: bool;
+	}
 
+	(* create unlockable from a name, resource, and cost *)
+	val create_unlockable : string -> string -> int -> t
 
-	(* = { 
-		cluster_id : string;
-		production_type : resource;
-		production_amount : int
-		unit_population : unit list;
-		tile : tile;
-	} *)
+	(* returns true if unlockable is unlocked *)
+	val is_unlocked : t -> bool
+
+	(* returns amount of a particular resource needed *)
+	val resource_needed : t -> int
+
+	(* returns the name of the resource *)
+	val resource : t -> string
+
+end
+
+module type Research = struct 
+
+	type t
+
+	type t tree = Leaf | Node of t * t list
 
 	(* adds an unlockable that can be accessed AFTER a certain unlockable  *)
-	val add_unlockable: unlockable -> unlockable option -> 
-		unlockable tree -> unlockable tree
+	val add_unlockable: t -> t option -> t tree -> t tree
 
-	(* searches the tree for a certain unlockable *)
-	val get_unlockable: name -> unlockable tree -> unlockable
+	(* searches the tree for a certain unlockable name *)
+	val get_unlockable: string -> t tree -> t
 
 	(* unlock and return  a potential unlockable if the type and amount of resources is valid
      * otheriwse, returns none *)
-	val unlock : unlockable -> resource -> unlockable option
+	val unlock : t -> resource -> unlockable option
 
 	(* gets every unlockable needed to unlock a certain unlockable *)
-	val get_path : unlockable -> unlockable list
+	val get_path : t -> t list
 
 	(* returns a list of every unlocked unlockable *)
-	val get_unlocked : unlockable tree -> unlockable list
+	val get_unlocked : t tree -> t list
 
 end
