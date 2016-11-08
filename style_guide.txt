@@ -43,6 +43,9 @@ guidelines *in addition to* the guidelines provided by the course style guide.
        `is_empty' is preferred over `isEmpty'.
     b) Module names should be camel case; e.g. `MyModule'.
 
+5) Module conventions
+    a) The module type will be the last argument to module functions
+
 Links
 -----
 [1] https://www.cs.cornell.edu/Courses/cs3110/2016fa/handouts/style.html
