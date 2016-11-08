@@ -24,8 +24,6 @@ type t
 
 (* TODO: Does procedural generation go in this file or a separate file? *)
 
-(* TODO: Is [t] the first or last argument to module functions? *)
-
 (* TODO: Should setters return some kind of indication of whether or not the
  * set operation was successful? What could go wrong? *)
 
