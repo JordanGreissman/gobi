@@ -1,75 +1,55 @@
 open Cluster
-open Unit
+open Hub
+open Entity
 
+include Identifiable
+include Describable
 
-
-(* A [Tile] is a module containing all the information about
- * tiles *)
-module type Tile = sig
-
-
-(* [terrianInformation] is a record holding information about the terrain
-*)
-  type terrain_information
-
-
-    (*{movementObstruction: bool; costToMove: int;
-                           needsClearing: bool; buildingRestriction: bool;
-                          foodRestriction: bool}*)
-
-(* [terrian] describes the type land on a specific tile
-*)
-  type terrain
-
-    (*
-  | Flatland of terrainInformation | Forest of terrainInformation
-  | Mountain of terrainInformation | Desert of terrainInformation*)
-
-  (* [id] is a type for id'ing tiles. Each id needs to be unique
- *)
-  type id
-
-
-(* [tile] describes the type of a specific tile on the map
-*)
-type tile
-    (*
-    {id: id; terrain: terrain; settled: bool; hub: hub option;
-             bits: bit list}*)
-
-(* [terrain] returns the type of terrain associated with the tile given by
- * its [id] *)
-  val get_terrain: id -> terrain
-
-  (* [is_settled] returns bool indentified in tile given by its [id] [settled]*)
-  val get_settled:  id -> bool
-
-  (* [get_hub] returns the type of hub associated with the tile given by
-   * its [id] *)
-  val get_hub: id -> hub option
-
-  (* [get_bits] returns the type of hub associated with the tile given by
-   * its [id] *)
-  val get_bits: id -> bit list
-
-  (* [get_tile] returns the tile from the given
-   * [id] *)
-  val get_tile: id -> tile
-
-  (* [create_tile] returns a newly created tile with the given parameters
-   *)
-  val create_tile: id -> terrain -> bool -> hub option -> bit list -> tile
-
-  (* [set_hub] updates the hub in the given tile
+module type Terrain = sig
+  (* the [info] type will be a record containing the following fields:
+   *  - movementObstruction: bool; whether units are allowed on this tile
+   *  - costToMove: int; the number of turns it takes unit to traverse this tile.
+   *      For tiles where [movementObstruction = true], [costToMove = -1].
+   *  - needsClearing: bool; whether this tile needs to be cleared before it can
+   *      be settled.
+   *  - buildingRestriction: bool; whether hubs are allowed on this tile
+   *  - foodRestriction: bool
   *)
-  val set_hub: id -> hub option -> tile
-
-  (* [set_bits] updates the bits in the given tile
-  *)
-  val set_bits: id -> bit list -> tile
-
-  (* [set_settled] updates the settled bool in the given tile
-  *)
-  val set_settled: id -> bool -> tile
-
+  type info
+  type t =
+    | Flatland of info
+    | Mountain of info
+    | Forest of info
+    | Desert of info
 end
+
+(** the type of a tile *)
+type t
+
+
+(* TODO: Should setters return some kind of indication of whether or not the
+ * set operation was successful? What could go wrong? *)
+
+(* TODO: By taking [id] instead of [t], every function in this API is calling
+ * into map.ml. Is that ok? *)
+
+val get_terrain : id -> terrain
+val set_terrain : id -> terrain -> unit
+
+(* [is_settled] returns bool indentified in tile given by it's [id] [settled]*)
+val is_settled : id -> bool
+val settle : id -> unit
+val unsettle : id -> unit
+
+(* [get_hub] returns the type of hub associated with the tile given by
+  * it's [id] *)
+val get_hub : id -> hub option
+val set_hub : id -> hub option -> unit
+
+(* [get_bits] returns the type of hub associated with the tile given by
+  * it's [id] *)
+val get_entity : id -> entity list
+val set_entity: id -> unit
+
+(** [create_tile] returns a newly created tile with the given parameters *)
+val create_tile : id -> terrain -> bool -> hub option -> entity list -> tile
