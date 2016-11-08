@@ -1,10 +1,24 @@
+open cluster
+open combat
+open ai
+open tile
+open map
+open interface
+open research
 
 (* state contains all the information about the game.
  * Turns modify the state and return a new state for the game. *)
 type state
 
+(* cmd contains a standardized form of what the user wants to do
+ * for a given move *)
+type cmd
+
 (* [make_move] computes the state after one action *)
-val make_move : state -> state
+val make_move : state -> cmd -> state
+
+(* [parse_input] returns a command based on use input *)
+val parse_input : string -> cmd
 
 (* [turn] computes the state after a player's entire turn *)
 val turn : state -> state

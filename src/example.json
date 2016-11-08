@@ -11,7 +11,7 @@
       "researchreq": 10,
       "prereq": [
         {
-          "tech": "iron"
+          "tech": "life"
         }
       ],
       "unlocks": [
