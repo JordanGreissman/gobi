@@ -11,8 +11,6 @@
   through u.pos or u.get_pos()?
 
 - best way to structure multiple inheritance?
-update: I(David) have no idea how to do this and will be going to OH for it
-
 module type Identifiable = sig
   type t
   val id : t
@@ -42,3 +40,9 @@ module MyMod : MyModType = struct
   let id = "id0"
   let describe () = "I am an int"
 end
+
+
+questions for OH:
+  - how to implement java-like interfaces with ocaml modules
+  - is passing around ids instead of data structures actually more efficient in ocaml?
+  - why "a module for every type"? (use tile.mli as an example)
