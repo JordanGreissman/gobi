@@ -43,6 +43,25 @@ guidelines *in addition to* the guidelines provided by the course style guide.
        `is_empty' is preferred over `isEmpty'.
     b) Module names should be camel case; e.g. `MyModule'.
 
+5) Module conventions
+    a) The module type will be the last argument to module functions
+    b) pad the colon preceeding type definitions with spaces on either side. If
+       there is an arrow in the type definition, pad that with spaces as well, e.g.:
+
+      NOT PREFERRED
+
+        val foo:bar->baz
+
+      PREFERRED
+
+        val foo : bar -> baz
+
+    c) Modules should have documentation when appropriate (documentation is
+       almost always appropriate). Documentation for the module should go in the
+       signature for the module (probably an mli file), and should use ocaml's
+       documentation comment style, (** which looks like this *). Note that the
+       opening comment delimiter has two asterisks instead of one.
+
 Links
 -----
 [1] https://www.cs.cornell.edu/Courses/cs3110/2016fa/handouts/style.html
