@@ -12,7 +12,10 @@ type state
 
 (* cmd contains a standardized form of what the user wants to do
  * for a given move *)
-type cmd
+type cmd = {
+  verb: string;
+  obj: string;
+}
 
 (* [make_move] computes the state after one action *)
 val make_move : state -> cmd -> state
