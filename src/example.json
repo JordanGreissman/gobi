@@ -24,7 +24,7 @@
   "hubs": [
     {
       "name": "town hall",
-      "desc": "Where shit happens",
+      "desc": "Where things happen",
       "built by": "settler",
       "generates": [
         {
@@ -47,7 +47,7 @@
   "units": [
     {
       "name": "Worker",
-      "desc": "Ur mum lol",
+      "desc": "A normal, ordinary worker",
       "can attack": false,
       "builds": [
         {
