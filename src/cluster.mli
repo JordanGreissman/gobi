@@ -1,16 +1,12 @@
-open Resource
+(* the cluster type will be a record containing the following fields:
+ * name: string;
+ * town_hall: hub;
+ * tiles: tile list;
+ * hubs: hub list;
+ *)
+(** the type of a cluster *)
+type t
 
-module type Cluster = struct 
-
-	type t = {
-		name: string;
-		town_hall: hub;
-		tiles: tile list;
-		hubs: hub list;
-	}
-
-	(* creates a new cluster based on existing units on a settled tile *)
-	val create_cluster : tile -> t
-
-end
+(** creates a new cluster based on existing units on a settled tile *)
+val create : Tile.t -> t
 

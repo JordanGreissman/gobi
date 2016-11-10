@@ -33,5 +33,5 @@ val set_hub : t -> Hub.t option -> t
 val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
 
-(** [create_tile] returns a newly created tile with the given parameters *)
-val create_tile : t -> terrain -> bool -> Hub.t option -> Entity.t list -> t
+(** [create] returns a newly created tile with the given parameters *)
+val create : t -> terrain -> bool -> Hub.t option -> Entity.t list -> t

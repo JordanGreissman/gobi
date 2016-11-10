@@ -6,42 +6,6 @@
   a unit moves, if no, looking up whether a list of units on a given tile
   becomes an expensive operation.
 
-- Should fields only be accessible through functions?
-  E.g. Unit module defines a unit type, is the position of that unit accessed
-  through u.pos or u.get_pos()?
-
-- best way to structure multiple inheritance?
-module type Identifiable = sig
-  type t
-  val id : t
-end
-
-module type Describable = sig
-  val describe : unit -> string
-end
-
-module type MyModType with type id = Identifiable.t = sig
-  include Identifiable
-  include Describable
-
-  type t
-  type id = Identifiable.t
-
-  val create : t
-  val go : t -> int -> string
-end
-
-module MyMod : MyModType = struct
-  type t = int
-  type id = Identifiable.t
-
-  let create = 0
-  let go v i = "poop"
-  let id = "id0"
-  let describe () = "I am an int"
-end
-
-
 questions for OH:
   - how to implement java-like interfaces with ocaml modules
 

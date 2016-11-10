@@ -1,47 +1,44 @@
-open Hub
-open Tile
+(* the entity type will be a record containing the following types:
+ *  entity_type: t_type;
+ *  power_level: (int, int);
+ *  tile: tile;
+ *  hub: hub option;
+ *)
+(** the type of an entity *)
+type t
 
-module type Entity = struct 
+(* the role type will be a record containing the following types:
+ *  description: string;
+ *  number_of_turns: int;
+ *  hub: hub;
+ *)
+(** the different roles entities can have *)
+type role
 
-	type t_type = {
-		description: string;
-		number_of_turns: int;
-		hub: hub;
-	}
+(** creates an entity type with a description, cost to create in turns, and
+  * assigned hub *)
+val entity_type : string -> int -> Hub.t -> t
 
-	(* creates an entity type with a description, cost to create 
-	 * in turns, and assigned hub *)
-	val entity_type : string -> int -> hub -> t_type
+(** Create a unit with a certain power level, starting at a cluster's town hall
+  * hub *)
+val create : role -> int -> int -> Tile.t -> Hub.t option -> t
 
-	type t = {
-		entity_type: t_type;
-		power_level: (int, int);
-		tile: tile;
-		hub: hub option;
-	}
+(** Increase / decrease the attack value of a unit, using + / - values. 
+  * This affects total power levels *)
+val change_attack : t -> int -> t
 
-	(* Create a unit with a certain power level, starting at a cluster's town hall
-	 * hub *)
-	val create_unit : t_type -> power_level -> tile -> hub option -> t
+(** Increase / decrease the defense value of a unit, using + / - values. 
+  * This affects total power levels *)
+val change_defense : t -> int -> t
 
-	(* Increase / decrease the attack value of a unit, using + / - values. 
-	 * This affects total power levels *)
-	val change_attack : t -> int -> t
+(** Move a unit to a new tile, affecting both structures *)
+val move_to_tile : t -> tile -> t
 
-	(* Increase / decrease the defense value of a unit, using + / - values. 
-	 * This affects total power levels *)
-	val change_defense : t -> int -> t
+(** Move a unit to a new hub, affecting borth structures and hub production *)
+val move_to_hub : t -> hub -> t
 
-	(* Move a unit to a new tile, affecting both structures *)
-	val move_to_tile : t -> tile -> t
+(** Returns the attack value of the entity *)
+val attack : t -> int
 
-	(* Move a unit to a new hub, affecting borth structures and hub production *)
-	val move_to_hub : t -> hub -> t
-
-	(* Returns the attack value of the entity *)
-	val attack : t -> int
-
-	(* Returns the defense value of the entity *)
-	val defend : t -> int
-
-end
+(** Returns the defense value of the entity *)
+val defend : t -> int
