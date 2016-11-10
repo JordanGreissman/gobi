@@ -24,5 +24,4 @@ type t
 type coordinate
 
 (** look up a tile by its coordinates *)
-val tile_by_pos : t -> Tile.id -> Tile.t option
-tile
+val tile_by_pos : coordinate -> t -> Tile.t option
