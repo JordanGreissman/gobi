@@ -6,6 +6,8 @@
   a unit moves, if no, looking up whether a list of units on a given tile
   becomes an expensive operation.
 
+- clarify resources: What is a "production type" string in the documentation for Hub.create?
+
 questions for OH:
   - how to implement java-like interfaces with ocaml modules
 
