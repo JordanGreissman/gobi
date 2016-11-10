@@ -1,5 +1,3 @@
-open cluster
-
 (* [compute_weights] returns an int, 1..100, that represents the
  * attacking unit's weight in this instance of combat *)
 val compute_weights : int -> int -> int
