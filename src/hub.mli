@@ -11,16 +11,16 @@ type t
 
 (** Returns a new hub with a name and production_type string on a 
   * certain tile and cluster and adds it to the cluster *)
-val create : string -> string -> Cluster.t -> Tile.t -> t
+val create : string -> string -> Cluster.t -> Tile.t -> t -> t
 
 (** Returns a new hub based on parameters and removes it from the cluster *)
 val remove : t -> t list
 
 (** Change the multiplier for the production output *)
-val change_production_amount : int -> t
+val change_production_amount : int -> t -> t
 
-(** Add entities to a hub, affecting production *)
-val add_entities : Entity.t list -> t
+(** Add entity to a hub, affecting production *)
+val add_entity : Entity.t -> t -> t
 
-(** Remove entities to a hub, affecting production *)
-val remove_entities : Entity.t list -> t
+(** Remove entity to a hub, affecting production *)
+val remove_entity : Entity.t -> t-> t
