@@ -1,7 +1,7 @@
 (** the type of a tile *)
 type t
 
-(* the [info] type will be a record containing the following fields:
+(* the info type will be a record containing the following fields:
  *  - movementObstruction: bool; whether units are allowed on this tile
  *  - costToMove: int; the number of turns it takes unit to traverse this tile.
  *      For tiles where [movementObstruction = true], [costToMove = -1].
@@ -34,4 +34,4 @@ val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
 
 (** [create] returns a newly created tile with the given parameters *)
-val create : t -> terrain -> bool -> Hub.t option -> Entity.t list -> t
+val create : terrain -> bool -> Hub.t option -> Entity.t list -> t
