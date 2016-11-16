@@ -1,5 +1,3 @@
-open Tile
-
 type tile = Tile.t
 
 type t = tile list list
@@ -39,3 +37,11 @@ let axial_from_offset (oc : offset_coordinate) : axial_coordinate =
 let offset_from_axial (ac : axial_coordinate) : offset_coordinate =
   let cc = cube_from_axial ac in
   offset_from_cube cc
+
+(* map generation *)
+let generate width height =
+  failwith "Unimplemented"
+
+(* map operations *)
+let tile_by_pos c map =
+  failwith "Unimplemented"
