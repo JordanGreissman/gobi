@@ -6,43 +6,31 @@
   a unit moves, if no, looking up whether a list of units on a given tile
   becomes an expensive operation.
 
-- Should fields only be accessible through functions?
-  E.g. Unit module defines a unit type, is the position of that unit accessed
-  through u.pos or u.get_pos()?
-
-- best way to structure multiple inheritance?
-module type Identifiable = sig
-  type t
-  val id : t
-end
-
-module type Describable = sig
-  val describe : unit -> string
-end
-
-module type MyModType with type id = Identifiable.t = sig
-  include Identifiable
-  include Describable
-
-  type t
-  type id = Identifiable.t
-
-  val create : t
-  val go : t -> int -> string
-end
-
-module MyMod : MyModType = struct
-  type t = int
-  type id = Identifiable.t
-
-  let create = 0
-  let go v i = "poop"
-  let id = "id0"
-  let describe () = "I am an int"
-end
-
+- clarify resources: What is a "production type" string in the documentation for Hub.create?
 
 questions for OH:
   - how to implement java-like interfaces with ocaml modules
+
+    In student.mli:
+        type t
+        val print_stats t -> unit
+    In teacher.mli:
+        type t
+        val print_stats t -> unit
+    In stats.ml:
+        type statable =
+          | Student of Student.t
+          | Teacher of Teacher.t
+        print_stats = function
+          | Student t -> Student.print_stats t
+          | Teacher t -> Teacher.print_stats t
+
   - is passing around ids instead of data structures actually more efficient in ocaml?
+     the pass-by-value/pass-by-reference optimization is already very well
+     handled by the ocaml compiler. So passing around Tile.t will be as
+     efficient as it is in java (i.e. the ocaml compiler knows to actually store
+     this struct somewhere and just pass a pointer to it)
   - why "a module for every type"? (use tile.mli as an example)
+     Sometimes it's necessary to wrap some simple stuff in a module in order to
+     pass it into a functor. In general, modules sometimes seem like the right
+     choice but make code more complicated than it needs to be.

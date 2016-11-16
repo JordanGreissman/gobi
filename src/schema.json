@@ -161,8 +161,19 @@
           "can attack": {
             "type": "boolean"
           },
-          "can build": {
-            "type": "boolean"
+          "builds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "hub": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "hub"
+              ]
+            }
           },
           "attack": {
             "type": "integer"
@@ -175,7 +186,7 @@
           "name",
           "desc",
           "can attack",
-          "can build",
+          "builds",
           "attack",
           "defense"
         ]
