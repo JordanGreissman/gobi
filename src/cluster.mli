@@ -4,7 +4,7 @@
  * tiles: tile list;
  * hubs: hub list;
  *)
-(** the type of a cluster *)
+(** A cluster is a collection of tiles, all of which contain hubs ("are settled") *)
 type t
 
 (** creates a new cluster based on existing units on a settled tile *)

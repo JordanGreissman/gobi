@@ -34,3 +34,27 @@ questions for OH:
      Sometimes it's necessary to wrap some simple stuff in a module in order to
      pass it into a functor. In general, modules sometimes seem like the right
      choice but make code more complicated than it needs to be.
+
+Wed meeting TODO:
+    - clarify arguments to `create' functions, convert these into named arguments
+    - remove_entity in hub.mli: we said this wasn't possible, right?
+    - what does Hub.remove do?
+
+Hubs produce resources
+Clusters consume resources in order to sustain the population of the cluster
+The production output of each cluster has to satisfy the needs of that cluster
+(it is not the case that the total production across all clusters has to satisfy
+the needs of all clusters combined).
+If the resource needs of the cluster aren't met, production of hubs and clusters
+takes twice as long
+
+Workers can be added to a hub after the hub has been constructed in order to
+increase its production rate.
+Multiple workers can be tasked with the construction of a hub, however when the
+hub is completed, only one worker is "put inside" the hub (and contributes to
+its production), the others are simply consumed.
+
+Hub design? Town hall is special because it's the only hub to produce both
+resources (one of everything?) and units.
+
+Clarify what resources exist in game and what their uses are.
