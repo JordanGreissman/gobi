@@ -7,6 +7,6 @@
 (** the type of a cluster *)
 type t
 
-(** creates a new cluster based on existing units on a settled tile *)
-val create : Tile.t -> t
+(** creates a new cluster with a name on a settled tile *)
+val create : string -> Tile.t -> t
 
