@@ -1,18 +1,3 @@
-module type Resource = struct 
-
-	type t = {
-		name: string;
-		amount: int;
-	}
-
-	(* create a resource with a name *)
-	val create_resource : string -> t
-
-	(* increase / decrese the amount of a particular resource *)
-	val change_resource_amount : t -> int -> t
-
-end
-
 module type Unlockable = struct
 
 	(* culmination of all of the above *)

@@ -1,26 +1,32 @@
 (* the hub type will be a record containing the following types:)
  *  name: string;
- *  production_type: string;
- *  production_amount: int;
+ *  resource: resource option
  *  entities: entity list;
- *  cluster: cluster;
- *  tile: tile;
+ *  defense: int
  *)
 (** the type of a hub *)
 type t
 
 (** Returns a new hub with a name and production_type string on a 
-  * certain tile and cluster and adds it to the cluster *)
-val create : string -> string -> Cluster.t -> Tile.t -> t -> t
+  * certain tile and cluster and adds it to the cluster. Default
+  * production amount is 0, with no entities *)
+val create : string -> resource option -> int -> t
 
-(** Returns a new hub based on parameters and removes it from the cluster *)
-val remove : t -> t list
+(** Returns resource of hub *)
+val get_resource : t -> resource
 
-(** Change the multiplier for the production output *)
-val change_production_amount : int -> t -> t
+(** Returns the hub with a new resource passed in *)
+val set_resource : resource -> t -> t
 
-(** Add entity to a hub, affecting production *)
+(** Add entity to a hub, returning the new hub *)
 val add_entity : Entity.t -> t -> t
 
-(** Remove entity to a hub, affecting production *)
+(** Remove entity to a hub, returning the new hub *)
 val remove_entity : Entity.t -> t-> t
+
+(** Get defense value of hub *)
+val get_defense : t -> int
+
+(** Edit defense value of hub; pos. int to increase, 
+  * neg. int to decrease; return new hub *)
+val set_defense : int -> t -> t
