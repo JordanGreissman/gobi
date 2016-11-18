@@ -40,7 +40,7 @@ let add_entity new_entity hub =
 	if List.mem new_entity.role hub.allowed_roles then
 		if not List.mem entity hub.entities then
 
-		{ hub with entities = hub.entities @ new_entity }
+		{ hub with entities = hub.entities @ [new_entity] }
 
 		(* TODO: handle exceptions when bad stuff happens *)
 

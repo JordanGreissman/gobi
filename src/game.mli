@@ -1,3 +1,5 @@
+(*
+
 open cluster
 open combat
 open ai
@@ -5,7 +7,12 @@ open tile
 open map
 open interface
 open research
+
+*)
+
 open Yojson
+
+
 
 (* state contains all the information about the game.
  * Turns modify the state and return a new state for the game. 

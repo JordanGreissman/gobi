@@ -1,5 +1,4 @@
 open Coordinate
-open Tile
 
 type role = {
 	name: string;
@@ -22,7 +21,7 @@ type t = {
 	position: coordinate;
 }
 
-(** Create an entity with a role, attack and defense values, and tile *)
+(** Create an entity with a role, attack and defense values, and coordinate *)
 let create_entity role attack defense position = 
 	{
 		role = role;
