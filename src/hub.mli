@@ -10,7 +10,11 @@ type t
 (** Returns a new hub with a name and production_type string on a 
   * certain tile and cluster and adds it to the cluster. Default
   * production amount is 0, with no entities *)
-val create : string -> resource option -> int -> t
+val create : string -> entity -> resource option -> role list -> int -> t
+
+val is_finished : t -> bool
+
+val set_finished : t -> t
 
 (** Returns resource of hub *)
 val get_resource : t -> resource

@@ -1,9 +1,3 @@
-
-(*
- * name: string;
- * amount: int;
-*)
-
 type t 
 
 (* create a resource with a name, default 0 amount *)

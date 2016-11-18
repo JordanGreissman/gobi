@@ -1,32 +1,33 @@
+open Coordinate
 open Tile
 
 type role = {
+	name: string;
 	description: string;
 	number_of_turns: int;
-	hub_name: string;
 }
 
-(** creates an entity type with a description, cost of creation in turn number, 
-  * and the type of hub the role is for (represented via string) *)
-let create_role description number_of_turns hub_name =
+(** creates an entity type with a description (string), 
+  * cost of creation through a turn number (int) *)
+let create_role name description number_of_turns =
 	{
+		name = name;
 		description = description;
 		number_of_turns = number_of_turns;
-		hub_name = hub_name;
 	}
 
 type t = {
 	role: role;
 	power: int * int;
-	tile: tile;
+	position: coordinate;
 }
 
 (** Create an entity with a role, attack and defense values, and tile *)
-let create_entity role attack defense tile = 
+let create_entity role attack defense position = 
 	{
 		role = role;
 		power = (attack, defense);
-		tile = tile;
+		position = position
 	}
 
 (** Return role of entity *)
@@ -54,8 +55,10 @@ let set_attack amount entity =
 let set_defense amount entity =
 	(Entity.get_attack entity, Entity.get_defense entity + amount)
 
-(** Return an entity with the tile changed *)
-let set_tile tile entity = 
-	Entity.(create_entity 
-		entity.role (get_attack entity) (get_defense entity) tile)
+(** Returns the coordinate representing the entity's position *)
+let get_pos entity = entity.position
+
+(** Returns an entity with a new coordinate representing the entity's position *)
+let set_pos position entity = 
+	{ entity with position = position}
 

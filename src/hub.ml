@@ -3,22 +3,27 @@ open Entity
 
 type t = {
 	name: string;
+	is_finished: bool;
 	resource: resource option;
 	entities: entity list;
+	allowed_roles: role list;
 	defense: int;
 }
 
-let create name resource defense =
-
-	let entity_role = Entity.create_role "unassigned role" 0 "town hall" in
-	let entity = Entity.create_entity entity_role 1 1 MARK: TILE in
+let create name built_by resource allowed_roles defense =
 
 	{
 		name = name;
+		is_finished = false;
 		resource = resource;
-		entities = [entity];
+		entities = [built_by];
+		allowed_roles = allowed_roles
 		defense = defense
 	}
+
+let is_finished hub = hub.is_finished
+
+let set_finished hub = { hub with is_finished = true }
 
 let get_resource hub = hub.resource
 
@@ -32,14 +37,15 @@ let set_resource new_resource hub =
 
 let add_entity new_entity hub = 
 
-	MARK:  check the entity can work there
+	if List.mem new_entity.role hub.allowed_roles then
+		if not List.mem entity hub.entities then
 
-	{ 
-		name = hub.name;
-		resource = hub.resource;
-		entities = hub.entities @ new_entity;
-		defense = hub.defense;
-	}
+		{ hub with entities = hub.entities @ new_entity }
+
+		(* TODO: handle exceptions when bad stuff happens *)
+
+		else hub 
+	else hub
 
 let remove_entity old_entity hub = 
 	let new_entity_list = 
