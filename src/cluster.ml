@@ -6,10 +6,9 @@ type t = {
 	name: string;
 	town_hall: hub;
 	tiles: tile list;
-	hubs: hub list;
 }
 
-let create name tile = 
+let create ~name ~town_hall_tile = 
 	{
 		name = name;
 		town_hall = Hub.create "town hall" None;

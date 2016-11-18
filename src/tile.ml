@@ -1,6 +1,8 @@
-type coordinate = Map.coordinate
+type coordinate = Coord.t
 type entity = Entity.t
 type hub = Hub.t
+
+type terrain = Flatland | Mountain | Forest | Desert
 
 type t = {
   position : coordinate;
@@ -8,8 +10,6 @@ type t = {
   entity : entity option;
   hub : hub option;
 }
-
-type terrain = Flatland | Mountain | Forest | Desert
 
 let get_terrain t =
   failwith "Unimplemented"
@@ -57,5 +57,9 @@ let hasBuildingRestriction t = match t.terrain with
   | Mountain -> true
   | _ -> false
 
-let create_tile t terrain b h l =
+let hasFoodRestriction t = match t.terrain with
+  | Desert -> true
+  | _ -> false
+
+let create ~terrain =
   failwith "Unimplemented"

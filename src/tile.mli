@@ -33,5 +33,7 @@ val hasBuildingRestriction : t -> bool
 (** whether food hubs are allowed on this tile (e.g. farms) *)
 val hasFoodRestriction : t -> bool
 
-(** [create] returns a newly created tile with the given parameters *)
-val create : terrain -> bool -> Hub.t option -> Entity.t list -> t
+(** Create and return a tile.
+  * [terrain] is the terrain type for the tile.
+  *)
+val create : terrain:terrain -> t

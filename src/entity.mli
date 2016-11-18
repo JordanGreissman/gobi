@@ -1,42 +1,34 @@
 (** the type of an entity *)
 type t
 
-(** the different roles entities can have *)
+(** the different roles entities can have; e.g. lumberjack, farmer, etc. *)
 type role
 
-(** creates an entity type with a name & description (string), 
-  * cost of creation through a turn number (int) *)
-val create_role : string -> string -> int -> role
+(** Create and return an entity. An entity has a role, an attack level, a defense
+  * level, and a position.
+  *)
+val create : role:role -> atk:int -> def:int -> pos:Coord.t -> t
 
-(** Create an entity with a role, attack and defense values, and 
-  * coordinate value *)
-val create_entity : role -> int -> int -> Coordinate.t -> t
+(** Create and return a role.
+  * [cost_to_make] is the number of turns after starting production of an entity
+  * of this role type that the entity will be available for use.
+  *)
+val create_role : name:string -> descr:string -> cost_to_make:int -> role
 
-(** Return role of entity *)
-val get_role : t -> role
+val describe : t -> string
 
-(** Get attack power level of entity *)
-val get_attack : t -> int * int
+(* getters and setters *)
 
-(** Get defense power level of entity *)
+val get_attack : t -> int
+val set_attack : int -> t -> t
+
 val get_defense : t -> int
+val set_defense : int -> t -> t
+
+val get_pos : t -> Coord.t
+val set_pos : Coord.t -> t -> t
 
 (** Get total power level of entity, attack + defense *)
 val get_total_power : t -> int
 
-(** Increase / decrease the attack value of a unit, using + / - values. 
-  * This affects total power levels *)
-val set_attack : int -> t -> t
-
-(** Increase / decrease the defense value of a unit, using + / - values. 
-  * This affects total power levels *)
-val set_defense : int -> t -> t
-
-(** Returns the coordinate representing the entity's position *)
-val get_pos : t -> coordinate
-
-(** Returns an entity with a new coordinate representing the entity's position *)
-val set_pos : coordinate -> t -> t
-
-
-
+val get_role : t -> role
