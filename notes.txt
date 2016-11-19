@@ -54,7 +54,28 @@ Multiple workers can be tasked with the construction of a hub, however when the
 hub is completed, only one worker is "put inside" the hub (and contributes to
 its production), the others are simply consumed.
 
-Hub design? Town hall is special because it's the only hub to produce both
-resources (one of everything?) and units.
+TODO: clean up hub, entity, cluster
+TODO: fix indentation
+TODO: exception architecture?
+  => When the player performs an illegal action or the like, how does this get
+  propagated up to the interface so that they can see it? How do we separate
+  errors that are routine and expected from those which are game-breaking?
+    => create custom exception types for the game
+  => functions which raise exceptions must be documented in their mli files
+  => in the case that a function raises an exception, how do we know the latest
+  state of the data structure that function was modifying? (e.g. if
+  Hub.add_entity raises an exception, do we assume that the hub was unchanged?)
+  Seems like a good assumption
+TODO: what does the resource module even do?
+  => Clarify what resources exist in game and what their uses are.
+TODO: how to implement town hall?
+  => Town hall is special because it's the only hub to produce both
+     resources (one of everything?) and units.
+TODO: implement describable interface
+TODO: need to be careful of range issues with `change_*' functions
+  => make sure that value can't overflow
 
-Clarify what resources exist in game and what their uses are.
+- Map => Mapp
+- [create] functions now take labeled arguments instead of positional ones
+- improved documentation
+- created Coord.{ml,mli}
