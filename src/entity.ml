@@ -44,9 +44,9 @@ let get_attack e = fst e.power
  
 let get_defense e = snd e.power
 
-let set_attack amt e = { e with power=(get_attack e + amt,get_defense e) }
+let change_attack amt e = { e with power=(get_attack e + amt,get_defense e) }
 
-let set_defense amt e = { e with power=(get_attack e,get_defense e + amt) }
+let change_defense amt e = { e with power=(get_attack e,get_defense e + amt) }
 
 (* Get total power level of entity, attack + defense *)
 let get_total_power e = 

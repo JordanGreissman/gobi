@@ -54,8 +54,6 @@ Multiple workers can be tasked with the construction of a hub, however when the
 hub is completed, only one worker is "put inside" the hub (and contributes to
 its production), the others are simply consumed.
 
-TODO: clean up hub, entity, cluster
-TODO: fix indentation
 TODO: exception architecture?
   => When the player performs an illegal action or the like, how does this get
   propagated up to the interface so that they can see it? How do we separate

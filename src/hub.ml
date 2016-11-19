@@ -5,7 +5,7 @@ type coord = Coord.t
 
 type production =
   | Resource of resource
-  | Entity of entity
+  | Entity of role
 
 type t = {
   (* the name of the hub (e.g. "Mill", "Barracks", etc.) *)
