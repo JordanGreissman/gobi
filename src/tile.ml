@@ -72,8 +72,8 @@ let hasMovementObstruction t = match t.terrain with
   | _ -> false
 
 let costToMove t = match t.terrain with
-  | Flatland | Forest -> 1
-  | Desert -> 2
+  | Flatland | Desert -> 1
+  | Forest -> 2
   | _ -> -1
 
 let needsClearing t = match t.terrain with

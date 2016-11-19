@@ -72,6 +72,13 @@ TODO: how to implement town hall?
 TODO: implement describable interface
 TODO: need to be careful of range issues with `change_*' functions
   => make sure that value can't overflow
+TODO: implement "clearing" mechanic
+  - Forest tiles cannot be built on until they are "cleared"
+  - Cleared forest tiles become flatland tiles
+    => so it's possible to change the type of a tile, but I don't think
+       this one case merits exposing a function because the type can be changed internally
+  - Forests can only be cleared by a certain type of unit, and only once a
+    certain research is acquired
 
 - Map => Mapp
 - [create] functions now take labeled arguments instead of positional ones
