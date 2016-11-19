@@ -16,19 +16,26 @@ val create : role:role -> atk:int -> def:int -> pos:Coord.t -> t
 val create_role : name:string -> descr:string -> cost_to_make:int -> role
 
 val describe : t -> string
+val describe_role : role -> string
 
 (* getters and setters *)
 
 val get_attack : t -> int
-val set_attack : int -> t -> t
+(** change the attack level of an entity by a relative amount (positive values
+  * increase the attack, negative values decrease the attack, etc.).
+  *)
+val change_attack : int -> t -> t
 
 val get_defense : t -> int
-val set_defense : int -> t -> t
-
-val get_pos : t -> Coord.t
-val set_pos : Coord.t -> t -> t
+(** change the defense level of an entity by a relative amount (positive values
+  * increase the defense, negative values decrease the defense, etc.).
+  *)
+val change_defense : int -> t -> t
 
 (** Get total power level of entity, attack + defense *)
 val get_total_power : t -> int
+
+val get_pos : t -> Coord.t
+val set_pos : Coord.t -> t -> t
 
 val get_role : t -> role

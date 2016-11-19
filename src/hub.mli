@@ -1,17 +1,20 @@
 (** the type of a hub *)
 type t
 
+(** the production type of a hub. Hubs can produce either resources or entities *)
+type production =
+  | Resource of Resource.t
+  | Entity of Entity.role
+
 (** Create and return a hub.
   * [starting_entity] is an entity that will automatically be consumed by the
   *   new hub when it is finished being built, if such an entity exists.
   *   Typically this is the first entity to start construction of the hub.
-  * [production] is the type of resource that this hub produces. If this hub only
-  *   produces entities, than [production] should be set to [None].
-  * [production_amt] is the base production rate of the hub (the number of
-  *   resource units produced per turn when the hub only contains one entity).
-  *   If this hub only produces entities, then [production_amt] has the same
-  *   meaning, but it is understood that it represents the production rate of
-  *   entities, not resource units.
+  * [production] is the production type of this hub.
+  * [production_rate] is the base production rate of the hub (the number of
+  *   production units produced per turn when the hub only contains one entity).
+  *   This is understood to be in terms of resource units if the hub produces
+  *   resources, or entities if the hub produces entities.
   * [allowed_roles] is a list of the types of entities that are allowed inside
   *   this hub. For example, only farmers are allowed inside a farm hub (no other
   *   role types make sense), so for a farm hub, [allowed_roles = ["farmer"]].
@@ -20,13 +23,17 @@ type t
   *   entity, hubs themselves cannot attack.
   *)
 val create :
-  name:string ->
-  descr:string ->
-  starting_entity:Entity.t option ->
-  production:Resource.t option ->
-  production_amt:int ->
-  allowed_roles:Entity.role list ->
-  def:int ->
+  name : string ->
+  descr : string ->
+  starting_entity : Entity.t option ->
+  (* TODO: Can a hub produce multiple types of resources/entities? If so, then
+   * this should be a [production list] instead, and [production_rate] should be
+   * a [float list] *)
+  production : production ->
+  production_rate : float ->
+  allowed_roles : Entity.role list ->
+  def : int ->
+  pos : Coord.t ->
   t
 
 val describe : t -> string
@@ -47,14 +54,15 @@ val is_finished : t -> bool
 (** mark this hub as finished (construction is complete) *)
 val set_finished : t -> t
 
-(** Returns the production resource of the hub argument. If this hub only
-  * produces entities, return [None].
-  *)
-val get_resource : t -> Resource.t option
+val get_production : t -> production
 
 val get_production_rate : t -> float
 
 val get_allowed_roles : t -> Entity.role list
 
 val get_defense : t -> int
-val set_defense : int -> t -> t
+
+(** change the defense of this hub by a relative amount (positive values increase
+  * the defense, negative values decrease the defense, etc.).
+  *)
+val change_defense : int -> t -> t
