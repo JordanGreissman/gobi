@@ -25,12 +25,12 @@ val get_defense : t -> int
 val get_total_power : t -> int
 
 (** Increase / decrease the attack value of a unit, using + / - values. 
-  * This affects total power levels *)
-val set_attack : int -> t -> t
+  * This affects total power levels. Returns new entity *)
+val change_attack : int -> t -> t
 
 (** Increase / decrease the defense value of a unit, using + / - values. 
-  * This affects total power levels *)
-val set_defense : int -> t -> t
+  * This affects total power levels. Returns new entity *)
+val change_defense : int -> t -> t
 
 (** Returns the coordinate representing the entity's position *)
 val get_pos : t -> coordinate

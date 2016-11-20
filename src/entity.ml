@@ -1,5 +1,6 @@
 open Coordinate
 
+(** the different roles entities can have *)
 type role = {
 	name: string;
 	description: string;
@@ -15,6 +16,7 @@ let create_role name description number_of_turns =
 		number_of_turns = number_of_turns;
 	}
 
+(** the type of an entity *)
 type t = {
 	role: role;
 	power: int * int;
@@ -45,19 +47,23 @@ let get_total_power entity =
 	let (attack, defense) = entity.power in attack + defense
 
 (** Increase / decrease the attack value of a unit, using + / - values. 
-  * This affects total power levels *)
-let set_attack amount entity =
-	(Entity.get_attack entity + amount, Entity.get_defense entity)
+  * This affects total power levels. Returns new entity *)
+let change_attack amount entity = 
+	{ entity with power = 
+		(Entity.get_attack entity + amount, Entity.get_defense entity)
+	}
 
 (** Increase / decrease the defense value of a unit, using + / - values. 
-  * This affects total power levels *)
-let set_defense amount entity =
-	(Entity.get_attack entity, Entity.get_defense entity + amount)
+  * This affects total power levels. Returns new entity *)
+let change_defense amount entity =
+	{ entity with power = 
+		(Entity.get_attack entity, Entity.get_defense entity + amount)
+	}
 
 (** Returns the coordinate representing the entity's position *)
 let get_pos entity = entity.position
 
 (** Returns an entity with a new coordinate representing the entity's position *)
 let set_pos position entity = 
-	{ entity with position = position}
+	{ entity with position = position }
 

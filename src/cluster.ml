@@ -1,6 +1,6 @@
 open Hub
 open Tile
-
+open Entity
 
 type t = {
 	name: string;
@@ -12,7 +12,7 @@ type t = {
 let create name tile = 
 	{
 		name = name;
-		town_hall = Hub.create "town hall" None;
+		town_hall = set_finished Hub.create None None [] 100;
 		tiles = [tile];
 		hubs = [town_hall];
 	}
