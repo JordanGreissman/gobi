@@ -1,15 +1,10 @@
-(*
-
-open cluster
-open combat
-open ai
-open tile
-open map
-open interface
-open research
-
-*)
-
+(* open Cluster *)
+(* open Combat *)
+(* open Ai *)
+(* open Tile *)
+(* open Map *)
+(* open Interface *)
+(* open Research *)
 open Yojson
 
 

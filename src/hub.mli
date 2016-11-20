@@ -1,32 +1,68 @@
 (** the type of a hub *)
 type t
 
-(** Returns a new hub with a name and production_type string on a 
-  * certain tile and cluster and adds it to the cluster. Default
-  * production amount is 0, with no entities *)
-val create : string -> entity option -> resource option -> role list -> int -> t
+(** the production type of a hub. Hubs can produce either resources or entities *)
+type production =
+  | Resource of Resource.t
+  | Entity of Entity.role
 
-(* Returns bool of whether the hub is complete or under construction *)
-val is_finished : t -> bool
+(** Create and return a hub.
+  * [starting_entity] is an entity that will automatically be consumed by the
+  *   new hub when it is finished being built, if such an entity exists.
+  *   Typically this is the first entity to start construction of the hub.
+  * [production] is the production type of this hub.
+  * [production_rate] is the base production rate of the hub (the number of
+  *   production units produced per turn when the hub only contains one entity).
+  *   This is understood to be in terms of resource units if the hub produces
+  *   resources, or entities if the hub produces entities.
+  * [allowed_roles] is a list of the types of entities that are allowed inside
+  *   this hub. For example, only farmers are allowed inside a farm hub (no other
+  *   role types make sense), so for a farm hub, [allowed_roles = ["farmer"]].
+  * [def] is the defense level of the hub. Hubs have a defense level but no
+  *   attack level because while it is possible for any hub to be attacked by an
+  *   entity, hubs themselves cannot attack.
+  *)
+val create :
+  name : string ->
+  descr : string ->
+  starting_entity : Entity.t option ->
+  (* TODO: Can a hub produce multiple types of resources/entities? If so, then
+   * this should be a [production list] instead, and [production_rate] should be
+   * a [float list] *)
+  production : production ->
+  production_rate : float ->
+  allowed_roles : Entity.role list ->
+  def : int ->
+  pos : Coord.t ->
+  t
 
-(* Set hub as finished, returning the new hub *)
-val set_finished : t -> t
+val describe : t -> string
 
-(** Returns resource of hub *)
-val get_resource : t -> resource
-
-(** Returns the hub with a new resource passed in *)
-val set_resource : resource -> t -> t
-
-(** Add entity to a hub, returning the new hub *)
+(** Add an entity to a hub. When this is done, the entity increases the
+  * production rate of the hub by a set amount, and the entity cannot be
+  * reclaimed.
+  *)
 val add_entity : Entity.t -> t -> t
 
-(** Remove entity to a hub, returning the new hub *)
-val remove_entity : Entity.t -> t-> t
+(* getters and setters *)
 
-(** Get defense value of hub *)
+val get_name : t -> string
+
+(** is the construction of this hub finished? *)
+val is_finished : t -> bool
+
+(** mark this hub as finished (construction is complete) *)
+val set_finished : t -> t
+
+val get_production : t -> production
+
+val get_production_rate : t -> float
+
+val get_allowed_roles : t -> Entity.role list
+
 val get_defense : t -> int
 
-(** Edit defense value of hub; pos. int to increase, 
-  * neg. int to decrease; return new hub *)
+(** change the defense of this hub by a relative amount (positive values increase
+  * the defense, negative values decrease the defense, etc.).
+  *)
 val change_defense : int -> t -> t

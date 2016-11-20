@@ -1,12 +1,36 @@
-type t = int
+type coordinate = Coord.t
+type entity = Entity.t
+type hub = Hub.t
 
-type terrain_info = string
+type terrain = Flatland | Mountain | Forest | Desert
 
-type terrain =
-  | Flatland of terrain_info
-  | Mountain of terrain_info
-  | Forest of terrain_info
-  | Desert of terrain_info
+type t = {
+  pos : coordinate;
+  terrain : terrain;
+  entity : entity option;
+  hub : hub option;
+}
+
+let create ~terrain =
+  failwith "Unimplemented"
+
+let describe t =
+  failwith "Unimplemented"
+
+let place_hub ~name ~descr ~starting_entity ~production ~production_rate ~allowed_roles ~def ~tile =
+  let h = Hub.create
+      ~name:name
+      ~descr:descr
+      ~starting_entity:starting_entity
+      ~production:production
+      ~production_rate:production_rate
+      ~allowed_roles:allowed_roles
+      ~def:def
+      ~pos:tile.pos in
+  { tile with hub=(Some h) }
+
+let move_entity to_tile from_tile =
+  failwith "Unimplemented"
 
 let get_terrain t =
   failwith "Unimplemented"
@@ -35,5 +59,31 @@ let get_entity t =
 let set_entity t =
   failwith "Unimplemented"
 
-let create_tile t terrain b h l =
-  failwith "Unimplemented"
+(* terrain property queries *)
+
+let describe_terrain = function
+  | Flatland -> "This is a flatland"
+  | Mountain -> "This is a mountain"
+  | Forest -> "This is a forest"
+  | Desert -> "This is a desert"
+
+let hasMovementObstruction t = match t.terrain with
+  | Mountain -> true
+  | _ -> false
+
+let costToMove t = match t.terrain with
+  | Flatland | Desert -> 1
+  | Forest -> 2
+  | _ -> -1
+
+let needsClearing t = match t.terrain with
+  | Forest -> true
+  | _ -> false
+
+let hasBuildingRestriction t = match t.terrain with
+  | Mountain -> true
+  | _ -> false
+
+let hasFoodRestriction t = match t.terrain with
+  | Desert -> true
+  | _ -> false

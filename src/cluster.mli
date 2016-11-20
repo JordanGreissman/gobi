@@ -1,12 +1,5 @@
-(* the cluster type will be a record containing the following fields:
- * name: string;
- * town_hall: hub;
- * tiles: tile list;
- * hubs: hub list;
- *)
-(** the type of a cluster *)
+(** A cluster is a collection of tiles, all of which contain hubs ("are settled") *)
 type t
 
 (** creates a new cluster with a name on a settled tile *)
-val create : string -> Tile.t -> t
-
+val create : name:string -> descr:string -> town_hall_tile:Tile.t -> t

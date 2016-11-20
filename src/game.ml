@@ -2,7 +2,7 @@
 (* open Combat *)
 (* open Ai *)
 (* open Tile *)
-open Map
+open Mapp
 (* open Interface *)
 (* open Research *)
 open Yojson

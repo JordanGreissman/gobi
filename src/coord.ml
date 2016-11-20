@@ -1,9 +1,3 @@
-open Tile
-
-type tile = Tile.t
-
-type t = tile list list
-
 (* Internally, there are 3 different coordinate types used for different purposes.
  * Specifically, cube coordinates lead to the simplest algorithms on hexagonal
  * grids. For descriptions and a comparison of the 3 different systems, please
@@ -13,7 +7,7 @@ type axial_coordinate  = int * int
 type cube_coordinate   = int * int * int
 type offset_coordinate = int * int
 (* offset coordinates are the ones we want to make publically visible *)
-type coordinate = offset_coordinate
+type t = offset_coordinate
 
 (* coordinate conversion functions *)
 

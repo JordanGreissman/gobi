@@ -1,69 +1,63 @@
-open Coordinate
+type coordinate = Coord.t
 
 (** the different roles entities can have *)
 type role = {
-	name: string;
-	description: string;
-	number_of_turns: int;
+  (* the name of this role (e.g. "Farmer", "Soldier", etc.) *)
+  name: string;
+  (* a description of this role and its capabilities that would be useful to the
+   * player if they wanted to know more about this role *)
+  descr: string;
+  (* the number of turns after starting production of an entity of this role type
+   * that the entity will be available for use *)
+  cost_to_make: int;
 }
 
-(** creates an entity type with a description (string), 
-  * cost of creation through a turn number (int) *)
-let create_role name description number_of_turns =
-	{
-		name = name;
-		description = description;
-		number_of_turns = number_of_turns;
-	}
-
-(** the type of an entity *)
 type t = {
-	role: role;
-	power: int * int;
-	position: coordinate;
+  (* the type of entity (e.g. farmer, soldier, etc.) *)
+  role: role;
+  (* an (attack, defense) tuple. Attack is this entity's potential to do damage
+   * to other entities, and defense is this entity's potential to prevent damage
+   * being dealt to it from other entities *)
+  power: int*int;
+  (* this entity's current position on the map *)
+  pos: coordinate;
 }
 
-(** Create an entity with a role, attack and defense values, and coordinate *)
-let create_entity role attack defense position = 
-	{
-		role = role;
-		power = (attack, defense);
-		position = position
-	}
+let create ~role ~atk ~def ~pos = {
+  role  = role;
+  power = (atk, def);
+  pos   = pos;
+}
 
-(** Return role of entity *)
-let get_role entity = entity.role
+let create_role ~name ~descr ~cost_to_make = {
+  name         = name;
+  descr        = descr;
+  cost_to_make = cost_to_make;
+}
 
-(** Get attack power level of entity *)
-let get_attack entity = 
-	let (attack , _ ) = entity.power in attack
+let describe e =
+  failwith "Unimplemented"
 
-(** Get defense power level of entity *)
-let get_defense entity = 
-	let (_ , defense) = entity.power in defense
+let describe_role r =
+  failwith "Unimplemented"
 
-(** Get total power level of entity, attack + defense *)
-let get_total_power entity = 
-	let (attack, defense) = entity.power in attack + defense
+let get_attack e = fst e.power
+ 
+let get_defense e = snd e.power
 
-(** Increase / decrease the attack value of a unit, using + / - values. 
-  * This affects total power levels. Returns new entity *)
-let change_attack amount entity = 
-	{ entity with power = 
-		(Entity.get_attack entity + amount, Entity.get_defense entity)
-	}
+let change_attack amt e = { e with power=(get_attack e + amt,get_defense e) }
 
-(** Increase / decrease the defense value of a unit, using + / - values. 
-  * This affects total power levels. Returns new entity *)
-let change_defense amount entity =
-	{ entity with power = 
-		(Entity.get_attack entity, Entity.get_defense entity + amount)
-	}
+let change_defense amt e = { e with power=(get_attack e,get_defense e + amt) }
 
-(** Returns the coordinate representing the entity's position *)
-let get_pos entity = entity.position
+(* Get total power level of entity, attack + defense *)
+let get_total_power e = 
+  let (attack, defense) = e.power in
+  attack + defense
+
+let get_pos e = e.pos
 
 (** Returns an entity with a new coordinate representing the entity's position *)
 let set_pos position entity = 
 	{ entity with position = position }
 
+let get_role entity = entity.role
