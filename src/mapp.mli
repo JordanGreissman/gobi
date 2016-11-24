@@ -2,7 +2,7 @@
 type t
 
 (** look up a tile by its coordinates *)
-val tile_by_pos : Coord.t -> t -> Tile.t option
+val tile_by_pos : Coord.t -> t -> Tile.t
 
 (** procedurally generate a map. The first argument is the width of the map, and
   * the second is the height *)

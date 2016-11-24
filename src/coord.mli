@@ -16,3 +16,14 @@
   *  \____/      \____/
   *)
 type t
+
+(* module type Screen = sig type t end *)
+type lt_coordinate
+
+val lt_add : (int*int) -> lt_coordinate -> lt_coordinate
+
+val offset_from_lt : lt_coordinate -> t option
+
+(* TODO: There needs to be a way to make lt_coordinates, but maybe this isn't the
+ * best way. Reconsider later *)
+val make_lt_coordinate : int -> int -> lt_coordinate

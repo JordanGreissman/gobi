@@ -14,22 +14,46 @@ let ( ^* ) c n = String.make n c
  * from characters [c0] to [c1] ([c0] and [c1] are character indices). [c0] is
  * included in the clip, but [c1] is not.
  *)
-let clip art r c0 r1 =
+let clip art r c0 c1 =
+  let row = try List.nth r art with
+    (* TODO: replace this failwith with an out_of_bounds exception *)
+    | Failure _ | Invalid_argument _ -> failwith "Out of bounds"
+    | _ -> failwith "Unknown error" in
+  try String.sub row c0 (c1-c0) with
+    | Invalid_argument _ -> failwith "Out of bounds"
+    | _ -> failwith "Unknown error"
 
-let draw ui matrix =
+(* even edge row *)
+(* size_len-2 intermediate rows *)
+(* odd edge row *)
+(* size_len-2 intermediate rows *)
+(* repeat... *)
+(* TODO: now I'm passing in the map...
+ * the problem is that Game now depends on Interface, and vice versa, so instead
+ * of passing in the state directly, I have to pass in all the components of state
+ * that I need... there has to be a better way to do this. *)
+let draw map top_left ui matrix =
   (* I'm going to hardcode this here for now *)
   let hexagon_side_length = 4 in
   let size = LTerm_ui.size ui in
-  let w,h = LTerm.geom.((rows size),(cols size)) in
+  let w,h = LTerm_geom.((rows size),(cols size)) in
   let ctx = LTerm_draw.context matrix size in
-  let left_pad = hexagon_side_length - 1 in
-  (* even edge row *)
-  let even_edge_string = (' ' ^* left_pad) ^ 
-  (* size_len-2 intermediate rows *)
-  (* odd edge row *)
-  (* size_len-2 intermediate rows *)
-  (* repeat... *)
-  LTerm_draw.draw_string ctx 2 2 "Hello, world!";
+  let edge_style = { LTerm_style.none with foreground = (Some LTerm_style.red) } in
+  for y = 0 to h do
+    for x = 0 to w do
+      (* the cell we're currently drawing in absolute lambda-term coords *)
+      let lt_cur = Coord.lt_add (x,y) top_left in
+      (* the hex or hexes containing that cell *)
+      match Coord.offset_from_lt lt_cur with
+      (* we're inside a hex *)
+      | Some c ->
+        let t = Mapp.tile_by_pos c map in
+        let c = Tile.get_art_char t lt_cur in
+        LTerm_draw.draw_char ctx x y (UChar.of_char c);
+      (* we're on the border between two hexes *)
+      | None -> LTerm_draw.draw_char ctx x y ~style:edge_style (UChar.of_char '.');
+    done
+  done
 
 (* let print_hexagon color side_length fill_char = *)
 (*   let rec go l f = *)

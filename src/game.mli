@@ -4,7 +4,11 @@ open Lwt
 (* state contains all the information about the game.
  * Turns modify the state and return a new state for the game. 
  * State will be represented as a record *)
-type state
+type state = {
+  (* TODO: change this to Coord.Screen.t *)
+  mutable top_left : Coord.lt_coordinate;
+  mutable map : Mapp.t;
+}
 
 (* cmd contains a standardized form of what the user wants to do
  * for a given move *)

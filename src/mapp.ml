@@ -7,5 +7,4 @@ let tile_by_pos c map =
   failwith "Unimplemented"
 
 (* map generation *)
-let generate width height =
-  failwith "Unimplemented"
+let generate width height = []

@@ -49,6 +49,8 @@ val set_hub : t -> Hub.t option -> t
 val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
 
+val get_art_char : t -> Coord.lt_coordinate -> char
+
 (* terrain property queries *)
 
 (** whether units are allowed on this tile *)

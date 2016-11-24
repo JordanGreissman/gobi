@@ -59,6 +59,10 @@ let get_entity t =
 let set_entity t =
   failwith "Unimplemented"
 
+(* TODO: ascii art system *)
+let get_art_char t ltc =
+  failwith "Unimplemented"
+
 (* terrain property queries *)
 
 let describe_terrain = function
