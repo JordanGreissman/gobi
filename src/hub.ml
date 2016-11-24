@@ -65,22 +65,12 @@ let is_finished hub = hub.is_finished
 
 let set_finished hub = { hub with is_finished = true }
 
-(** Remove entity to a hub, returning the new hub *)
-let remove_entity old_entity hub = 
-	let new_entity_list = 
-		List.filter 
-			(fun entity -> not (entity = old_entity))
-		hub.entities in
-
-	{ hub with entities = hub.entities @ entity	}
-
 (** Get defense value of hub *)
-let get_defense hub = hub.defense
+let get_defense hub = hub.def
 
 (** Edit defense value of hub; pos. int to increase, 
   * neg. int to decrease; return new hub *)
-let change_defense amount hub = 
-	{ hub with defense = hub.defense + amount }
+let change_defense amount hub = { hub with def = hub.def + amount }
 
 let get_production hub = hub.production
 

@@ -1,10 +1,10 @@
 test:
-		ocamlbuild -cflags -g -pkgs oUnit,ANSITerminal,yojson test/run_tests.byte && ./run_tests.byte
+		ocamlbuild -cflags -g -pkgs oUnit,yojson,lwt,camomile,lambda-term test/run_tests.byte && ./run_tests.byte
 
 clean:
 		ocamlbuild -clean
 
 game:
-		ocamlbuild -pkgs ANSITerminal,yojson src/main.byte && mv main.byte gooby
+		ocamlbuild -pkgs yojson,lwt,camomile,lambda-term src/game.byte && mv game.byte gooby
 
 .PHONY: test

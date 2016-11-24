@@ -6,6 +6,8 @@ open Mapp
 (* open Interface *)
 (* open Research *)
 open Yojson
+open Lwt
+open CamomileLibrary
 
 type state = {
   foo : int;
@@ -31,5 +33,17 @@ let init_state json =
 let load_json s =
   failwith "Unimplemented"
 
-let main s =
-  failwith "Unimplemented"
+let rec loop ui =
+  LTerm_ui.wait ui >>= function
+  | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' -> return ()
+  | _ ->
+    LTerm_ui.draw ui;
+    loop ui
+
+let main () =
+  Lazy.force LTerm.stdout >>= fun term ->
+  LTerm_ui.create term Interface.draw >>= fun ui ->
+  loop ui >>= fun () ->
+  LTerm_ui.quit ui
+
+let () = Lwt_main.run (main ())

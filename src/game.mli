@@ -1,13 +1,5 @@
-(* open Cluster *)
-(* open Combat *)
-(* open Ai *)
-(* open Tile *)
-(* open Map *)
-(* open Interface *)
-(* open Research *)
 open Yojson
-
-
+open Lwt
 
 (* state contains all the information about the game.
  * Turns modify the state and return a new state for the game. 
@@ -38,4 +30,4 @@ val init_state : json -> state
 val load_json : string -> json
 
 (* [main] computes the state based on given difficulty level *)
-val main : string -> state
+val main : unit -> unit Lwt.t
