@@ -1,8 +1,7 @@
-(** the type of a resource *)
-type t 
+type t = Food | Gold | Iron
 
-(* val create : name:string -> descr:string -> amt:int -> t *)
+(* val get_name t -> string *)
 
-(* increase / decrese the amount of a particular resource *)
-val change_resource_amount : t -> int -> t
+(* val describe t -> string *)
 
+(* val get_amt civ -> t -> int *)

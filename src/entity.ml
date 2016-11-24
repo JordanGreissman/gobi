@@ -1,5 +1,6 @@
 type coordinate = Coord.t
 
+(** the different roles entities can have *)
 type role = {
   (* the name of this role (e.g. "Farmer", "Soldier", etc.) *)
   name: string;
@@ -55,6 +56,7 @@ let get_total_power e =
 
 let get_pos e = e.pos
 
-let set_pos pos e = { e with pos=pos }
+(** Returns an entity with a new coordinate representing the entity's position *)
+let set_pos position entity = { entity with pos = position }
 
 let get_role entity = entity.role

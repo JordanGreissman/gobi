@@ -49,6 +49,7 @@ let create ~name ~descr ~starting_entity ~production
 let describe hub =
   failwith "Unimplemented"
 
+(** Add entity to a hub, returning the new hub *)
 let add_entity new_entity hub = 
   if List.mem (Entity.get_role new_entity) hub.allowed_roles
   then
@@ -63,6 +64,13 @@ let get_name hub = hub.name
 let is_finished hub = hub.is_finished
 
 let set_finished hub = { hub with is_finished = true }
+
+(** Get defense value of hub *)
+let get_defense hub = hub.def
+
+(** Edit defense value of hub; pos. int to increase, 
+  * neg. int to decrease; return new hub *)
+let change_defense amount hub = { hub with def = hub.def + amount }
 
 let get_production hub = hub.production
 

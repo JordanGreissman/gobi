@@ -1,3 +1,7 @@
+open Hub
+open Tile
+open Entity
+
 type tile = Tile.t
 
 type t = {
