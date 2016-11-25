@@ -1,12 +1,10 @@
 {
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
     "game": {
       "type": "object",
       "properties": {
-        "difficulty": {
-          "type": "string"
-        },
         "turns": {
           "type": "integer"
         },
@@ -15,7 +13,6 @@
         }
       },
       "required": [
-        "difficulty",
         "turns",
         "AI"
       ]
@@ -36,29 +33,35 @@
           },
           "prereq": {
             "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "tech": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "tech"
-              ]
-            }
+            "items": {}
           },
           "unlocks": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "component": {
-                  "type": "string"
+                "entity": {
+                  "type": "array",
+                  "items": {}
+                },
+                "tech": {
+                  "type": "array",
+                  "items": {}
+                },
+                "hub": {
+                  "type": "array",
+                  "items": {}
+                },
+                "upgrades": {
+                  "type": "array",
+                  "items": {}
                 }
               },
               "required": [
-                "component"
+                "entity",
+                "tech",
+                "hub",
+                "upgrades"
               ]
             }
           }
@@ -104,13 +107,24 @@
               ]
             }
           },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
           "upgrades to": {
             "type": "string"
           },
           "health": {
-            "type": "integer"
-          },
-          "defense": {
             "type": "integer"
           }
         },
@@ -119,9 +133,9 @@
           "desc",
           "built by",
           "generates",
+          "units",
           "upgrades to",
-          "health",
-          "defense"
+          "health"
         ]
       }
     },
@@ -135,15 +149,11 @@
           },
           "desc": {
             "type": "string"
-          },
-          "repr": {
-            "type": "string"
           }
         },
         "required": [
           "name",
-          "desc",
-          "repr"
+          "desc"
         ]
       }
     },
@@ -163,23 +173,19 @@
           },
           "builds": {
             "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "hub": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "hub"
-              ]
-            }
+            "items": {}
           },
           "attack": {
             "type": "integer"
           },
           "defense": {
             "type": "integer"
+          },
+          "actions": {
+            "type": "integer"
+          },
+          "requires": {
+            "type": "string"
           }
         },
         "required": [
@@ -188,7 +194,9 @@
           "can attack",
           "builds",
           "attack",
-          "defense"
+          "defense",
+          "actions",
+          "requires"
         ]
       }
     }
