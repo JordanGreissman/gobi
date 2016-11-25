@@ -9,17 +9,12 @@ type offset_coordinate = int * int
 (* offset coordinates are the ones we want to make publically visible *)
 type t = offset_coordinate
 
-(* The terminal is broken up into cells. Each cell can display one character.
- * These coordinates represent the absolute position of cells. That is,
- * the Screen.t coordinate (0,0) always corresponds to the cell in the top left
- * corner of the game map; the ascii art in all tiles on the map have Screen.t
- * coordinates that doesn't change over the course of the game. The top left
- * corner of the terminal (which is *not* a Screen.t coordinate) corresponds to
- * a Screen.t coordinate that changes as the player moves the map around.
- *)
-(* module Screen:Screen = struct type t = int*int end *)
-(* type lt_coordinate = Screen.t *)
-type lt_coordinate = int*int
+module Screen = struct
+  type t = int*int
+  let origin = (0,0)
+  let create x y = (x,y)
+  let add (x1,y1) (x2,y2) = (x1+x2,y1+y2)
+end
 
 (* coordinate conversion functions *)
 
@@ -46,11 +41,35 @@ let offset_from_axial (ac : axial_coordinate) : offset_coordinate =
   let cc = cube_from_axial ac in
   offset_from_cube cc
 
-(* =========================================================================== *)
+(* ASSUMES A SIDE LENGTH OF 4 *)
+let offset_from_screen ((x,y) : Screen.t) : offset_coordinate option =
+  match y mod 6 with
+  | 0 -> (
+    let x = x-3 in
+    if x < 0 then None
+    else if x mod 18 < 7 then None
+    else if y = 0 then None
+    else Some (x/18*2+1,(y-3)/6))
+  | 3 -> (
+    let x = x-1 in
+    if x = -1 then None
+    else if x mod 18 >= 11 then None
+    else Some (x/18*2,y/6))
+  | 1 | 5 -> (
+    let x = x-2 in
+    if x < 0 then None
+    else match x mod 18 with
+      | 0 | 8 -> None
+      | n when n < 8 -> Some (x/18*2,y/6)
+      | n when n > 8 -> if y = 1 then None else Some (x/18*2+1,(y-3)/6)
+      | _ -> failwith "Illegal value mod 18")
+  | 2 | 4 -> (
+    let x = x-1 in
+    if x < 0 then None
+    else match x mod 18 with
+      | 0 | 10 -> None
+      | n when n < 10 -> Some (x/18*2,y/6)
+      | n when n > 10 -> if y = 2 then None else Some (x/18*2+1,(y-3)/6)
+      | _ -> failwith "Illegal value mod 18")
+  | _ -> failwith "Illegal value mod 6"
 
-let lt_add (x,y) (ox,oy) = (ox+x,oy+y)
-
-let offset_from_lt (lt : lt_coordinate) : offset_coordinate option =
-  failwith "Unimplemented"
-
-let make_lt_coordinate x y = (x,y)

@@ -8,6 +8,11 @@
 
 open CamomileLibrary
 
+type draw_context = {
+  mutable top_left : Coord.Screen.t;
+  mutable map : Mapp.t;
+}
+
 let ( ^* ) c n = String.make n c
 
 (* [clip art r c0 c1] is the subsection of the tile ascii art [art] at row [r]
@@ -28,11 +33,7 @@ let clip art r c0 c1 =
 (* odd edge row *)
 (* size_len-2 intermediate rows *)
 (* repeat... *)
-(* TODO: now I'm passing in the map...
- * the problem is that Game now depends on Interface, and vice versa, so instead
- * of passing in the state directly, I have to pass in all the components of state
- * that I need... there has to be a better way to do this. *)
-let draw map top_left ui matrix =
+let draw dctx ui matrix =
   (* I'm going to hardcode this here for now *)
   let hexagon_side_length = 4 in
   let size = LTerm_ui.size ui in
@@ -42,14 +43,16 @@ let draw map top_left ui matrix =
   for y = 0 to h do
     for x = 0 to w do
       (* the cell we're currently drawing in absolute lambda-term coords *)
-      let lt_cur = Coord.lt_add (x,y) top_left in
+      let delta = Coord.Screen.create x y in
+      let screen_cur = Coord.Screen.add dctx.top_left delta in
       (* the hex or hexes containing that cell *)
-      match Coord.offset_from_lt lt_cur with
+      match Coord.offset_from_screen screen_cur with
       (* we're inside a hex *)
       | Some c ->
-        let t = Mapp.tile_by_pos c map in
-        let c = Tile.get_art_char t lt_cur in
-        LTerm_draw.draw_char ctx x y (UChar.of_char c);
+        (* let t = Mapp.tile_by_pos c dctx.map in *)
+        (* let c = Tile.get_art_char t screen_cur in *)
+        (* LTerm_draw.draw_char ctx x y (UChar.of_char c); *)
+        LTerm_draw.draw_char ctx x y (UChar.of_char '~')
       (* we're on the border between two hexes *)
       | None -> LTerm_draw.draw_char ctx x y ~style:edge_style (UChar.of_char '.');
     done

@@ -1,6 +1,8 @@
 type coordinate = Coord.t
 type entity = Entity.t
+type entity_role = Entity.role
 type hub = Hub.t
+type hub_role = Hub.role
 
 type terrain = Flatland | Mountain | Forest | Desert
 

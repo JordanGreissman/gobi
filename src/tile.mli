@@ -1,3 +1,4 @@
+(* TODO: the module type will be the *last* argument to module functions *)
 (** the type of a tile *)
 type t
 
@@ -49,7 +50,7 @@ val set_hub : t -> Hub.t option -> t
 val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
 
-val get_art_char : t -> Coord.lt_coordinate -> char
+val get_art_char : t -> Coord.Screen.t -> char
 
 (* terrain property queries *)
 

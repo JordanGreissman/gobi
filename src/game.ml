@@ -10,8 +10,7 @@ open Lwt
 open CamomileLibrary
 
 type state = {
-  mutable top_left : Coord.lt_coordinate;
-  mutable map : Mapp.t;
+  mutable ctx : Interface.draw_context;
 }
 
 type cmd = {
@@ -29,9 +28,11 @@ let turn st =
   failwith "Unimplemented"
 
 let init_state json = {
-  top_left = (Coord.make_lt_coordinate 0 0);
   (* TODO: what are the width and height params to generate? *)
-  map = Mapp.generate 0 0;
+  ctx = {
+    top_left = Coord.Screen.create 0 0;
+    map = Mapp.generate 0 0;
+  };
 }
 
 let load_json s = 
@@ -47,7 +48,7 @@ let rec loop ui state =
 let main () =
   let state = init_state () in
   Lazy.force LTerm.stdout >>= fun term ->
-  LTerm_ui.create term (Interface.draw state.map state.top_left) >>= fun ui ->
+  LTerm_ui.create term (Interface.draw state.ctx) >>= fun ui ->
   loop ui state >>= fun () ->
   LTerm_ui.quit ui
 
