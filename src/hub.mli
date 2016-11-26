@@ -1,4 +1,7 @@
-(** the type of a hub *)
+(** the type of a hub. This type represents a specific instance of a hub, which
+  * has a location, production levels, etc., and should not be conflated with
+  * the [role] type, described below.
+  *)
 type t
 
 (* TODO API:
@@ -10,14 +13,11 @@ type t
  *   - do the same for entity!
  *)
 (* TODO clean this whole thing up and make sure you and Matt are on the same page *)
-(** a hub role (answers the question "What type of hub is it?") *)
+(** the type of a hub role. Hub roles are just another name for hub types (e.g.
+  * post office, mill, armory, etc.) because it would be confusing to use the
+  * word "type" in two different ways at once.
+  *)
 type role
-
-(** add a new role *)
-val create_role : name:string -> descr:string -> unlocked:bool -> unit
-
-(** set a role as having been unlocked *)
-val unlock_role : role -> unit
 
 (** the production type of a hub. Hubs can produce either resources or entities *)
 type production =
@@ -54,7 +54,14 @@ val create :
   pos : Coord.t ->
   t
 
+(* TODO this function is weird and is probably indicative of poor design *)
+(** this function evaluates to a bool indicating if the new role was successfully
+  * created and added to the role list (as a side effect). *)
+val create_role : name:string -> descr:string -> unlocked:bool -> bool
+
 val describe : t -> string
+
+val describe_role : role -> string
 
 (** Add an entity to a hub. When this is done, the entity increases the
   * production rate of the hub by a set amount, and the entity cannot be
@@ -62,7 +69,7 @@ val describe : t -> string
   *)
 val add_entity : Entity.t -> t -> t
 
-(* getters and setters *)
+(* [t] getters and setters *)
 
 val get_name : t -> string
 
@@ -84,3 +91,13 @@ val get_defense : t -> int
   * the defense, negative values decrease the defense, etc.).
   *)
 val change_defense : int -> t -> t
+
+(* [role] getters and setters *)
+
+val get_role_art : role -> Art.t
+
+val is_role_unlocked : role -> bool
+
+(** set a role as having been unlocked *)
+val unlock_role : role -> unit
+

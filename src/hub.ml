@@ -12,22 +12,6 @@ type role_info = {
   unlocked : bool;
 }
 
-(* A list of all the possible hub roles (types of hubs) available in the game
- * and their characteristics *)
-(* TODO: should this be an array? *)
-let roles = []
-
-let create_role ~name ~descr ~unlocked =
-  let r = {
-    descr = descr;
-    art = Art.load name;
-    unlocked = unlocked;
-  } in
-  ()
-
-let unlock_role r =
-  failwith "Unimplemented"
-
 type production =
   | Resource of resource
   | Entity of entity_role
@@ -58,6 +42,10 @@ type t = {
   pos: coord;
 }
 
+(* A list of all the possible hub roles (types of hubs) available in the game
+ * and their characteristics *)
+let roles : (role*role_info) list ref = ref []
+
 let create ~name ~descr ~starting_entity ~production
            ~production_rate ~allowed_roles ~def ~pos =
 {
@@ -71,8 +59,23 @@ let create ~name ~descr ~starting_entity ~production
   pos             = pos;
 }
 
+let create_role ~name ~descr ~unlocked =
+  if List.mem_assoc name !roles then false else
+  let r = {
+    descr = descr;
+    art = Art.load name;
+    unlocked = unlocked;
+  } in
+  roles := (name,r)::(!roles);
+  true
+
 let describe hub =
   failwith "Unimplemented"
+
+let describe_role r =
+  (* TODO what to do if not found? *)
+  let info = List.assoc r !roles in
+  info.descr
 
 (** Add entity to a hub, returning the new hub *)
 let add_entity new_entity hub = 
@@ -83,6 +86,8 @@ let add_entity new_entity hub =
     { hub with production_rate = hub.production_rate +. 1.0 }
   (* TODO: handle exceptions when bad stuff happens *)
   else hub
+
+(* [t] getters and setters *)
 
 let get_name hub = hub.name
 
@@ -106,3 +111,17 @@ let get_allowed_roles hub = hub.allowed_roles
 let get_defense hub = hub.def
 
 let change_defense amount hub = { hub with def = hub.def + amount }
+
+(* [role] getters and setters *)
+
+let get_role_art r =
+  (* TODO what to do if not found? *)
+  let info = List.assoc r !roles in
+  info.art
+
+let is_role_unlocked r =
+  let info = List.assoc r !roles in
+  info.unlocked
+
+let unlock_role r =
+  failwith "Unimplemented"

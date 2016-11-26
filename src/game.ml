@@ -32,6 +32,9 @@ let init_state json = {
   ctx = {
     top_left = Coord.Screen.create 0 0;
     map = Mapp.generate 0 0;
+    (* selected = Coord.origin; *)
+    selected = Coord.create 1 1;
+    messages = [ "This is a test message" ];
   };
 }
 
@@ -40,6 +43,17 @@ let load_json s =
 
 let rec loop ui state =
   LTerm_ui.wait ui >>= function
+  | LTerm_event.Mouse e ->
+    (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)
+    (* state.ctx.messages <- new_msg'::state.ctx.messages; *)
+    (match Coord.offset_from_screen (Coord.Screen.create e.col e.row) with
+    | Contained c ->
+      state.ctx.selected <- c;
+      let new_msg = Printf.sprintf "Selected tile is now %s" (Coord.to_string c) in
+      state.ctx.messages <- new_msg::state.ctx.messages
+    | _ -> ());
+    LTerm_ui.draw ui;
+    loop ui state
   | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' -> return ()
   | _ ->
     LTerm_ui.draw ui;
@@ -48,8 +62,10 @@ let rec loop ui state =
 let main () =
   let state = init_state () in
   Lazy.force LTerm.stdout >>= fun term ->
+  LTerm.enable_mouse term >>= fun () ->
   LTerm_ui.create term (Interface.draw state.ctx) >>= fun ui ->
   loop ui state >>= fun () ->
+  LTerm.disable_mouse term >>= fun () ->
   LTerm_ui.quit ui
 
 let () = Lwt_main.run (main ())

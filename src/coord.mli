@@ -17,6 +17,15 @@
   *)
 type t
 
+(** the offset coordinate (0,0) *)
+val origin : t
+(** [create x y] is a new offset coordinate that represents ([x],[y]) *)
+val create : int -> int -> t
+(** [add a b] is the offset coordinate obtained when [a] is added to [b] *)
+val add : t -> t -> t
+(** [to_string c] is the string representation of [c] *)
+val to_string : t -> string
+
 (** The terminal is broken up into cells. Each cell can display one character.
  *  These coordinates represent the absolute position of cells. That is,
  *  the Screen.t coordinate (0,0) always corresponds to the cell in the top left
@@ -37,8 +46,21 @@ module Screen : sig
   val add : t -> t -> t
 end
 
+(** this type represents the possibilities when a [Screen.t] coordinate is
+  * converted into a [t] coordinate *)
+type offset_from_screen_t =
+  (** this screen coordinate is contained within the tile at the [t] coordinate
+    * given as a parameter *)
+  | Contained of t
+  (** this screen coordinate exists on the border of between one and three tiles.
+    * Since only one tile is guaranteed, the other two are given as options *)
+  | Border of t*(t option)*(t option)
+  (** this screen coordinate does not exist within any tile or on the border of
+    * any tile *)
+  | None
+
 (** [offset_from_screen s] is the hex tile (represented in offset coordinates)
   * which contains the screen coordinate [s]. If [s] falls outside of a hex tile
   * or is on the border between two hex tiles, this function is [None].
   *)
-val offset_from_screen : Screen.t -> t option
+val offset_from_screen : Screen.t -> offset_from_screen_t

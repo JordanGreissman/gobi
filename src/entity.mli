@@ -22,12 +22,14 @@ val describe_role : role -> string
 (* getters and setters *)
 
 val get_attack : t -> int
+
 (** change the attack level of an entity by a relative amount (positive values
   * increase the attack, negative values decrease the attack, etc.).
   *)
 val change_attack : int -> t -> t
 
 val get_defense : t -> int
+
 (** change the defense level of an entity by a relative amount (positive values
   * increase the defense, negative values decrease the defense, etc.).
   *)
