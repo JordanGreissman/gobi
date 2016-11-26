@@ -57,7 +57,6 @@ let get_total_power e =
 let get_pos e = e.pos
 
 (** Returns an entity with a new coordinate representing the entity's position *)
-let set_pos position entity = 
-	{ entity with position = position }
+let set_pos position entity = { entity with pos = position }
 
 let get_role entity = entity.role

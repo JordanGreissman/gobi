@@ -1,29 +1,131 @@
 {
   "game": {
-    "difficulty": "ezpz",
     "turns": 100,
     "AI": 3
   },
   "techtree": [
     {
-      "tech": "wood",
-      "desc": "Literally wood.",
-      "researchreq": 10,
-      "prereq": [
-        {
-          "tech": "life"
-        }
-      ],
+      "tech": "Agriculture",
+      "desc": "TBD",
+      "researchreq": 3,
+      "prereq": [],
       "unlocks": [
         {
-          "component": "forestry"
+          "entity": "Worker",
+          "tech": "Mining",
+          "hub": [
+            {
+              "name": "Lumber Mill"
+            },
+            {
+              "name": "Farm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tech": "Mining",
+      "desc": "TBD",
+      "researchreq": 3,
+      "prereq": [],
+      "unlocks": [
+        {
+          "tech": "Bronze Working",
+          "hub": "Mine",
+          "entity": [],
+          "upgrades": []
+        }
+      ]
+    },
+    {
+      "tech": "Bronze Working",
+      "desc": "TBD",
+      "researchreq": 3,
+      "prereq": [],
+      "unlocks": [
+        {
+          "entity": "Warrior",
+          "tech": "Archery",
+          "hub": [],
+          "upgrades": []
+        }
+      ]
+    },
+    {
+      "tech": "Archery",
+      "desc": "TBD",
+      "researchreq": 5,
+      "prereq": [],
+      "unlocks": [
+        {
+          "entity": "Archer",
+          "tech": "Horseback Riding",
+          "hub": [],
+          "upgrades": []
+        }
+      ]
+    },
+    {
+      "tech": "Horseback Riding",
+      "desc": "TBD",
+      "researchreq": 10,
+      "prereq": [],
+      "unlocks": [
+        {
+          "entity": "Cavalry",
+          "tech": "Steel",
+          "hub": [],
+          "upgrades": []
+        }
+      ]
+    },
+    {
+      "tech": "Steel",
+      "desc": "TBD",
+      "researchreq": 10,
+      "prereq": [],
+      "unlocks": [
+        {
+          "entity": "Spearman",
+          "tech": "Armor",
+          "hub": [],
+          "upgrades": []
+        }
+      ]
+    },
+    {
+      "tech": "Armor",
+      "desc": "TBD",
+      "researchreq": 12,
+      "prereq": [],
+      "unlocks": [
+        {
+          "entity": "Heavy",
+          "tech": "Futureness",
+          "hub": [],
+          "upgrades": []
+        }
+      ]
+    },
+    {
+      "tech": "Futureness",
+      "desc": "TBD",
+      "researchreq": 20,
+      "prereq": [],
+      "unlocks": [
+        {
+          "entity": [],
+          "tech": [],
+          "hub": [],
+          "upgrades": []
         }
       ]
     }
   ],
   "hubs": [
     {
-      "name": "town hall",
+      "name": "Town Hall",
       "desc": "Where things happen",
       "built by": "settler",
       "generates": [
@@ -32,16 +134,106 @@
           "amount": 1
         }
       ],
+      "units": [
+        {
+          "name": "worker"
+        },
+        {
+          "name": "settler"
+        }
+      ],
       "upgrades to": "none",
-      "health": 100,
-      "defense": 0
+      "health": 100
+    },
+    {
+      "name": "Farm",
+      "desc": "Produces food",
+      "built by": "worker",
+      "generates": [
+        {
+          "resource": "food",
+          "amount": 1
+        }
+      ],
+      "units": [],
+      "upgrades to": "none",
+      "health": 50
+    },
+    {
+      "name": "Lumber Mill",
+      "desc": "Makes production",
+      "built by": "worker",
+      "generates": [
+        {
+          "resource": "iron",
+          "amount": 1
+        }
+      ],
+      "units": [],
+      "upgrades to": "none",
+      "health": 50
+    },
+    {
+      "name": "Mine",
+      "desc": "Produces gold",
+      "built by": "worker",
+      "generates": [
+        {
+          "resource": "gold",
+          "amount": 1
+        }
+      ],
+      "units": [],
+      "upgrades to": "none",
+      "health": 50
+    },
+    {
+      "name": "Barracks",
+      "desc": "Trains soldiers",
+      "built by": "worker",
+      "generates": [
+        {
+          "resource": "none",
+          "amount": 1
+        }
+      ],
+      "units": [
+        {
+          "name": "Warrior"
+        },
+        {
+          "name": "Archer"
+        },
+        {
+          "name": "Cavalry"
+        },
+        {
+          "name": "Spearman"
+        },
+        {
+          "name": "Heavy"
+        }
+      ],
+      "upgrades to": "none",
+      "health": 25
     }
   ],
   "civilizations": [
     {
       "name": "Jojo",
-      "desc": "P wavy dude",
-      "repr": "j"
+      "desc": "P wavy dude"
+    },
+    {
+      "name": "Udels",
+      "desc": "The kid himself"
+    },
+    {
+      "name": "Barker",
+      "desc": "If Kanye were a CS major"
+    },
+    {
+      "name": "Austin",
+      "desc": "You already know"
     }
   ],
   "units": [
@@ -51,11 +243,86 @@
       "can attack": false,
       "builds": [
         {
-          "hub"
+          "hub": "Farm"
+        },
+        {
+          "hub": "Lumber Mill"
+        },
+        {
+          "hub": "Mine"
+        },
+        {
+          "hub": "Barracks"
         }
       ],
       "attack": 0,
-      "defense": 0
+      "defense": 0,
+      "actions": 2,
+      "requires": "none"
+    },
+    {
+      "name": "Settler",
+      "desc": "Creates new town for your civilization",
+      "can attack": false,
+      "builds": [
+        {
+          "hub": "town hall"
+        }
+      ],
+      "attack": 0,
+      "defense": 0,
+      "actions": 2,
+      "requires": "none"
+    },
+    {
+      "name": "Warrior",
+      "desc": "A basic soldier, melee attacks",
+      "can attack": true,
+      "builds": [],
+      "attack": 5,
+      "defense": 5,
+      "actions": 2,
+      "requires": "none"
+    },
+    {
+      "name": "Archer",
+      "desc": "High attack, very low defense",
+      "can attack": true,
+      "builds": [],
+      "attack": 8,
+      "defense": 1,
+      "actions": 2,
+      "requires": "none"
+    },
+    {
+      "name": "Cavalry",
+      "desc": "High mobility, average stats",
+      "can attack": true,
+      "builds": [],
+      "attack": 9,
+      "defense": 3,
+      "actions": 4,
+      "requires": "none"
+    },
+    {
+      "name": "Spearman",
+      "desc": "Stronger than a warrior",
+      "can attack": true,
+      "builds": [],
+      "attack": 7,
+      "defense": 7,
+      "actions": 2,
+      "requires": "none"
+    },
+    {
+      "name": "Heavy",
+      "desc": "Very high defense, low attack",
+      "can attack": true,
+      "builds": [],
+      "attack": 2,
+      "defense": 20,
+      "actions": 2,
+      "requires": "none"
     }
   ]
 }

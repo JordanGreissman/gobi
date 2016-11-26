@@ -1,6 +1,24 @@
 (** the type of a hub *)
 type t
 
+(* TODO API:
+ *   - type [role] is a string which uniquely identifies a role. Exposed (the type, not its definition).
+ *   - type [role_info] is used internally to store info about a role
+ *   - val [roles] is a internal master list of (role*role_info)
+ *   - getters for every field
+ *   - setters only as necessary (right now only for unlock)
+ *   - do the same for entity!
+ *)
+(* TODO clean this whole thing up and make sure you and Matt are on the same page *)
+(** a hub role (answers the question "What type of hub is it?") *)
+type role
+
+(** add a new role *)
+val create_role : name:string -> descr:string -> unlocked:bool -> unit
+
+(** set a role as having been unlocked *)
+val unlock_role : role -> unit
+
 (** the production type of a hub. Hubs can produce either resources or entities *)
 type production =
   | Resource of Resource.t

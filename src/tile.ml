@@ -1,6 +1,8 @@
 type coordinate = Coord.t
 type entity = Entity.t
+type entity_role = Entity.role
 type hub = Hub.t
+type hub_role = Hub.role
 
 type terrain = Flatland | Mountain | Forest | Desert
 
@@ -57,6 +59,10 @@ let get_entity t =
   failwith "Unimplemented"
 
 let set_entity t =
+  failwith "Unimplemented"
+
+(* TODO: ascii art system *)
+let get_art_char t ltc =
   failwith "Unimplemented"
 
 (* terrain property queries *)

@@ -1,11 +1,36 @@
 type entity = Entity.t
-type role = Entity.role
+type entity_role = Entity.role
 type resource = Resource.t
 type coord = Coord.t
+type art = Art.t
+
+type role = string
+
+type role_info = {
+  descr : string;
+  art : art;
+  unlocked : bool;
+}
+
+(* A list of all the possible hub roles (types of hubs) available in the game
+ * and their characteristics *)
+(* TODO: should this be an array? *)
+let roles = []
+
+let create_role ~name ~descr ~unlocked =
+  let r = {
+    descr = descr;
+    art = Art.load name;
+    unlocked = unlocked;
+  } in
+  ()
+
+let unlock_role r =
+  failwith "Unimplemented"
 
 type production =
   | Resource of resource
-  | Entity of role
+  | Entity of entity_role
 
 type t = {
   (* the name of the hub (e.g. "Mill", "Barracks", etc.) *)
@@ -24,7 +49,7 @@ type t = {
    * in order to increase its production. E.g. only farmer entities should be
    * able to increase the production of a farm because soldiers and other entity
    * roles don't know how to farm well. *)
-  allowed_roles: role list;
+  allowed_roles: entity_role list;
   (* the defense of this hub (for when it is attacked by entities)
    * NOTE that the defense is allowed to be negative! It is the responsibility
    * of the caller to check the updated defense value after changing it *)
@@ -65,22 +90,12 @@ let is_finished hub = hub.is_finished
 
 let set_finished hub = { hub with is_finished = true }
 
-(** Remove entity to a hub, returning the new hub *)
-let remove_entity old_entity hub = 
-	let new_entity_list = 
-		List.filter 
-			(fun entity -> not (entity = old_entity))
-		hub.entities in
-
-	{ hub with entities = hub.entities @ entity	}
-
 (** Get defense value of hub *)
-let get_defense hub = hub.defense
+let get_defense hub = hub.def
 
 (** Edit defense value of hub; pos. int to increase, 
   * neg. int to decrease; return new hub *)
-let change_defense amount hub = 
-	{ hub with defense = hub.defense + amount }
+let change_defense amount hub = { hub with def = hub.def + amount }
 
 let get_production hub = hub.production
 

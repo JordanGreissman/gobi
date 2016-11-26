@@ -1,18 +1,12 @@
-(* open Cluster *)
-(* open Combat *)
-(* open Ai *)
-(* open Tile *)
-(* open Map *)
-(* open Interface *)
-(* open Research *)
 open Yojson
-
-
+open Lwt
 
 (* state contains all the information about the game.
  * Turns modify the state and return a new state for the game. 
  * State will be represented as a record *)
-type state
+type state = {
+  mutable ctx : Interface.draw_context;
+}
 
 (* cmd contains a standardized form of what the user wants to do
  * for a given move *)
@@ -38,4 +32,4 @@ val init_state : json -> state
 val load_json : string -> json
 
 (* [main] computes the state based on given difficulty level *)
-val main : string -> state
+val main : unit -> unit Lwt.t
