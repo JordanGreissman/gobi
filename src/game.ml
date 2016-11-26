@@ -9,7 +9,16 @@ open Yojson
 open Lwt
 open CamomileLibrary
 
+(* type civ = {
+  name : string;
+  entities : entity list;
+  clusters : cluster list;
+  player_controlled : boolean;
+} *)
+
 type state = {
+ (*  civs : civ list;
+  turns_left : int; *)
   mutable ctx : Interface.draw_context;
 }
 
