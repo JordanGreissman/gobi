@@ -53,7 +53,7 @@ let extract_list str lst =
 let extract_game assoc =
   let turns = (List.assoc "turns" assoc) |> Basic.Util.to_string in
   let ai = (List.assoc "AI" assoc) |> Basic.Util.to_string in
-  {turns_left = turns; ai = ai}
+  (turns, ai)
 
 let extract_unlockable assoc =
   let tech = (List.assoc "tech" assoc) |> Basic.Util.to_string in
