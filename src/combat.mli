@@ -28,6 +28,10 @@
  * compute the weight, and then weight has to be converted back into int *)
 val compute_weights : int -> int -> int
 
+
+
+val get_random_number : int
+
 (** [attack_hub] returns true if the attacking unit
  * destroys the building, false otherwise
  *
@@ -44,7 +48,7 @@ val compute_weights : int -> int -> int
  *    TownHall.defense < 0, attack wins and hub is destroyed
  *
  *    Returns true *)
-val attack_hub : int -> int -> bool
+val attack_hub : tile -> tile -> bool
 
 (** [attack_entity] returns true if the attacking unit wins
  * and false otherwise
@@ -61,4 +65,4 @@ val attack_hub : int -> int -> bool
  *    29 < 35, defense wins and attack is destroyed
  *
  *    Returns false *)
-val attack_entity : int -> int -> bool
+val attack_entity : tile -> tile -> bool
