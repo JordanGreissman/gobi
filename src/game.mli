@@ -2,7 +2,7 @@ open Yojson
 open Lwt
 
 (* state contains all the information about the game.
- * Turns modify the state and return a new state for the game. 
+ * Turns modify the state and return a new state for the game.
  * State will be represented as a record *)
 type state = {
   mutable ctx : Interface.draw_context;

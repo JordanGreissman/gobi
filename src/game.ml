@@ -9,13 +9,7 @@ open Yojson
 open Lwt
 open CamomileLibrary
 
-type metagame = {
-  turns_left : int;
-  ai : int;
-}
-
 type state = {
-  meta : metagame;
   mutable ctx : Interface.draw_context;
 }
 
