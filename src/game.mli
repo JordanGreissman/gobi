@@ -29,7 +29,7 @@ val turn : state -> state
 val init_state : json -> state
 
 (* [load_json] returns a json loaded from string *)
-val load_json : string -> json
+val load_json : string -> Basic.json
 
 (* [main] computes the state based on given difficulty level *)
 val main : unit -> unit Lwt.t
