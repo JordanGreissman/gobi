@@ -9,7 +9,13 @@ open Yojson
 open Lwt
 open CamomileLibrary
 
+type metagame = {
+  turns_left : int;
+  ai : int;
+}
+
 type state = {
+  meta : metagame;
   mutable ctx : Interface.draw_context;
 }
 
@@ -27,7 +33,85 @@ let parse_input s =
 let turn st =
   failwith "Unimplemented"
 
-let init_state json = {
+(* Error handling necessary? *)
+let load_json s =
+  try Yojson.Basic.from_file s with
+  | _ -> print_endline "Illegal: File does not exist or is not a JSON\n";
+          failwith "whoops"
+
+let get_assoc s json =
+  json |> Yojson.Basic.Util.member s
+    |> Basic.Util.to_list |> Basic.Util.filter_assoc
+
+let extract_list str lst =
+  let json_list = List.assoc str lst |> Basic.Util.to_list in
+  Basic.Util.filter_map (Basic.Util.to_string_option) json_list
+
+let extract_game assoc =
+  let turns = (List.assoc "turns" assoc) |> Basic.Util.to_string in
+  let ai = (List.assoc "AI" assoc) |> Basic.Util.to_string in
+  {turns_left = turns; ai = ai}
+
+let extract_unlockable assoc =
+  let tech = (List.assoc "tech" assoc) |> Basic.Util.to_string in
+  let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
+  let req = (List.assoc "researchreq" assoc) |> Basic.Util.to_int in
+  let unlocks = (List.assoc "unlocks" assoc) |> Basic.Util.to_list
+    |> Basic.Util.filter_assoc in
+  let unlocks = List.nth unlocks 0 in
+    let entities = extract_list "entity" unlocks in
+    let techs = extract_list "tech" unlocks in
+    let hubs = extract_list "hub" unlocks in
+    let upgrades = extract_list "upgrades" unlocks in
+  (tech, desc, req, (entities, techs, hubs, upgrades))
+
+let extract_hub assoc =
+  let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
+  let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
+  let builder = (List.assoc "built by" assoc) |> Basic.Util.to_string in
+  let upgrades = (List.assoc "upgrades to" assoc) |> Basic.Util.to_string in
+  let health = (List.assoc "health" assoc) |> Basic.Util.to_int in
+  let units = extract_list "units" assoc in
+  let generates = (List.assoc "generates" assoc) |> Basic.Util.to_list
+    |> Basic.Util.filter_assoc in
+  let generates = List.nth generates 0 in
+    let resource = (List.assoc "resource" generates) |> Basic.Util.to_string in
+    let amount = (List.assoc "amount" generates) |> Basic.Util.to_int in
+  (name, desc, builder, upgrades, health, units, (resource, amount))
+
+let extract_civ assoc =
+  let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
+  let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
+  (name, desc)
+
+let extract_entity assoc =
+  let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
+  let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
+  let can_attack = (List.assoc "can attack" assoc) |> Basic.Util.to_bool in
+  let builds = extract_list "builds" assoc in
+  let attack = (List.assoc "attack" assoc) |> Basic.Util.to_int in
+  let defense = (List.assoc "defense" assoc) |> Basic.Util.to_int in
+  let actions = (List.assoc "actions" assoc) |> Basic.Util.to_int in
+  let requires = (List.assoc "requires" assoc) |> Basic.Util.to_string in
+  (name, desc, can_attack, builds, attack, defense, actions, requires)
+
+let init_json json =
+  let meta = json |> Yojson.Basic.Util.member "game"
+    |> Basic.Util.to_assoc |> extract_game in
+  let unlockables = List.map extract_unlockable
+    (get_assoc "unlockables" json) in
+  let hubs = List.map extract_hub
+    (get_assoc "hubs" json) in
+  let civs = List.map extract_civ
+    (get_assoc "civilizations" json) in
+  let entities = List.map extract_entity
+    (get_assoc "units" json) in
+  unlockables
+
+let init_state json =
+(*   let json = Yojson.Basic.from_file json in
+  let initialized = init_json json in  *)
+  {
   (* TODO: what are the width and height params to generate? *)
   ctx = {
     top_left = Coord.Screen.create 0 0;
@@ -37,9 +121,6 @@ let init_state json = {
     messages = [ "This is a test message" ];
   };
 }
-
-let load_json s = 
-  failwith "Unimplemented"
 
 let rec loop ui state =
   LTerm_ui.wait ui >>= function

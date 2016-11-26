@@ -8,19 +8,12 @@
       "tech": "Agriculture",
       "desc": "TBD",
       "researchreq": 3,
-      "prereq": [],
       "unlocks": [
         {
-          "entity": "Worker",
-          "tech": "Mining",
-          "hub": [
-            {
-              "name": "Lumber Mill"
-            },
-            {
-              "name": "Farm"
-            }
-          ]
+          "entity": ["Worker"],
+          "tech": ["Mining"],
+          "hub": ["Lumber Mill", "Mine"],
+          "upgrades": []
         }
       ]
     },
@@ -28,11 +21,10 @@
       "tech": "Mining",
       "desc": "TBD",
       "researchreq": 3,
-      "prereq": [],
       "unlocks": [
         {
-          "tech": "Bronze Working",
-          "hub": "Mine",
+          "tech": ["Bronze Working"],
+          "hub": ["Mine"],
           "entity": [],
           "upgrades": []
         }
@@ -42,11 +34,10 @@
       "tech": "Bronze Working",
       "desc": "TBD",
       "researchreq": 3,
-      "prereq": [],
       "unlocks": [
         {
-          "entity": "Warrior",
-          "tech": "Archery",
+          "entity": ["Warrior"],
+          "tech": ["Archery"],
           "hub": [],
           "upgrades": []
         }
@@ -56,11 +47,10 @@
       "tech": "Archery",
       "desc": "TBD",
       "researchreq": 5,
-      "prereq": [],
       "unlocks": [
         {
-          "entity": "Archer",
-          "tech": "Horseback Riding",
+          "entity": ["Archer"],
+          "tech": ["Horseback Riding"],
           "hub": [],
           "upgrades": []
         }
@@ -70,11 +60,10 @@
       "tech": "Horseback Riding",
       "desc": "TBD",
       "researchreq": 10,
-      "prereq": [],
       "unlocks": [
         {
-          "entity": "Cavalry",
-          "tech": "Steel",
+          "entity": ["Cavalry"],
+          "tech": ["Steel"],
           "hub": [],
           "upgrades": []
         }
@@ -84,11 +73,10 @@
       "tech": "Steel",
       "desc": "TBD",
       "researchreq": 10,
-      "prereq": [],
       "unlocks": [
         {
-          "entity": "Spearman",
-          "tech": "Armor",
+          "entity": ["Spearman"],
+          "tech": ["Armor"],
           "hub": [],
           "upgrades": []
         }
@@ -98,11 +86,10 @@
       "tech": "Armor",
       "desc": "TBD",
       "researchreq": 12,
-      "prereq": [],
       "unlocks": [
         {
-          "entity": "Heavy",
-          "tech": "Futureness",
+          "entity": ["Heavy"],
+          "tech": ["Futureness"],
           "hub": [],
           "upgrades": []
         }
@@ -112,7 +99,6 @@
       "tech": "Futureness",
       "desc": "TBD",
       "researchreq": 20,
-      "prereq": [],
       "unlocks": [
         {
           "entity": [],
@@ -127,28 +113,21 @@
     {
       "name": "Town Hall",
       "desc": "Where things happen",
-      "built by": "settler",
+      "built by": "Settler",
       "generates": [
         {
-          "resource": "happiness",
+          "resource": "Happiness",
           "amount": 1
         }
       ],
-      "units": [
-        {
-          "name": "worker"
-        },
-        {
-          "name": "settler"
-        }
-      ],
+      "units": ["Worker", "Settler"],
       "upgrades to": "none",
       "health": 100
     },
     {
       "name": "Farm",
       "desc": "Produces food",
-      "built by": "worker",
+      "built by": "Worker",
       "generates": [
         {
           "resource": "food",
@@ -162,7 +141,7 @@
     {
       "name": "Lumber Mill",
       "desc": "Makes production",
-      "built by": "worker",
+      "built by": "Worker",
       "generates": [
         {
           "resource": "iron",
@@ -176,7 +155,7 @@
     {
       "name": "Mine",
       "desc": "Produces gold",
-      "built by": "worker",
+      "built by": "Worker",
       "generates": [
         {
           "resource": "gold",
@@ -190,30 +169,14 @@
     {
       "name": "Barracks",
       "desc": "Trains soldiers",
-      "built by": "worker",
+      "built by": "Worker",
       "generates": [
         {
           "resource": "none",
           "amount": 1
         }
       ],
-      "units": [
-        {
-          "name": "Warrior"
-        },
-        {
-          "name": "Archer"
-        },
-        {
-          "name": "Cavalry"
-        },
-        {
-          "name": "Spearman"
-        },
-        {
-          "name": "Heavy"
-        }
-      ],
+      "units": ["Warrior", "Archer", "Cavalry", "Spearman", "Heavy"],
       "upgrades to": "none",
       "health": 25
     }
@@ -241,20 +204,7 @@
       "name": "Worker",
       "desc": "A normal, ordinary worker",
       "can attack": false,
-      "builds": [
-        {
-          "hub": "Farm"
-        },
-        {
-          "hub": "Lumber Mill"
-        },
-        {
-          "hub": "Mine"
-        },
-        {
-          "hub": "Barracks"
-        }
-      ],
+      "builds": ["Farm", "Lumber Mill", "Mine", "Barracks"],
       "attack": 0,
       "defense": 0,
       "actions": 2,
@@ -264,11 +214,7 @@
       "name": "Settler",
       "desc": "Creates new town for your civilization",
       "can attack": false,
-      "builds": [
-        {
-          "hub": "town hall"
-        }
-      ],
+      "builds": ["Town Hall"],
       "attack": 0,
       "defense": 0,
       "actions": 2,
