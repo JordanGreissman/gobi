@@ -1,4 +1,4 @@
-module type Unlockable = struct
+module type Unlockable = sig
 
 	(* culmination of all of the above *)
 	type t = {
@@ -22,26 +22,32 @@ module type Unlockable = struct
 
 end
 
-module type Research = struct 
+module type Research = sig
 
-	type t
+  type t
 
-	type t tree = Leaf | Node of t * t list
+  type key
+
+  type value = t list
+
+  type research_list
+
+  val add_unlockable_key: key -> research_list -> research_list
 
 	(* adds an unlockable that can be accessed AFTER a certain unlockable  *)
-	val add_unlockable: t -> t option -> t tree -> t tree
+ val add_unlockable_value: key -> value -> research_list -> research_list
 
-	(* searches the tree for a certain unlockable name *)
-	val get_unlockable: string -> t tree -> t
+ (* gets the next locked unlockable from the [key]*)
+	val get_next_unlockable: key -> research_list -> t option
 
-	(* unlock and return  a potential unlockable if the type and amount of resources is valid
+	(* unlock and return  a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
      * otheriwse, returns none *)
-	val unlock : t -> resource -> unlockable option
+	val unlock : key -> research_list -> unlockable option
 
-	(* gets every unlockable needed to unlock a certain unlockable *)
-	val get_path : t -> t list
+	(* returns the list of unlockables based on the key*)
+ val get_key_list : key -> research_list ->  value
 
 	(* returns a list of every unlocked unlockable *)
-	val get_unlocked : t tree -> t list
+ val get_unlocked : key -> research_list -> list
 
 end
