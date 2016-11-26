@@ -78,7 +78,6 @@ TODO: ascii art
           (this won't happen on the map once the game is fleshed out more, but it
           will happen off the edges of the map, and in the meantime it will be
           good for debugging).
-
 TODO: exception architecture?
   => When the player performs an illegal action or the like, how does this get
   propagated up to the interface so that they can see it? How do we separate
@@ -89,6 +88,76 @@ TODO: exception architecture?
   state of the data structure that function was modifying? (e.g. if
   Hub.add_entity raises an exception, do we assume that the hub was unchanged?)
   Seems like a good assumption
+
+NOTE that functions should be able to generate info messages to. That is, the
+function completes successfully, but a message is added to the queue as a side-effect.
+
+TODO: menus
+  => when you click on a tile, the menu along the left side (which doesn't exist
+  yet) should be populated with things you can do on that tile. There are two
+  ways to implement this:
+    - Have each action bound to a key
+    - Have each action be a button (which is clicked with the mouse)
+  You can do buttons in lambda-term with widgets, but idk if I want to get into
+  all of this ocaml object-oriented nonsense. I could also roll my own buttons,
+  but not sure how difficult this would be.
+  => I also have to know what options are available for the selected tile. This
+  will typically be a union of the options available for the hub that's on the
+  tile and the options available for the entity that's on the tile (if they
+  exist). Also, the tile itself may have menu items, like "Clear" for a forest.
+  So Tile should have a function which returns a list of all the menu items
+  available for a given tile and the "commands" they're bound to.
+  => This implies that there needs to be a way to represent an "action" that the
+  player wants to take (some kind of type?)
+  => We also need to deal with long menus and sub-menus. Obviously the menu
+  can't run off the bottom of the screen, all the options must be visible for
+  all menus. Because of variable screen and terminal sizes, I think the simplest
+  thing is to have a [m]ore key that will show whatever part of the menu got cut
+  off, etc. This works because when I go to display a menu at runtime, I know
+  how many items are in the menu, and the height of the context I'm drawing them
+  on, so I can pre-compute how many "pages" of menu there will have to be.
+  So it will probably look like:
++-------------------+
+| [p] previous page |
+|                   |
+| [a] Action A      |
+| [b] Action B      |
+|     ...           |
+| [z] Action Z      |
+|                   |
+| [n] next page     |
++-------------------+
+  Some items (like the town hall) will have a shitton of actions
+  available, so it makes sense to organize them into sub-menus. Then the action
+  for certain menu items is something like "ShowSubMenu {menu record}" which
+  will cause the submenu to be displayed.
+  => There should be a tutorial, explaning how the game works and basic
+  keybindings, which is always available as the last menu option. I think it
+  should be bound to '?'.
+
+Idea: maybe instead of making a union of the hub and entity and tile menus, we
+simply make the initial menu:
+
++---------------+
+| Action for:   |
+|               |
+|  [t] tile     |
+|  [e] entity   |
+|  [h] hub      |
+|               |
++---------------+
+
+This way we can plan in advance how the menus and sub-menus are going to be laid
+out, and we're guaranteed that they'll fit (because they're not being combined
+with other menus on the fly). It also means that the keybindings don't have to
+be generated on the fly (if I choose to use keybindings), because we're not
+combining menus so there's no change for a keybinding conflict between menus.
+
+So make the menu options and the associated commands part of the json for each
+entity type. These will be parsed into part of the each Hub.role_info and
+Entity.role_info records. Then
+
+TODO: procedural map generation
 TODO: how to implement town hall?
   => Town hall is special because it's the only hub to produce both
      resources (one of everything?) and units.

@@ -56,6 +56,7 @@ type offset_from_screen_t =
 
 (* ASSUMES A SIDE LENGTH OF 4 *)
 let offset_from_screen ((x,y) : Screen.t) : offset_from_screen_t =
+  if x < 0 || y < 0 then None else
   match y mod 6 with
   | 0 -> (
     let x = x-3 in
@@ -68,7 +69,8 @@ let offset_from_screen ((x,y) : Screen.t) : offset_from_screen_t =
     else if y = 0 then None
     else Contained (x/18*2+1,(y-3)/6))
   | 3 -> (
-    if x = 0 then Border ((0,y/6),None,None)
+    if x < 0 then None
+    else if x = 0 then Border ((0,y/6),None,None)
     else match x mod 18 with
       | 0 ->
         if y = 3 then Border ((x/18*2,y/6),Some (x/18*2-1,y/6),None)

@@ -1,9 +1,9 @@
 (* TODO:
- *   - Draw the hex grid. Make each hex labelled with its coord for debugging purposes
- *   - Enable the map to be panned around with the arrow keys
- *   - Implement selecting a hex with the mouse. The selected hex should be outlined in a new color
- *   - Draw menus and message pane
- *   - Draw dialogs for selecting different things (town hall, other hubs, combat, etc)
+ *   - [x] Draw the hex grid. Make each hex labelled with its coord for debugging purposes
+ *   - [x] Enable the map to be panned around with the arrow keys
+ *   - [x] Implement selecting a hex with the mouse. The selected hex should be outlined in a new color
+ *   - [ ] Draw menus and message pane
+ *   - [ ] Draw dialogs for selecting different things (town hall, other hubs, combat, etc)
  *)
 
 open CamomileLibrary
@@ -57,6 +57,9 @@ let draw_map ctx top_left w h selected =
         (* let t = Mapp.tile_by_pos c dctx.map in *)
         (* let c = Tile.get_art_char t screen_cur in *)
         (* LTerm_draw.draw_char ctx x y (UChar.of_char c); *)
+        (* (if (x mod 18 = 3 && y mod 6 = 2) || (x mod 18 = 12 && y mod 6 = 5) *)
+        (* then LTerm_draw.draw_string ctx (y-1) x (Coord.to_string c) *)
+        (* else ()); *)
         LTerm_draw.draw_char ctx y x (UChar.of_char '~')
       (* we're on the border between two hexes *)
       | Border (h1,h2,h3) ->
