@@ -44,6 +44,7 @@ let draw_map ctx top_left w h selected =
     foreground = (Some LTerm_style.black);
     background = (Some LTerm_style.black);
   } in
+  LTerm_draw.clear ctx;
   for y = 0 to h do
     for x = 0 to w do
       (* the cell we're currently drawing in absolute lambda-term coords *)
