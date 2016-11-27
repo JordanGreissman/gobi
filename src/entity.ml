@@ -1,4 +1,5 @@
 type coordinate = Coord.t
+type art = Art.t
 
 (** the different roles entities can have *)
 type role = {
@@ -10,6 +11,12 @@ type role = {
   (* the number of turns after starting production of an entity of this role type
    * that the entity will be available for use *)
   cost_to_make: int;
+  (* the ascii art for an entity of this role *)
+  art: art;
+  (* whether the entity role has been unlocked and can be made *)
+  unlocked: bool;
+  (* the default (starting) power of entities of this entity role *)
+  default_power: int*int;
 }
 
 type t = {
@@ -23,16 +30,26 @@ type t = {
   pos: coordinate;
 }
 
-let create ~role ~atk ~def ~pos = {
-  role  = role;
-  power = (atk, def);
-  pos   = pos;
-}
+let create ~role ?atk ?def ~pos =
+  let attack = match atk with
+    | Some a -> a
+    | None -> fst role.default_power in
+  let defense = match def with
+    | Some d -> d
+    | None -> snd role.default_power in
+  {
+    role  = role;
+    power = (attack,defense);
+    pos   = pos;
+  }
 
-let create_role ~name ~descr ~cost_to_make = {
-  name         = name;
-  descr        = descr;
-  cost_to_make = cost_to_make;
+let create_role ~name ~descr ~cost_to_make ~unlocked ~default_power = {
+  name          = name;
+  descr         = descr;
+  cost_to_make  = cost_to_make;
+  art           = Art.load name;
+  unlocked      = unlocked;
+  default_power = default_power;
 }
 
 let describe e =
@@ -40,6 +57,10 @@ let describe e =
 
 let describe_role r =
   failwith "Unimplemented"
+
+(* [t] getters and setters *)
+
+let get_role entity = entity.role
 
 let get_attack e = fst e.power
  
@@ -59,4 +80,17 @@ let get_pos e = e.pos
 (** Returns an entity with a new coordinate representing the entity's position *)
 let set_pos position entity = { entity with pos = position }
 
-let get_role entity = entity.role
+(* [role] getters and setters *)
+let get_role_name r = r.name
+let get_role_cost_to_make r = r.cost_to_make
+let get_role_art r = r.art
+
+let is_role_unlocked r = r.unlocked
+let unlock_role r = { r with unlocked = true }
+
+let get_role_default_power r = r.default_power
+
+(* convenience functions *)
+let get_name e = e.role.name
+let get_cost_to_make e = e.role.cost_to_make
+let get_art e = e.role.art

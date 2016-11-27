@@ -4,36 +4,43 @@ type resource = Resource.t
 type coord = Coord.t
 type art = Art.t
 
-type role = string
-
-type role_info = {
-  descr : string;
-  art : art;
-  unlocked : bool;
-}
-
 type production =
   | Resource of resource
   | Entity of entity_role
 
-type t = {
-  (* the name of the hub (e.g. "Mill", "Barracks", etc.) *)
-  name: string;
-  (* a description of the hub and its capabilities that would be useful to
-   * the player if they wanted to know about the hub in detail *)
-  descr: string;
-  (* whether the hub is finished being built *)
-  is_finished: bool;
-  (* what this hub produces *)
-  production: production;
-  (* the number of production units this hub generates every turn. This number
-   * can be increased by adding entities to the hub *)
-  production_rate: float;
+type role = {
+  (* the name of this role (e.g. "Mill", "Barracks", etc.) *)
+  name : string;
+  (* a description of this role and its capabilities that would be useful to the
+   * player if they wanted to know more about this role *)
+  descr : string;
+  (* the number of turns after starting production of a hub of this role type
+   * that the hub will be available for use *)
+  cost_to_make : int;
+  (* the ascii art for a hub of this role *)
+  art : art;
+  (* whether this hub role has been unlocked and can be made *)
+  unlocked : bool;
   (* the types of entities (roles) that are allowed to be consumed by this hub
    * in order to increase its production. E.g. only farmer entities should be
    * able to increase the production of a farm because soldiers and other entity
    * roles don't know how to farm well. *)
   allowed_roles: entity_role list;
+  (* the types of things that hubs of this hub role can produce *)
+  production: production list;
+  (* the production rate of hubs of this hub role when they contain 0 entities *)
+  default_production_rate: int list;
+  (* the default (starting) defense of hubs of this hub role *)
+  default_def: int;
+}
+
+type t = {
+  role: role;
+  (* whether the hub is finished being built *)
+  is_finished: bool;
+  (* the number of production units this hub generates every turn. This number
+   * can be increased by adding entities to the hub *)
+  production_rate: int list;
   (* the defense of this hub (for when it is attacked by entities)
    * NOTE that the defense is allowed to be negative! It is the responsibility
    * of the caller to check the updated defense value after changing it *)
@@ -42,86 +49,79 @@ type t = {
   pos: coord;
 }
 
-(* A list of all the possible hub roles (types of hubs) available in the game
- * and their characteristics *)
-let roles : (role*role_info) list ref = ref []
-
-let create ~name ~descr ~starting_entity ~production
-           ~production_rate ~allowed_roles ~def ~pos =
-{
-  name            = name;
-  descr           = descr;
+let create ~role ~production_rate ~def ~pos = {
+  role            = role;
   is_finished     = false;
-  production      = production;
   production_rate = production_rate;
-  allowed_roles   = allowed_roles;
   def             = def;
   pos             = pos;
 }
 
-let create_role ~name ~descr ~unlocked =
-  if List.mem_assoc name !roles then false else
-  let r = {
-    descr = descr;
-    art = Art.load name;
-    unlocked = unlocked;
-  } in
-  roles := (name,r)::(!roles);
-  true
+let create_role ~name ~descr ~cost_to_make ~unlocked ~allowed_roles
+                ~production ~default_production_rate ~default_def =
+{
+  name                    = name;
+  descr                   = descr;
+  cost_to_make            = cost_to_make;
+  art                     = Art.load name;
+  unlocked                = unlocked;
+  allowed_roles           = allowed_roles;
+  production              = production;
+  default_production_rate = default_production_rate;
+  default_def             = default_def;
+}
 
 let describe hub =
   failwith "Unimplemented"
 
-let describe_role r =
-  (* TODO what to do if not found? *)
-  let info = List.assoc r !roles in
-  info.descr
+let describe_role r = r.descr
 
 (** Add entity to a hub, returning the new hub *)
-let add_entity new_entity hub = 
-  if List.mem (Entity.get_role new_entity) hub.allowed_roles
-  then
-    (* TODO: delete this entity *)
-    (* TODO: by how much does the production rate increase for one entity? *)
-    { hub with production_rate = hub.production_rate +. 1.0 }
-  (* TODO: handle exceptions when bad stuff happens *)
-  else hub
+let add_entity new_entity hub =
+  failwith "Unimplemented"
+(*   if List.mem (Entity.get_role new_entity) hub.allowed_roles *)
+(*   then *)
+(*     (\* TODO: delete this entity *\) *)
+(*     { hub with production_rate = hub.production_rate + 1 } *)
+(*   (\* TODO: handle exceptions when bad stuff happens *\) *)
+(*   else hub *)
 
 (* [t] getters and setters *)
 
-let get_name hub = hub.name
+let get_role hub = hub.role
 
 let is_finished hub = hub.is_finished
-
 let set_finished hub = { hub with is_finished = true }
-
-(** Get defense value of hub *)
-let get_defense hub = hub.def
-
-(** Edit defense value of hub; pos. int to increase, 
-  * neg. int to decrease; return new hub *)
-let change_defense amount hub = { hub with def = hub.def + amount }
-
-let get_production hub = hub.production
 
 let get_production_rate hub = hub.production_rate
 
-let get_allowed_roles hub = hub.allowed_roles
-
 let get_defense hub = hub.def
-
 let change_defense amount hub = { hub with def = hub.def + amount }
+
+let get_position hub = hub.pos
+let change_position delta hub =
+  let pos' = Coord.add hub.pos delta in
+  { hub with pos = pos' }
 
 (* [role] getters and setters *)
 
-let get_role_art r =
-  (* TODO what to do if not found? *)
-  let info = List.assoc r !roles in
-  info.art
+let get_role_name r = r.name
+let get_role_cost_to_make r = r.cost_to_make
+let get_role_art r = r.art
 
-let is_role_unlocked r =
-  let info = List.assoc r !roles in
-  info.unlocked
+let is_role_unlocked r = r.unlocked
+let unlock_role r = { r with unlocked = true }
 
-let unlock_role r =
-  failwith "Unimplemented"
+let get_role_allowed_roles r = r.allowed_roles
+let get_role_production r = r.production
+let get_role_default_production_rate r = r.default_production_rate
+let get_role_default_defense r = r.default_def
+
+(* convenience functions *)
+let get_name hub = hub.role.name
+let get_cost_to_make hub = hub.role.cost_to_make
+let get_art hub = hub.role.art
+let get_allowed_roles hub = hub.role.allowed_roles
+let get_production hub = hub.role.production
+let get_default_production_rate hub = hub.role.default_production_rate
+let get_default_defense hub = hub.role.default_def

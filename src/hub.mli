@@ -4,15 +4,6 @@
   *)
 type t
 
-(* TODO API:
- *   - type [role] is a string which uniquely identifies a role. Exposed (the type, not its definition).
- *   - type [role_info] is used internally to store info about a role
- *   - val [roles] is a internal master list of (role*role_info)
- *   - getters for every field
- *   - setters only as necessary (right now only for unlock)
- *   - do the same for entity!
- *)
-(* TODO clean this whole thing up and make sure you and Matt are on the same page *)
 (** the type of a hub role. Hub roles are just another name for hub types (e.g.
   * post office, mill, armory, etc.) because it would be confusing to use the
   * word "type" in two different ways at once.
@@ -25,42 +16,51 @@ type production =
   | Entity of Entity.role
 
 (** Create and return a hub.
-  * [starting_entity] is an entity that will automatically be consumed by the
-  *   new hub when it is finished being built, if such an entity exists.
-  *   Typically this is the first entity to start construction of the hub.
-  * [production] is the production type of this hub.
+  * [role] is the hub role (i.e. the type of hub).
   * [production_rate] is the base production rate of the hub (the number of
   *   production units produced per turn when the hub only contains one entity).
   *   This is understood to be in terms of resource units if the hub produces
   *   resources, or entities if the hub produces entities.
-  * [allowed_roles] is a list of the types of entities that are allowed inside
-  *   this hub. For example, only farmers are allowed inside a farm hub (no other
-  *   role types make sense), so for a farm hub, [allowed_roles = ["farmer"]].
   * [def] is the defense level of the hub. Hubs have a defense level but no
   *   attack level because while it is possible for any hub to be attacked by an
   *   entity, hubs themselves cannot attack.
   *)
 val create :
-  name : string ->
-  descr : string ->
-  starting_entity : Entity.t option ->
-  (* TODO: Can a hub produce multiple types of resources/entities? If so, then
-   * this should be a [production list] instead, and [production_rate] should be
-   * a [float list] *)
-  production : production ->
-  production_rate : float ->
-  allowed_roles : Entity.role list ->
+  role : role ->
+  production_rate : int list ->
   def : int ->
   pos : Coord.t ->
   t
 
-(* TODO this function is weird and is probably indicative of poor design *)
-(** this function evaluates to a bool indicating if the new role was successfully
-  * created and added to the role list (as a side effect). *)
-val create_role : name:string -> descr:string -> unlocked:bool -> bool
+(** Create and return a hub role.
+  * [name] is the name of the hub role (e.g. "Post Office", "Mill", etc.)
+  * [descr] is a description of this hub type and its capabilities that would
+  *   be useful to the player if they wanted to know more about this hub role.
+  * [cost_to_make] is the number of turns after initiating construction of this
+  *   hub type that the hub type will be ready for use.
+  * [unlocked] is whether the player is allowed to build hubs of this hub role.
+  *   Some hub roles are initially locked, and are unlocked through research.
+  * [allowed_roles] is a list of the types of entities that are allowed inside
+  *   this hub role in order to increase its production. For example, only farmers
+  *   are allowed inside a "Farm" hub (no other role types make sense), so for
+  *   this hub role [allowed_roles = ["farmer"]].
+  * [production] is the list of things that hubs of this hub role can produce.
+  * [default_production_rate] is the production rate of hubs of this hub role
+  *   when they contain 0 entities.
+  * [default_def] is the starting defense of hubs of this hub type.
+  *)
+val create_role :
+  name:string ->
+  descr:string ->
+  cost_to_make:int ->
+  unlocked:bool ->
+  allowed_roles : Entity.role list ->
+  production : production list ->
+  default_production_rate : int list ->
+  default_def : int ->
+  role
 
 val describe : t -> string
-
 val describe_role : role -> string
 
 (** Add an entity to a hub. When this is done, the entity increases the
@@ -71,7 +71,7 @@ val add_entity : Entity.t -> t -> t
 
 (* [t] getters and setters *)
 
-val get_name : t -> string
+val get_role : t -> role
 
 (** is the construction of this hub finished? *)
 val is_finished : t -> bool
@@ -79,11 +79,7 @@ val is_finished : t -> bool
 (** mark this hub as finished (construction is complete) *)
 val set_finished : t -> t
 
-val get_production : t -> production
-
-val get_production_rate : t -> float
-
-val get_allowed_roles : t -> Entity.role list
+val get_production_rate : t -> int list
 
 val get_defense : t -> int
 
@@ -92,12 +88,34 @@ val get_defense : t -> int
   *)
 val change_defense : int -> t -> t
 
-(* [role] getters and setters *)
+val get_position : t -> Coord.t
 
+(** [change_position delta h] is the hub whose new position is the hub's old
+  * position plus [delta].)
+  *)
+val change_position : Coord.t -> t -> t
+
+(* [role] getters and setters *)
+val get_role_name : role -> string
+val get_role_cost_to_make : role -> int
 val get_role_art : role -> Art.t
 
 val is_role_unlocked : role -> bool
 
-(** set a role as having been unlocked *)
-val unlock_role : role -> unit
+(** [unlock_role r] is [r] where [is_role_unlocked r] is guaranteed to be [true].
+  *)
+val unlock_role : role -> role
 
+val get_role_allowed_roles : role -> Entity.role list
+val get_role_production : role -> production list
+val get_role_default_production_rate : role -> int list
+val get_role_default_defense : role -> int
+
+(* convenience functions *)
+val get_name : t -> string
+val get_cost_to_make : t -> int
+val get_art : t -> Art.t
+val get_allowed_roles : t -> Entity.role list
+val get_production : t -> production list
+val get_default_production_rate : t -> int list
+val get_default_defense : t -> int

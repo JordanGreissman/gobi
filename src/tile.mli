@@ -14,18 +14,14 @@ val describe : t -> string
 val describe_terrain : terrain -> string
 
 (** Create a hub and place it on this tile. For descriptions of the named
-  * parameters, see hub.mli *)
+  * parameters, see hub.mli.
+  * [starting_entity] is an entity that will automatically be consumed by the
+  *   new hub when it is finished being built, if such an entity exists.
+  *   Typically this is the first entity to start construction of the hub.
+  *)
 val place_hub :
-  name : string ->
-  descr : string ->
+  role : Hub.role ->
   starting_entity : Entity.t option ->
-  (* TODO: Can a hub produce multiple types of resources/entities? If so, then
-   * this should be a [production list] instead, and [production_rate] should be
-   * a [float list] *)
-  production : Hub.production ->
-  production_rate : float ->
-  allowed_roles : Entity.role list ->
-  def : int ->
   tile : t ->
   t
 

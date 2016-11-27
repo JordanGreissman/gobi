@@ -19,14 +19,20 @@ let create ~terrain =
 let describe t =
   failwith "Unimplemented"
 
-let place_hub ~name ~descr ~starting_entity ~production ~production_rate ~allowed_roles ~def ~tile =
+let place_hub ~role ~starting_entity ~tile =
+  let production_rate = match starting_entity with
+    (* TODO production rate questions:
+     *  - how much does production increase per entity added? Is it the same for
+     *    all hubs?
+     *)
+    (* TODO remove the entity [e] from the game (it is consumed by the hub) *)
+    | Some e ->
+      List.map (fun x -> x+1) (Hub.get_role_default_production_rate role)
+    | None   -> Hub.get_role_default_production_rate role in
+  let def = Hub.get_role_default_defense role in
   let h = Hub.create
-      ~name:name
-      ~descr:descr
-      ~starting_entity:starting_entity
-      ~production:production
+      ~role:role
       ~production_rate:production_rate
-      ~allowed_roles:allowed_roles
       ~def:def
       ~pos:tile.pos in
   { tile with hub=(Some h) }
