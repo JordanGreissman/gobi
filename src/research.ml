@@ -48,7 +48,7 @@ module Researches (R: Research) =
 struct
   type t = Unlockables.t
 
-  type key = idk
+  type key = string 
 
   type  value = t list
 
