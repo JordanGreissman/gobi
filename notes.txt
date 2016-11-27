@@ -54,30 +54,7 @@ Multiple workers can be tasked with the construction of a hub, however when the
 hub is completed, only one worker is "put inside" the hub (and contributes to
 its production), the others are simply consumed.
 
-TODO: ascii art
-    - role interfaces for hubs and entities
-    - json parser (parsing the roles and creating that data structure)
-    - Art module (loading and parsing art)
-    - Tile module
-        - function to return the art info (char + color) for a given Coord.Screen.t
-        - since the art for the hub/entity on the tile in question is stored in
-          the Hub or Entity module, it has no sense of absolute positioning. So
-          how to convert the Coord.Screen.t into a coordinate relative to the
-          ascii art, so we can get the right character?
-        - Need a "null" character for ascii art, and a default background
-          character. This is because the ascii art has "layers". Entities and hubs
-          can exist on the same tile at the same time, and additionally the
-          terrain has ascii art. Entities are always drawn on top, then hubs, then
-          the terrain. Most entities won't take up the entire tile, so the ascii
-          art of whatever's "behind" the entity (a hub, if one exists, or the
-          terrain) should be drawn in the cells where the entity has no art. This
-          means that in the ascii art file for the entity, there has to be a way
-          to explicitly state that the entity does not have any art on certain
-          cells. Additionally, there should be a "default" character, which is
-          drawn as the last resort if nothing else is being drawn on that cell
-          (this won't happen on the map once the game is fleshed out more, but it
-          will happen off the edges of the map, and in the meantime it will be
-          good for debugging).
+TODO: procedural map generation
 TODO: exception architecture?
   => When the player performs an illegal action or the like, how does this get
   propagated up to the interface so that they can see it? How do we separate
@@ -157,7 +134,6 @@ So make the menu options and the associated commands part of the json for each
 entity type. These will be parsed into part of the each Hub.role_info and
 Entity.role_info records. Then
 
-TODO: procedural map generation
 TODO: how to implement town hall?
   => Town hall is special because it's the only hub to produce both
      resources (one of everything?) and units.

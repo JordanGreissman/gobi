@@ -30,7 +30,7 @@ let clip art r c0 c1 =
     | Invalid_argument _ -> failwith "Out of bounds"
     | _ -> failwith "Unknown error"
 
-let draw_map ctx top_left w h selected =
+let draw_map ctx top_left map w h selected =
   let edge_style = {
     LTerm_style.none with foreground = (Some LTerm_style.red)
   } in
@@ -54,27 +54,29 @@ let draw_map ctx top_left w h selected =
       match Coord.offset_from_screen screen_cur with
       (* we're inside a hex *)
       | Contained c ->
-        (* let t = Mapp.tile_by_pos c dctx.map in *)
-        (* let c = Tile.get_art_char t screen_cur in *)
-        (* LTerm_draw.draw_char ctx x y (UChar.of_char c); *)
-        (* (if (x mod 18 = 3 && y mod 6 = 2) || (x mod 18 = 12 && y mod 6 = 5) *)
-        (* then LTerm_draw.draw_string ctx (y-1) x (Coord.to_string c) *)
-        (* else ()); *)
-        LTerm_draw.draw_char ctx y x (UChar.of_char '~')
+        let t = Mapp.tile_by_pos c map in
+        let cell = Tile.get_art_char screen_cur t in
+        print_endline "here";
+        let style = match cell with
+          | Some c ->
+            { LTerm_style.none with foreground = Some (Art.get_color c) }
+          | None -> none_style in
+        let ch = match cell with
+          | Some c -> Art.get_char c
+          | None   -> 'x' in
+        LTerm_draw.draw_char ctx y x ~style (UChar.of_char ch);
+        (* LTerm_draw.draw_char ctx y x (UChar.of_char '~') *)
       (* we're on the border between two hexes *)
       | Border (h1,h2,h3) ->
         let is_selected =
           (h1 = selected) ||
           (match h2 with Some c when c = selected -> true | _ -> false) ||
           (match h3 with Some c when c = selected -> true | _ -> false) in
-        if is_selected then (
-          LTerm_draw.draw_char ctx y x ~style:selected_edge_style (UChar.of_char '.');
-        ) else (
-          LTerm_draw.draw_char ctx y x ~style:edge_style (UChar.of_char '.');
-        )
+        let style = if is_selected then selected_edge_style else edge_style in
+        LTerm_draw.draw_char ctx y x ~style (UChar.of_char '.')
       (* we're off the edge of the map *)
       | None ->
-        LTerm_draw.draw_char ctx y x ~style:none_style (UChar.of_char 'x');
+        LTerm_draw.draw_char ctx y x ~style:none_style (UChar.of_char 'x')
     done
   done
 
@@ -106,5 +108,5 @@ let draw dctx ui matrix =
   let ctx = LTerm_draw.context matrix size in
   let map_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=0;col2=w} in
   let message_ctx = LTerm_draw.sub ctx {row1=(h-message_box_height);row2=h;col1=0;col2=w} in
-  draw_map map_ctx dctx.top_left w (h-message_box_height) dctx.selected;
+  draw_map map_ctx dctx.top_left dctx.map w (h-message_box_height) dctx.selected;
   draw_messages message_ctx w message_box_height dctx.messages

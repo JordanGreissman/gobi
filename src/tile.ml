@@ -40,6 +40,8 @@ let place_hub ~role ~starting_entity ~tile =
 let move_entity to_tile from_tile =
   failwith "Unimplemented"
 
+(* getters and setters *)
+
 let get_terrain t =
   failwith "Unimplemented"
 
@@ -67,10 +69,6 @@ let get_entity t =
 let set_entity t =
   failwith "Unimplemented"
 
-(* TODO: ascii art system *)
-let get_art_char t ltc =
-  failwith "Unimplemented"
-
 (* terrain property queries *)
 
 let describe_terrain = function
@@ -79,23 +77,69 @@ let describe_terrain = function
   | Forest -> "This is a forest"
   | Desert -> "This is a desert"
 
-let hasMovementObstruction t = match t.terrain with
+let flatland_art = Art.load "flatland"
+let mountain_art = Art.load "mountain"
+let forest_art = Art.load "forest"
+let desert_art = Art.load "desert"
+let get_terrain_art = function
+  | Flatland -> flatland_art
+  | Mountain -> mountain_art
+  | Forest -> forest_art
+  | Desert -> desert_art
+
+let has_movement_obstruction t = match t.terrain with
   | Mountain -> true
   | _ -> false
 
-let costToMove t = match t.terrain with
+let cost_to_move t = match t.terrain with
   | Flatland | Desert -> 1
   | Forest -> 2
   | _ -> -1
 
-let needsClearing t = match t.terrain with
+let needs_clearing t = match t.terrain with
   | Forest -> true
   | _ -> false
 
-let hasBuildingRestriction t = match t.terrain with
+let has_building_restriction t = match t.terrain with
   | Mountain -> true
   | _ -> false
 
-let hasFoodRestriction t = match t.terrain with
+let has_food_restriction t = match t.terrain with
   | Desert -> true
   | _ -> false
+
+(* ============================================================== *)
+
+let get_art_char c t =
+  let ax,ay =
+    let index x lst =
+      let rec f i = function
+      | []   -> raise Not_found
+      | h::t -> if h=x then i else f (i+1) t in
+      f 0 lst in
+    let f i x = try Some (i,index c x) with Not_found -> None in
+    let g x = match x with Some _ -> true | None -> false in
+    let l = t.pos |> Coord.screen_from_offset |> List.mapi f |> List.filter g in
+    match List.length l with
+    | 0 -> failwith "Coordinate not contained in this tile"
+    | 1 -> (match List.hd l with
+        | Some x -> x
+        | None -> failwith "?????")
+    | _ -> failwith "Duplicate coordinate found" in
+  let e () = match t.entity with
+    | Some e -> (
+      let cell = List.nth (List.nth (Entity.get_art e) ax) ay in
+      match cell with
+      | Some c -> Some c
+      | None -> raise Not_found)
+    | None -> raise Not_found in
+  let h () = match t.hub with
+    | Some h -> (
+      let cell = List.nth (List.nth (Hub.get_art h) ax) ay in
+      match cell with
+      | Some c -> Some c
+      | None -> raise Not_found)
+    | None -> raise Not_found in
+  try e () with Not_found ->
+  try h () with Not_found ->
+  List.nth (List.nth (get_terrain_art t.terrain) ax) ay

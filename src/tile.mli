@@ -31,6 +31,13 @@ val place_hub :
   *)
 val move_entity : Coord.t -> Coord.t -> t*t
 
+(** [get_art_char c t] is the art cell for the absolute screen coordinate [c],
+  * which is contained within tile [t]. This is the art cell for the entity on
+  * [t]; or if there is no entity, the hub on [t]; or if there is also no hub,
+  * the terrain of [t].
+  *)
+val get_art_char : Coord.Screen.t -> t -> Art.cell option
+
 (* getters and setters *)
 
 val get_terrain : t -> terrain
@@ -46,18 +53,16 @@ val set_hub : t -> Hub.t option -> t
 val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
 
-val get_art_char : t -> Coord.Screen.t -> char
-
 (* terrain property queries *)
 
 (** whether units are allowed on this tile *)
-val hasMovementObstruction : t -> bool
+val has_movement_obstruction : t -> bool
 (** the number of turns it takes unit to traverse this tile
   *  for tiles where [movementObstruction = true], [costToMove = -1] *)
-val costToMove : t -> int
+val cost_to_move : t -> int
 (** whether this tile needs to be cleared before it can be settled *)
-val needsClearing : t -> bool
+val needs_clearing : t -> bool
 (** whether hubs are allowed on this tile *)
-val hasBuildingRestriction : t -> bool
+val has_building_restriction : t -> bool
 (** whether food hubs are allowed on this tile (e.g. farms) *)
-val hasFoodRestriction : t -> bool
+val has_food_restriction : t -> bool

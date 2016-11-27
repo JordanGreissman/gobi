@@ -49,6 +49,15 @@ let offset_from_axial (ac : axial_coordinate) : offset_coordinate =
   let cc = cube_from_axial ac in
   offset_from_cube cc
 
+let screen_from_offset ((x,y) : offset_coordinate) : Screen.t list list =
+  let ox,oy = if y mod 2 = 0 then (9*x,6*y) else (9*x,6*y+3) in
+  let l1 = [3;4;5;6;7;8;9] |> List.map (fun i -> (ox+i,oy+1)) in
+  let l2 = [2;3;4;5;6;7;8;9;10] |> List.map (fun i -> (ox+i,oy+2)) in
+  let l3 = [1;2;3;4;5;6;7;8;9;10;11] |> List.map (fun i -> (ox+i,oy+3)) in
+  let l4 = l2 |> List.map (fun (x,y) -> (x,y+2)) in
+  let l5 = l1 |> List.map (fun (x,y) -> (x,y+4)) in
+  [l1;l2;l3;l4;l5]
+
 type offset_from_screen_t =
   | Contained of offset_coordinate
   | Border of offset_coordinate*(offset_coordinate option)*(offset_coordinate option)
