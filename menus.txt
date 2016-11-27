@@ -1,0 +1,113 @@
+Are menu options always available or, for example, is settle not available if
+entity is not a settler? Would the entity menu be avaiable for selection if there
+is no entity on the selected title (I think so).
+
+Flatland (unsettled)
+  [t] tile
+    describe
+  [e] entity
+    move
+      - select next tile to move entity to?
+    describe
+    settle
+      - if entity is a settler, builds a town hall on tile
+    build
+      - opens sub menu for hubs to be built
+    wait
+      - does nothing with the turn
+      - civ has this because you have to expend all possible actions before
+        ending your turn, this may be good for us as well
+    attack
+      - select adjacent tile to attack
+  [h] hub
+    none
+
+Desert (unsettled)
+  [t] tile
+    describe
+  [e] entity
+    move
+    describe
+    build
+    wait
+    attack
+  [h] hub
+    none
+
+Forest (unsettled)
+  [t] tile
+    describe
+  [e] entity
+    move
+    describe
+    build
+    wait
+    attack
+    clear
+      - clears forest
+  [h] hub
+    none
+
+Mountain (unsettled)
+  [t] tile
+    describe
+  [e] entity
+    none
+  [h] hub
+    none
+
+Flatland (settled)
+  [t] tile
+    describe
+  [e] entity
+    move
+    describe
+    wait
+    enter hub
+      - adds entity to hub, consuming entity
+    destroy?
+      - destroys hub, has some cost associate with it
+    repair?
+      - adds health back to hub? maybe only a certain unit can do this?
+    attack
+  [h] hub
+    describe
+    maybe destroy and repair should be here and not require an entity, but resources?
+
+Desert (settled)
+  [t] tile
+    describe
+  [e] entity
+    move
+    describe
+    wait
+    enter hub
+    destroy?
+    repair?
+    attack
+  [h] hub
+    describe
+
+Forest (settled)
+  [t] tile
+    describe
+  [e] entity
+    move
+    describe
+    wait
+    enter hub
+    destroy?
+    repair?
+    clear?
+      - destroys lumber mill (are lumber mills the only hubs that can be built on forests?)
+    attack
+  [h] hub
+    describe
+
+Enemy tiles
+  [t] tile
+    describe
+  [e] entity
+    describe
+  [h] hub
+    describe
