@@ -80,11 +80,20 @@ let draw_map ctx top_left w h selected =
 
 let draw_messages ctx w h messages =
   LTerm_draw.clear ctx;
-  LTerm_draw.draw_frame_labelled
-    ctx
-    {row1=0;row2=h;col1=0;col2=w}
-    "Messages"
-    LTerm_draw.Light;
+  (* draw an ascii box because the built-in boxes don't work on OSX *)
+  for i = 1 to (w-1) do
+    LTerm_draw.draw_char ctx 0     i (UChar.of_char '-');
+    LTerm_draw.draw_char ctx (h-1) i (UChar.of_char '-')
+  done;
+  for i = 1 to (h-1) do
+    LTerm_draw.draw_char ctx i 0     (UChar.of_char '|');
+    LTerm_draw.draw_char ctx i (w-1) (UChar.of_char '|')
+  done;
+  LTerm_draw.draw_char ctx 0     0     (UChar.of_char '+');
+  LTerm_draw.draw_char ctx (h-1) 0     (UChar.of_char '+');
+  LTerm_draw.draw_char ctx 0     (w-1) (UChar.of_char '+');
+  LTerm_draw.draw_char ctx (h-1) (w-1) (UChar.of_char '+');
+  (* draw the messages *)
   for i = 1 to min (h-2) (List.length messages) do
     LTerm_draw.draw_string ctx i 1 (List.nth messages (i-1))
   done
