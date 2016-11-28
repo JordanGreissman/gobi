@@ -23,6 +23,7 @@ val create_role :
   descr:string ->
   cost_to_make:int ->
   unlocked:bool ->
+  actions:int ->
   default_power:int*int ->
   role
 
@@ -70,6 +71,7 @@ val unlock_role : role -> role
 val get_role_default_power : role -> int*int
 
 (* convenience functions *)
+val get_actions : t -> int
 val get_name : t -> string
 val get_cost_to_make : t -> int
 val get_art : t -> Art.t

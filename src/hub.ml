@@ -29,7 +29,7 @@ type role = {
   (* the types of things that hubs of this hub role can produce *)
   production: production list;
   (* the production rate of hubs of this hub role when they contain 0 entities *)
-  default_production_rate: int list;
+  default_production_rate: int;
   (* the default (starting) defense of hubs of this hub role *)
   default_def: int;
 }
@@ -58,7 +58,7 @@ let create ~role ~production_rate ~def ~pos = {
 }
 
 let create_role ~name ~descr ~cost_to_make ~unlocked ~allowed_roles
-                ~production ~default_production_rate ~default_def =
+                ~production ~default_def =
 {
   name                    = name;
   descr                   = descr;
@@ -67,7 +67,7 @@ let create_role ~name ~descr ~cost_to_make ~unlocked ~allowed_roles
   unlocked                = unlocked;
   allowed_roles           = allowed_roles;
   production              = production;
-  default_production_rate = default_production_rate;
+  default_production_rate = 1;
   default_def             = default_def;
 }
 

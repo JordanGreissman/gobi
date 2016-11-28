@@ -68,10 +68,10 @@ struct
 
   type research_list = (key * value) list
 
-  let tech_to_value name res_str cost u_hub u_amt u_unit = 
+  let extract_to_value name res_str cost u_hub u_amt u_entity = 
     let treasure = ( if u_unit = [] 
       then Unlockables.create_treasure_hub u_hub u_amt
-      else Unlockables.create_treasure_prod [(hub, u_unit)]
+      else Unlockables.create_treasure_prod [(hub, u_entity)]
     ) in create_unlockable name (str_to_res res_str) cost treasure
 
   let rec create_tree key_list value_list acc_tree = 
@@ -109,3 +109,5 @@ struct
   let get_unlocked key research_list =
     let value_list = List.assoc key research_list in
     List.filter (fun x -> x.is_unlocked) value_list
+
+end

@@ -56,12 +56,18 @@ val create_role :
   unlocked:bool ->
   allowed_roles : Entity.role list ->
   production : production list ->
-  default_production_rate : int list ->
   default_def : int ->
   role
 
 val describe : t -> string
 val describe_role : role -> string
+
+(* Faciliate going from JSON to research tree. Respectively takes 
+ * the tech name, the resource type string (lower / uppercase of resource)
+ * the amount (int) of the treasure / upgrade, and then then the upgrade 
+ * details: the affected hub's name (string), the amount (int) and 
+ * list of new production (can be empty ot a string list) *)
+val extract_to_hub : string -> string
 
 (** Add an entity to a hub. When this is done, the entity increases the
   * production rate of the hub by a set amount, and the entity cannot be
