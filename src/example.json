@@ -5,106 +5,317 @@
   },
   "techtree": [
     {
-      "tech": "Agriculture",
-      "desc": "TBD",
-      "researchreq": 3,
-      "unlocks": [
+      "branch": "Agriculture",
+      "techs": [
         {
-          "entity": ["Worker"],
-          "tech": ["Mining"],
-          "hub": ["Lumber Mill", "Mine"],
-          "upgrades": []
+          "tech": "Farming Tools",
+          "desc": "TBD",
+          "resource": "food",
+          "cost": 10,
+          "upgrade": [
+            {
+              "hub": "Farm",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Livestock",
+          "desc": "TBD",
+          "resource": "food",
+          "cost": 50,
+          "upgrade": [
+            {
+              "hub": "Farm",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Plow",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 50,
+          "upgrade": [
+            {
+              "hub": "Farm",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Mechanized Tools",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 200,
+          "upgrade": [
+            {
+              "hub": "Farm",
+              "amount": 25,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "GMOs",
+          "desc": "TBD",
+          "resource": "food",
+          "cost": 500,
+          "upgrade": [
+            {
+              "hub": "Farm",
+              "amount": 50,
+              "unit": []
+            }
+          ]
         }
       ]
     },
     {
-      "tech": "Mining",
-      "desc": "TBD",
-      "researchreq": 3,
-      "unlocks": [
+      "branch": "Transportation",
+      "techs": [
         {
-          "tech": ["Bronze Working"],
-          "hub": ["Mine"],
-          "entity": [],
-          "upgrades": []
+          "tech": "Wheel",
+          "desc": "TBD",
+          "resource": "food",
+          "cost": 5,
+          "upgrade": [
+            {
+              "hub": "all",
+              "amount": 5,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Carriage",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 50,
+          "upgrade": [
+            {
+              "hub": "all",
+              "amount": 5,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Train",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 200,
+          "upgrade": [
+            {
+              "hub": "all",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Automobile",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 500,
+          "upgrade": [
+            {
+              "hub": "all",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Flight",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 1000,
+          "upgrade": [
+            {
+              "hub": "Farm",
+              "amount": 50,
+              "unit": []
+            }
+          ]
         }
       ]
     },
     {
-      "tech": "Bronze Working",
-      "desc": "TBD",
-      "researchreq": 3,
-      "unlocks": [
+      "branch": "Combat",
+      "techs": [
         {
-          "entity": ["Warrior"],
-          "tech": ["Archery"],
-          "hub": [],
-          "upgrades": []
+          "tech": "Archery",
+          "desc": "TBD",
+          "resource": "food",
+          "cost": 10,
+          "upgrade": [
+            {
+              "hub": "Barracks",
+              "amount": 0,
+              "unit": [
+                "Archer"
+              ]
+            }
+          ]
+        },
+        {
+          "tech": "Sword and Armor",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 10,
+          "upgrade": [
+            {
+              "hub": "Barracks",
+              "amount": 0,
+              "unit": [
+                "Cavalry",
+                "Warrior"
+              ]
+            }
+          ]
+        },
+        {
+          "tech": "Spears",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 50,
+          "upgrade": [
+            {
+              "hub": "Barracks",
+              "amount": 0,
+              "unit": [
+                "Spearman"
+              ]
+            }
+          ]
+        },
+        {
+          "tech": "Cannons",
+          "desc": "TBD",
+          "resource": "paper",
+          "cost": 100,
+          "upgrade": [
+            {
+              "hub": "Barracks",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Guns",
+          "desc": "TBD",
+          "resource": "paper",
+          "cost": 250,
+          "upgrade": [
+            {
+              "hub": "Barracks",
+              "amount": 0,
+              "unit": [
+                "Heavy"
+              ]
+            }
+          ]
+        },
+        {
+          "tech": "Tanks",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 500,
+          "upgrade": [
+            {
+              "hub": "Barracks",
+              "amount": 20,
+              "unit": []
+            }
+          ]
         }
       ]
     },
     {
-      "tech": "Archery",
-      "desc": "TBD",
-      "researchreq": 5,
-      "unlocks": [
+      "branch": "Productivity",
+      "techs": [
         {
-          "entity": ["Archer"],
-          "tech": ["Horseback Riding"],
-          "hub": [],
-          "upgrades": []
-        }
-      ]
-    },
-    {
-      "tech": "Horseback Riding",
-      "desc": "TBD",
-      "researchreq": 10,
-      "unlocks": [
+          "tech": "Writing",
+          "desc": "TBD",
+          "resource": "food",
+          "cost": 50,
+          "upgrade": [
+            {
+              "hub": "library",
+              "amount": 1,
+              "unit": []
+            }
+          ]
+        },
         {
-          "entity": ["Cavalry"],
-          "tech": ["Steel"],
-          "hub": [],
-          "upgrades": []
-        }
-      ]
-    },
-    {
-      "tech": "Steel",
-      "desc": "TBD",
-      "researchreq": 10,
-      "unlocks": [
+          "tech": "Money",
+          "desc": "TBD",
+          "resource": "gold",
+          "cost": 100,
+          "upgrade": [
+            {
+              "hub": "all",
+              "amount": 10,
+              "unit": []
+            }
+          ]
+        },
         {
-          "entity": ["Spearman"],
-          "tech": ["Armor"],
-          "hub": [],
-          "upgrades": []
-        }
-      ]
-    },
-    {
-      "tech": "Armor",
-      "desc": "TBD",
-      "researchreq": 12,
-      "unlocks": [
+          "tech": "Mining Tools",
+          "desc": "TBD",
+          "resource": "iron",
+          "cost": 200,
+          "upgrade": [
+            {
+              "hub": "mine",
+              "amount": 50,
+              "unit": []
+            }
+          ]
+        },
         {
-          "entity": ["Heavy"],
-          "tech": ["Futureness"],
-          "hub": [],
-          "upgrades": []
-        }
-      ]
-    },
-    {
-      "tech": "Futureness",
-      "desc": "TBD",
-      "researchreq": 20,
-      "unlocks": [
+          "tech": "Education",
+          "desc": "TBD",
+          "resource": "paper",
+          "cost": 500,
+          "upgrade": [
+            {
+              "hub": "libary",
+              "amount": 50,
+              "unit": []
+            }
+          ]
+        },
         {
-          "entity": [],
-          "tech": [],
-          "hub": [],
-          "upgrades": []
+          "tech": "Manufacturing",
+          "desc": "TBD",
+          "resource": "gold",
+          "cost": 1000,
+          "upgrade": [
+            {
+              "hub": "forge",
+              "amount": 50,
+              "unit": []
+            }
+          ]
+        },
+        {
+          "tech": "Space Program",
+          "desc": "TBD",
+          "resource": "gold",
+          "cost": 10000,
+          "upgrade": [
+            {
+              "hub": "barracks",
+              "amount": 50,
+              "unit": []
+            }
+          ]
         }
       ]
     }
@@ -112,15 +323,15 @@
   "hubs": [
     {
       "name": "Town Hall",
-      "desc": "Where things happen",
+      "desc": "The 'center' of a town. Where happiness is produced.",
       "built by": "Settler",
       "generates": [
-        {
-          "resource": "Happiness",
-          "amount": 1
-        }
+        {}
       ],
-      "units": ["Worker", "Settler"],
+      "units": [
+        "Worker",
+        "Settler"
+      ],
       "upgrades to": "none",
       "health": 100
     },
@@ -139,8 +350,8 @@
       "health": 50
     },
     {
-      "name": "Lumber Mill",
-      "desc": "Makes production",
+      "name": "Forge",
+      "desc": "Produces iron",
       "built by": "Worker",
       "generates": [
         {
@@ -171,14 +382,31 @@
       "desc": "Trains soldiers",
       "built by": "Worker",
       "generates": [
+        {}
+      ],
+      "units": [
+        "Warrior",
+        "Archer",
+        "Cavalry",
+        "Spearman",
+        "Heavy"
+      ],
+      "upgrades to": "none",
+      "health": 25
+    },
+    {
+      "name": "Library",
+      "desc": "Produces paper",
+      "built by": "Worker",
+      "generates": [
         {
-          "resource": "none",
+          "resource": "paper",
           "amount": 1
         }
       ],
-      "units": ["Warrior", "Archer", "Cavalry", "Spearman", "Heavy"],
+      "units": [],
       "upgrades to": "none",
-      "health": 25
+      "health": 50
     }
   ],
   "civilizations": [
@@ -204,7 +432,13 @@
       "name": "Worker",
       "desc": "A normal, ordinary worker",
       "can attack": false,
-      "builds": ["Farm", "Lumber Mill", "Mine", "Barracks"],
+      "builds": [
+        "Farm",
+        "Lumber Mill",
+        "Mine",
+        "Barracks",
+        "Library"
+      ],
       "attack": 0,
       "defense": 0,
       "actions": 2,
@@ -214,7 +448,9 @@
       "name": "Settler",
       "desc": "Creates new town for your civilization",
       "can attack": false,
-      "builds": ["Town Hall"],
+      "builds": [
+        "Town Hall"
+      ],
       "attack": 0,
       "defense": 0,
       "actions": 2,

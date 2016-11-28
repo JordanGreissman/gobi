@@ -21,51 +21,63 @@
       "items": {
         "type": "object",
         "properties": {
-          "tech": {
+          "branch": {
             "type": "string"
           },
-          "desc": {
-            "type": "string"
-          },
-          "researchreq": {
-            "type": "integer"
-          },
-          "unlocks": {
+          "techs": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "entity": {
-                  "type": "array",
-                  "items": {}
-                },
                 "tech": {
-                  "type": "array",
-                  "items": {}
+                  "type": "string"
                 },
-                "hub": {
-                  "type": "array",
-                  "items": {}
+                "desc": {
+                  "type": "string"
                 },
-                "upgrades": {
+                "resource": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "integer"
+                },
+                "upgrade": {
                   "type": "array",
-                  "items": {}
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hub": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "integer"
+                      },
+                      "unit": {
+                        "type": "array",
+                        "items": {}
+                      }
+                    },
+                    "required": [
+                      "hub",
+                      "amount",
+                      "unit"
+                    ]
+                  }
                 }
               },
               "required": [
-                "entity",
                 "tech",
-                "hub",
-                "upgrades"
+                "desc",
+                "resource",
+                "cost",
+                "upgrade"
               ]
             }
           }
         },
         "required": [
-          "tech",
-          "desc",
-          "researchreq",
-          "unlocks"
+          "branch",
+          "techs"
         ]
       }
     },
@@ -103,9 +115,7 @@
           },
           "units": {
             "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "items": {}
           },
           "upgrades to": {
             "type": "string"

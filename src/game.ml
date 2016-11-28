@@ -52,21 +52,28 @@ let extract_list str lst =
 
 let extract_game assoc =
   let turns = (List.assoc "turns" assoc) |> Basic.Util.to_string in
-  let ai = (List.assoc "AI" assoc) |> Basic.Util.to_string in
+  let ai = (List.assoc "ai" assoc) |> Basic.Util.to_string in
   (turns, ai)
 
-let extract_unlockable assoc =
+let extract_techs assoc =
   let tech = (List.assoc "tech" assoc) |> Basic.Util.to_string in
   let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
-  let req = (List.assoc "researchreq" assoc) |> Basic.Util.to_int in
-  let unlocks = (List.assoc "unlocks" assoc) |> Basic.Util.to_list
+  let resource = (List.assoc "resource" assoc) |> Basic.Util.to_string in
+  let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
+  let upgrade = (List.assoc "upgrade" assoc) |> Basic.Util.to_list
     |> Basic.Util.filter_assoc in
-  let unlocks = List.nth unlocks 0 in
-    let entities = extract_list "entity" unlocks in
-    let techs = extract_list "tech" unlocks in
-    let hubs = extract_list "hub" unlocks in
-    let upgrades = extract_list "upgrades" unlocks in
-  (tech, desc, req, (entities, techs, hubs, upgrades))
+  let upgrade = List.nth upgrade 0 in
+  let hub = (List.assoc "hub" upgrade) |> Basic.Util.to_string in
+  let amount = (List.assoc "amount" upgrade) |> Basic.Util.to_int in
+  let entity = extract_list "unit" upgrade in
+  (tech, desc, resource, cost, (hub, amount, entity))
+
+let extract_unlockable assoc =
+  let branch = (List.assoc "branch" assoc) |> Basic.Util.to_string in
+  let techs = (List.assoc "techs" assoc) |> Basic.Util.to_list
+    |> Basic.Util.filter_assoc in
+  let techs = List.map extract_techs techs in
+  (branch, techs)
 
 let extract_hub assoc =
   let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
@@ -102,7 +109,7 @@ let init_json json =
   let meta = json |> Yojson.Basic.Util.member "game"
     |> Basic.Util.to_assoc |> extract_game in
   let unlockables = List.map extract_unlockable
-    (get_assoc "unlockables" json) in
+    (get_assoc "techtree" json) in
   let hubs = List.map extract_hub
     (get_assoc "hubs" json) in
   let civs = List.map extract_civ
