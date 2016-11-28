@@ -13,8 +13,12 @@ type t = {
   hub : hub option;
 }
 
-let create ~terrain =
-  failwith "Unimplemented"
+let create ~terrain ~pos = {
+  pos     = pos;
+  terrain = terrain;
+  entity  = None;
+  hub     = None;
+}
 
 let describe t =
   failwith "Unimplemented"
@@ -69,6 +73,8 @@ let get_entity t =
 let set_entity t =
   failwith "Unimplemented"
 
+let get_pos t = t.pos
+
 (* terrain property queries *)
 
 let describe_terrain = function
@@ -121,7 +127,11 @@ let get_art_char c t =
     let g x = match x with Some _ -> true | None -> false in
     let l = t.pos |> Coord.screen_from_offset |> List.mapi f |> List.filter g in
     match List.length l with
-    | 0 -> failwith "Coordinate not contained in this tile"
+    | 0 -> failwith
+             (Printf.sprintf
+                "Coordinate %s not contained in tile %s"
+                (Coord.Screen.to_string c)
+                (Coord.to_string t.pos))
     | 1 -> (match List.hd l with
         | Some x -> x
         | None -> failwith "?????")
