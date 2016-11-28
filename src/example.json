@@ -9,10 +9,9 @@
       "techs": [
         {
           "tech": "Farming Tools",
-          "desc": "TBD",
           "resource": "food",
           "cost": 10,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Farm",
               "amount": 10,
@@ -22,10 +21,9 @@
         },
         {
           "tech": "Livestock",
-          "desc": "TBD",
           "resource": "food",
           "cost": 50,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Farm",
               "amount": 10,
@@ -35,10 +33,9 @@
         },
         {
           "tech": "Plow",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 50,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Farm",
               "amount": 10,
@@ -48,10 +45,9 @@
         },
         {
           "tech": "Mechanized Tools",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 200,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Farm",
               "amount": 25,
@@ -61,10 +57,9 @@
         },
         {
           "tech": "GMOs",
-          "desc": "TBD",
           "resource": "food",
           "cost": 500,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Farm",
               "amount": 50,
@@ -79,10 +74,9 @@
       "techs": [
         {
           "tech": "Wheel",
-          "desc": "TBD",
           "resource": "food",
           "cost": 5,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "all",
               "amount": 5,
@@ -92,10 +86,9 @@
         },
         {
           "tech": "Carriage",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 50,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "all",
               "amount": 5,
@@ -105,10 +98,9 @@
         },
         {
           "tech": "Train",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 200,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "all",
               "amount": 10,
@@ -118,10 +110,9 @@
         },
         {
           "tech": "Automobile",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 500,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "all",
               "amount": 10,
@@ -131,10 +122,9 @@
         },
         {
           "tech": "Flight",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 1000,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Farm",
               "amount": 50,
@@ -149,10 +139,9 @@
       "techs": [
         {
           "tech": "Archery",
-          "desc": "TBD",
           "resource": "food",
           "cost": 10,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Barracks",
               "amount": 0,
@@ -164,26 +153,23 @@
         },
         {
           "tech": "Sword and Armor",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 10,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Barracks",
               "amount": 0,
               "unit": [
-                "Cavalry",
-                "Warrior"
+                "Cavalry"
               ]
             }
           ]
         },
         {
           "tech": "Spears",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 50,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Barracks",
               "amount": 0,
@@ -195,10 +181,9 @@
         },
         {
           "tech": "Cannons",
-          "desc": "TBD",
           "resource": "paper",
           "cost": 100,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Barracks",
               "amount": 10,
@@ -208,10 +193,9 @@
         },
         {
           "tech": "Guns",
-          "desc": "TBD",
           "resource": "paper",
           "cost": 250,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Barracks",
               "amount": 0,
@@ -223,10 +207,9 @@
         },
         {
           "tech": "Tanks",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 500,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "Barracks",
               "amount": 20,
@@ -241,20 +224,18 @@
       "techs": [
         {
           "tech": "Writing",
-          "desc": "TBD",
           "resource": "food",
           "cost": 50,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "library",
-              "amount": 1,
+              "amount": 5,
               "unit": []
             }
           ]
         },
         {
           "tech": "Money",
-          "desc": "TBD",
           "resource": "gold",
           "cost": 100,
           "upgrade": [
@@ -267,10 +248,9 @@
         },
         {
           "tech": "Mining Tools",
-          "desc": "TBD",
           "resource": "iron",
           "cost": 200,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "mine",
               "amount": 50,
@@ -280,10 +260,9 @@
         },
         {
           "tech": "Education",
-          "desc": "TBD",
           "resource": "paper",
           "cost": 500,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "libary",
               "amount": 50,
@@ -293,10 +272,9 @@
         },
         {
           "tech": "Manufacturing",
-          "desc": "TBD",
           "resource": "gold",
           "cost": 1000,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "forge",
               "amount": 50,
@@ -306,10 +284,9 @@
         },
         {
           "tech": "Space Program",
-          "desc": "TBD",
           "resource": "gold",
           "cost": 10000,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "barracks",
               "amount": 50,
@@ -427,7 +404,7 @@
       "desc": "You already know"
     }
   ],
-  "units": [
+  "entities": [
     {
       "name": "Worker",
       "desc": "A normal, ordinary worker",
@@ -474,7 +451,7 @@
       "attack": 8,
       "defense": 1,
       "actions": 2,
-      "requires": "none"
+      "requires": "Archery"
     },
     {
       "name": "Cavalry",
@@ -484,7 +461,7 @@
       "attack": 9,
       "defense": 3,
       "actions": 4,
-      "requires": "none"
+      "requires": "Sword and Armor"
     },
     {
       "name": "Spearman",
@@ -494,7 +471,7 @@
       "attack": 7,
       "defense": 7,
       "actions": 2,
-      "requires": "none"
+      "requires": "Spears"
     },
     {
       "name": "Heavy",
@@ -504,7 +481,7 @@
       "attack": 2,
       "defense": 20,
       "actions": 2,
-      "requires": "none"
+      "requires": "Guns"
     }
   ]
 }

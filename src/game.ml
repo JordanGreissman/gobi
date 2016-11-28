@@ -57,16 +57,15 @@ let extract_game assoc =
 
 let extract_techs assoc =
   let tech = (List.assoc "tech" assoc) |> Basic.Util.to_string in
-  let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
   let resource = (List.assoc "resource" assoc) |> Basic.Util.to_string in
   let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
-  let upgrade = (List.assoc "upgrade" assoc) |> Basic.Util.to_list
+  let treasure = (List.assoc "treasure" assoc) |> Basic.Util.to_list
     |> Basic.Util.filter_assoc in
-  let upgrade = List.nth upgrade 0 in
-  let hub = (List.assoc "hub" upgrade) |> Basic.Util.to_string in
-  let amount = (List.assoc "amount" upgrade) |> Basic.Util.to_int in
-  let entity = extract_list "unit" upgrade in
-  (tech, desc, resource, cost, (hub, amount, entity))
+  let treasure = List.nth treasure 0 in
+  let hub = (List.assoc "hub" treasure) |> Basic.Util.to_string in
+  let amount = (List.assoc "amount" treasure) |> Basic.Util.to_int in
+  let entity = extract_list "entities" treasure in
+  (tech, resource, cost, (hub, amount, entity))
 
 let extract_unlockable assoc =
   let branch = (List.assoc "branch" assoc) |> Basic.Util.to_string in
