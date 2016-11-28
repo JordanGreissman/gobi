@@ -2,8 +2,8 @@ module type Unlockable =
 sig
   type treasure
   type t
-  val create_treasure_hub : hub * int -> treasure
-  val create_treasure_prod : (hub * production) list -> treasure
+  val create_treasure_hub : Hub.hub * int -> treasure
+  val create_treasure_prod : (Hub.hub * Hub.production) list -> treasure
   val create_unlockable : string -> string -> int -> t
   val is_unlocked : t -> bool
   val resource_needed : t -> int
@@ -13,9 +13,9 @@ end
 module Unlockables (U: Unlockable) =
 struct
 
-  type treasure = 
-    | Hub of hub * int
-    | Production of (hub * production) list
+  type treasure =
+    | Hub of Hub.hub * int
+    | Production of (Hub.hub * Hub.production) list
 
   type t = {
     name: string;
@@ -25,10 +25,10 @@ struct
     treasure: treasure;
   }
 
-  let create_treasure_hub hub amt = 
+  let create_treasure_hub hub amt =
     Hub (hub, amt)
 
-  let create_treasure_prod hub_prod_list = 
+  let create_treasure_prod hub_prod_list =
     Production hub_prod_list
 
   let create_unlockable ~name ~resource ~cost ~treasure =
@@ -62,23 +62,23 @@ module Researches (R: Research) =
 struct
   type t = Unlockables.t
 
-  type key = string 
+  type key = string
 
   type value = t list
 
   type research_list = (key * value) list
 
-  let tech_to_value name res_str cost u_hub u_amt u_unit = 
-    let treasure = ( if u_unit = [] 
+  let tech_to_value name res_str cost u_hub u_amt u_unit =
+    let treasure = ( if u_unit = []
       then Unlockables.create_treasure_hub u_hub u_amt
       else Unlockables.create_treasure_prod [(hub, u_unit)]
     ) in create_unlockable name (str_to_res res_str) cost treasure
 
-  let rec create_tree key_list value_list acc_tree = 
+  let rec create_tree key_list value_list acc_tree =
     match key_list, value_list with
       | [], [] -> acc_tree
-      | key::key_tail, value::value_tail -> 
-        let tree = add_unlockable_value key value 
+      | key::key_tail, value::value_tail ->
+        let tree = add_unlockable_value key value
           (add_unlockable_key key acc_tree) in
         create_tree key_tail value_tail tree
       | _ -> failwith "Precondition violation"
@@ -109,3 +109,5 @@ struct
   let get_unlocked key research_list =
     let value_list = List.assoc key research_list in
     List.filter (fun x -> x.is_unlocked) value_list
+end
+

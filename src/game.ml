@@ -4,13 +4,6 @@ open CamomileLibrary
 
 type state = State.t
 
-(* type civ = {
-   name : string;
-   entities : entity list;
-   clusters : cluster list;
-   player_controlled : boolean;
-   } *)
-
 let make_move st cmd =
   failwith "Unimplemented"
 
@@ -24,11 +17,11 @@ let turn st =
 let load_json s =
   try Yojson.Basic.from_file s with
   | _ -> print_endline "Illegal: File does not exist or is not a JSON\n";
-    failwith "whoops"
+          failwith "whoops"
 
 let get_assoc s json =
   json |> Yojson.Basic.Util.member s
-  |> Basic.Util.to_list |> Basic.Util.filter_assoc
+    |> Basic.Util.to_list |> Basic.Util.filter_assoc
 
 let extract_list str lst =
   let json_list = List.assoc str lst |> Basic.Util.to_list in
@@ -49,12 +42,13 @@ let extract_techs assoc =
   let hub = (List.assoc "hub" treasure) |> Basic.Util.to_string in
   let amount = (List.assoc "amount" treasure) |> Basic.Util.to_int in
   let entity = extract_list "entity" treasure in
-  (tech, resource, cost, (hub, amount, entity))
+  Research.Researches.tech_to_value name resource cost hub amount entity
+  (* entity *)
 
 let extract_unlockable assoc =
   let branch = (List.assoc "branch" assoc) |> Basic.Util.to_string in
   let techs = (List.assoc "techs" assoc) |> Basic.Util.to_list
-              |> Basic.Util.filter_assoc in
+    |> Basic.Util.filter_assoc in
   let techs = List.map extract_techs techs in
   (branch, techs)
 
@@ -63,14 +57,15 @@ let extract_hub assoc =
   let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
   let builder = (List.assoc "built by" assoc) |> Basic.Util.to_string in
   let upgrades = (List.assoc "upgrades to" assoc) |> Basic.Util.to_string in
-  let health = (List.assoc "health" assoc) |> Basic.Util.to_int in
+  let defense = (List.assoc "defense" assoc) |> Basic.Util.to_int in
+  let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
   let entities = extract_list "entities" assoc in
   let generates = (List.assoc "generates" assoc) |> Basic.Util.to_list
-                  |> Basic.Util.filter_assoc in
+    |> Basic.Util.filter_assoc in
   let generates = List.nth generates 0 in
     let resource = (List.assoc "resource" generates) |> Basic.Util.to_string in
     let amount = (List.assoc "amount" generates) |> Basic.Util.to_int in
-  (name, desc, builder, upgrades, health, entities, (resource, amount))
+  (name, desc, builder, upgrades, cost, defense, entities, (resource, amount))
 
 let extract_civ assoc =
   let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
@@ -80,23 +75,25 @@ let extract_civ assoc =
 let extract_entity assoc =
   let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
   let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
-  let can_attack = (List.assoc "can attack" assoc) |> Basic.Util.to_bool in
-  let builds = extract_list "builds" assoc in
   let attack = (List.assoc "attack" assoc) |> Basic.Util.to_int in
   let defense = (List.assoc "defense" assoc) |> Basic.Util.to_int in
   let actions = (List.assoc "actions" assoc) |> Basic.Util.to_int in
+  let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
   let requires = (List.assoc "requires" assoc) |> Basic.Util.to_string in
-  (name, desc, can_attack, builds, attack, defense, actions, requires)
+  (name, desc, attack, defense, actions, cost, requires)
 
 let init_json json =
   let meta = json |> Yojson.Basic.Util.member "game"
-             |> Basic.Util.to_assoc |> extract_game in
+    |> Basic.Util.to_assoc |> extract_game in
   let unlockables = List.map extract_unlockable
-      (get_assoc "techtree" json) in
+    (get_assoc "techtree" json) in
+  let branches = List.map fst unlockables in
+  let techs = List.map snd unlockables in
+  let tree = Research.Researches.create_tree branches techs [] in
   let hubs = List.map extract_hub
-      (get_assoc "hubs" json) in
+    (get_assoc "hubs" json) in
   let civs = List.map extract_civ
-      (get_assoc "civilizations" json) in
+    (get_assoc "civilizations" json) in
   let entities = List.map extract_entity
     (get_assoc "entities" json) in
   (meta, unlockables, hubs, civs, entities)
@@ -123,7 +120,7 @@ let get_next_state (s:state) = function
       Coord.Screen.add
         s.screen_top_left
         (Coord.Screen.create (LTerm_mouse.col e) (LTerm_mouse.row e)) in
-    (match Coord.offset_from_screen abs_click_coord with 
+    (match Coord.offset_from_screen abs_click_coord with
     | Contained c ->
       let new_msg = Printf.sprintf "Selected tile is now %s" (Coord.to_string c) in
       { s with messages = new_msg::s.messages; selected_tile = c }

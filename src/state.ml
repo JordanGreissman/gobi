@@ -1,6 +1,7 @@
+
 type t = {
-  (* civs : civ list; *)
-  (* turn : int; *)
+  civs : Civ.t list;
+  turns_left : int;
   hub_roles : Hub.role list;
   entity_roles : Entity.role list;
   map : Mapp.t;

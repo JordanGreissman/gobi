@@ -160,13 +160,6 @@
           "desc": {
             "type": "string"
           },
-          "can attack": {
-            "type": "boolean"
-          },
-          "builds": {
-            "type": "array",
-            "items": {}
-          },
           "attack": {
             "type": "integer"
           },
@@ -183,7 +176,6 @@
         "required": [
           "name",
           "desc",
-          "can attack",
           "builds",
           "attack",
           "defense",
