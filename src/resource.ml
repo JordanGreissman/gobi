@@ -16,7 +16,14 @@
 
 (* ========================================================================== *)
 
-type t = Food | Gold | Iron
+type t = Food | Gold | Iron | Paper
+
+let str_to_res str = match str with
+	| "iron" | "Iron" -> Iron
+	| "gold" | "Gold" -> Gold
+	| "paper" | "Paper" -> Paper
+	| "food" | "Food" -> Food
+	| _ -> failwith "Precondition violated" 
 
 (* (\* comprehensive list of resource amounts for every resource in the game *\) *)
 (* let res_lst = [ *)
