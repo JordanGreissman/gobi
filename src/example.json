@@ -1,7 +1,7 @@
 {
   "game": {
     "turns": 100,
-    "AI": 3
+    "ai": 3
   },
   "techtree": [
     {
@@ -15,7 +15,7 @@
             {
               "hub": "Farm",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -27,7 +27,7 @@
             {
               "hub": "Farm",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -39,7 +39,7 @@
             {
               "hub": "Farm",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -51,7 +51,7 @@
             {
               "hub": "Farm",
               "amount": 25,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -63,7 +63,7 @@
             {
               "hub": "Farm",
               "amount": 50,
-              "unit": []
+              "entity": []
             }
           ]
         }
@@ -80,7 +80,7 @@
             {
               "hub": "all",
               "amount": 5,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -92,7 +92,7 @@
             {
               "hub": "all",
               "amount": 5,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -104,7 +104,7 @@
             {
               "hub": "all",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -116,7 +116,7 @@
             {
               "hub": "all",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -128,7 +128,7 @@
             {
               "hub": "Farm",
               "amount": 50,
-              "unit": []
+              "entity": []
             }
           ]
         }
@@ -145,7 +145,7 @@
             {
               "hub": "Barracks",
               "amount": 0,
-              "unit": [
+              "entity": [
                 "Archer"
               ]
             }
@@ -159,7 +159,7 @@
             {
               "hub": "Barracks",
               "amount": 0,
-              "unit": [
+              "entity": [
                 "Cavalry"
               ]
             }
@@ -173,7 +173,7 @@
             {
               "hub": "Barracks",
               "amount": 0,
-              "unit": [
+              "entity": [
                 "Spearman"
               ]
             }
@@ -187,7 +187,7 @@
             {
               "hub": "Barracks",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -199,7 +199,7 @@
             {
               "hub": "Barracks",
               "amount": 0,
-              "unit": [
+              "entity": [
                 "Heavy"
               ]
             }
@@ -213,7 +213,7 @@
             {
               "hub": "Barracks",
               "amount": 20,
-              "unit": []
+              "entity": []
             }
           ]
         }
@@ -230,7 +230,7 @@
             {
               "hub": "library",
               "amount": 5,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -238,11 +238,11 @@
           "tech": "Money",
           "resource": "gold",
           "cost": 100,
-          "upgrade": [
+          "treasure": [
             {
               "hub": "all",
               "amount": 10,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -254,7 +254,7 @@
             {
               "hub": "mine",
               "amount": 50,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -266,7 +266,7 @@
             {
               "hub": "libary",
               "amount": 50,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -278,7 +278,7 @@
             {
               "hub": "forge",
               "amount": 50,
-              "unit": []
+              "entity": []
             }
           ]
         },
@@ -290,7 +290,7 @@
             {
               "hub": "barracks",
               "amount": 50,
-              "unit": []
+              "entity": []
             }
           ]
         }
@@ -303,9 +303,12 @@
       "desc": "The 'center' of a town. Where happiness is produced.",
       "built by": "Settler",
       "generates": [
-        {}
+        {
+          "resource": "none",
+          "amount": 0
+        }
       ],
-      "units": [
+      "entities": [
         "Worker",
         "Settler"
       ],
@@ -322,7 +325,7 @@
           "amount": 1
         }
       ],
-      "units": [],
+      "entities": [],
       "upgrades to": "none",
       "health": 50
     },
@@ -336,7 +339,7 @@
           "amount": 1
         }
       ],
-      "units": [],
+      "entities": [],
       "upgrades to": "none",
       "health": 50
     },
@@ -350,7 +353,7 @@
           "amount": 1
         }
       ],
-      "units": [],
+      "entities": [],
       "upgrades to": "none",
       "health": 50
     },
@@ -359,9 +362,12 @@
       "desc": "Trains soldiers",
       "built by": "Worker",
       "generates": [
-        {}
+        {
+          "resource": "none",
+          "amount": 0
+        }
       ],
-      "units": [
+      "entities": [
         "Warrior",
         "Archer",
         "Cavalry",
@@ -381,7 +387,7 @@
           "amount": 1
         }
       ],
-      "units": [],
+      "entities": [],
       "upgrades to": "none",
       "health": 50
     }

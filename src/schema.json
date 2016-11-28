@@ -7,13 +7,13 @@
         "turns": {
           "type": "integer"
         },
-        "AI": {
+        "ai": {
           "type": "integer"
         }
       },
       "required": [
         "turns",
-        "AI"
+        "ai"
       ]
     },
     "techtree": {
@@ -32,16 +32,13 @@
                 "tech": {
                   "type": "string"
                 },
-                "desc": {
-                  "type": "string"
-                },
                 "resource": {
                   "type": "string"
                 },
                 "cost": {
                   "type": "integer"
                 },
-                "upgrade": {
+                "treasure": {
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -52,7 +49,7 @@
                       "amount": {
                         "type": "integer"
                       },
-                      "unit": {
+                      "entity": {
                         "type": "array",
                         "items": {}
                       }
@@ -60,17 +57,16 @@
                     "required": [
                       "hub",
                       "amount",
-                      "unit"
+                      "entity"
                     ]
                   }
                 }
               },
               "required": [
                 "tech",
-                "desc",
                 "resource",
                 "cost",
-                "upgrade"
+                "treasure"
               ]
             }
           }
@@ -113,7 +109,7 @@
               ]
             }
           },
-          "units": {
+          "entities": {
             "type": "array",
             "items": {}
           },
@@ -129,7 +125,7 @@
           "desc",
           "built by",
           "generates",
-          "units",
+          "entities",
           "upgrades to",
           "health"
         ]
@@ -153,7 +149,7 @@
         ]
       }
     },
-    "units": {
+    "entities": {
       "type": "array",
       "items": {
         "type": "object",
@@ -202,6 +198,6 @@
     "techtree",
     "hubs",
     "civilizations",
-    "units"
+    "entities"
   ]
 }
