@@ -3,173 +3,195 @@ open CamomileLibrary
 type t = {
   text: string;
   key: LTerm_key.code;
-  (* action: action; *)
+  cmd: Cmd.t;
+  next_menu: menu;
 }
 
-let get_menu t =
-  failwith "Menu.get_menu is unimplemented"
-
-(* [execute s a] returns the next state of the game given the current state [s]
- * and the action [a]. *)
-let execute state = function
-  | SubMenu m            -> state (* TODO *)
-  | Research r           -> state (* TODO *)
-  | DisplayResearch t    -> state (* TODO *)
-  | Skip                 -> state (* TODO *)
-  | Move (from,to)       -> state (* TODO *)
-  | Attack (o,d)         -> state (* TODO *)
-  | PlaceHub (t,r)       -> state (* TODO *)
-  | Produce (t,r)        -> state (* TODO *)
-  | AddEntityToHub (e,h) -> state (* TODO *)
-  | NextTurn             -> state (* TODO *)
-  | Describe d           -> state (* TODO *)
-  | Settle t             -> state (* TODO *)
+and menu =
+  | NoMenu
+  | StaticMenu of t list
+  | TileMenu of (Tile.t -> t list)
+  | BuildHubMenu of (Hub.role list -> t list)
+  | ProduceEntityMenu of (Hub.t -> t list)
+  | NextResearchMenu of (Research.Research.key -> t list)
 
 let get_tile_menu t =
   let describe = {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    (* action = Describe; *)
-  } in
-  let settle = {
-    text = "settle";
-    key = Char (UChar.of_char 's');
-    (* action = Settle *)
+    cmd = Cmd.create Cmd.Describe;
+    next_menu = StaticMenu main_menu;
   } in
   let clear = {
     text = "clear";
     key = Char (UChar.of_char 'c');
-    (* action = Settle *)
+    cmd = Cmd.create (Cmd.Clear);
+    next_menu = StaticMenu main_menu;
   } in
   let build = {
     text = "build hub";
     key = Char (UChar.of_char 'b');
-    (* action = Settle *)
+    cmd = Cmd.create (Cmd.PlaceHub);
+    next_menu = BuildHubMenu get_build_hub_menu;
   } in
   let back = {
     text = "back";
     key = Char (UChar.of_char '<');
-    (* action = SubMenu *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = StaticMenu main_menu;
   } in
-  (* TODO how to implement clearing mechanic? *)
-  match (Tile.is_settled t,Tile.is_clear t,Tile.has_building_restriction t) with
-  | (true,_,false) -> [describe;build;back]
-  | (false,false,_) -> [describe;clear;back]
-  | (false,true,true) -> [describe;]
+  match (Tile.needs_clearing t,Tile.has_building_restriction t) with
+  | (false,false) -> [describe;build;back]
+  | (false,true)  -> [describe;back]
+  | (true,_)      -> [describe;clear;back]
 
-let main_menu : t list = [
+and get_build_hub_menu roles =
+  failwith "get_build_hub_menu is unimplemented"
+
+and get_produce_entity_menu roles =
+  failwith "get_produce_entity_menu is unimplemented"
+
+and get_research_menu r =
+  failwith "get_research_menu is unimplemented"
+
+let main_menu = [
   {
     text = "tile";
     key = Char (UChar.of_char 't');
-    (* action = SubMenu; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    (* next_menu = TileMenu get_tile_menu; *)
+    next_menu = NoMenu;
   };
   {
     text = "hub";
     key = Char (UChar.of_char 'h');
-    (* action = SubMenu; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    (* next_menu = StaticMenu hub_menu; *)
+    next_menu = NoMenu;
   };
   {
     text = "entity";
     key = Char (UChar.of_char 'e');
-    (* action = SubMenu; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    (* next_menu = StaticMenu entity_menu; *)
+    next_menu = NoMenu;
   };
   {
     text = "research";
     key = Char (UChar.of_char 'r');
-    (* action = SubMenu; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    (* next_menu = StaticMenu research_menu; *)
+    next_menu = NoMenu;
   };
   {
     text = "next turn";
     key = Char (UChar.of_char 'n');
-    (* action = NextTurn; *)
+    cmd = Cmd.create Cmd.NextTurn;
+    next_menu = NoMenu;
   };
   {
     text = "tutorial";
     key = Char (UChar.of_char '?');
-    (* action = Tutorial; *)
+    cmd = Cmd.create Cmd.Tutorial;
+    next_menu = NoMenu;
   };
 ]
 
-let hub_menu : t list = [
+and hub_menu = [
   {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    (* action = Describe *)
+    cmd = Cmd.create Cmd.Describe;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "produce";
     key = Char (UChar.of_char 'p');
-    (* action = Produce; *)
+    cmd = Cmd.create Cmd.Produce;
+    next_menu = ProduceEntityMenu get_produce_entity_menu;
   };
   {
     text = "add entities";
     key = Char (UChar.of_char 'e');
-    (* action = AddEntityToHub; *)
+    cmd = Cmd.create Cmd.AddEntityToHub;
+    next_menu = NoMenu;
   };
   {
     text = "back";
     key = Char (UChar.of_char '<');
-    (* action = SubMenu *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = StaticMenu main_menu;
   };
 ]
 
-let entity_menu : t list = [
+and entity_menu : t list = [
   {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    (* action = Describe *)
+    cmd = Cmd.create Cmd.Describe;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "move";
     key = Char (UChar.of_char 'm');
-    (* action = Produce; *)
+    cmd = Cmd.create Cmd.Move;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "attack";
     key = Char (UChar.of_char 'a');
-    (* action = AddEntityToHub; *)
+    cmd = Cmd.create Cmd.Attack;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "skip";
     key = Char (UChar.of_char 's');
-    (* action = AddEntityToHub; *)
+    cmd = Cmd.create Cmd.Skip;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "add to hub";
     key = Char (UChar.of_char 'h');
-    (* action = AddEntityToHub; *)
+    cmd = Cmd.create Cmd.AddEntityToHub;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "back";
     key = Char (UChar.of_char '<');
-    (* action = SubMenu *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = StaticMenu main_menu;
   };
 ]
 
-let research_menu : t list = [
+and research_menu : t list = [
   {
     text = "Agriculture";
     key = Char (UChar.of_char '1');
-    (* action = Describe *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = NextResearchMenu get_research_menu;
   };
   {
     text = "Transportation";
     key = Char (UChar.of_char '2');
-    (* action = Produce; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = NextResearchMenu get_research_menu;
   };
   {
     text = "Combat";
     key = Char (UChar.of_char '3');
-    (* action = AddEntityToHub; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = NextResearchMenu get_research_menu;
   };
   {
     text = "Productivity";
     key = Char (UChar.of_char '4');
-    (* action = AddEntityToHub; *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = NextResearchMenu get_research_menu;
   };
   {
     text = "back";
     key = Char (UChar.of_char '<');
-    (* action = SubMenu *)
+    cmd = Cmd.create Cmd.NoCmd;
+    next_menu = StaticMenu main_menu;
   };
 ]
