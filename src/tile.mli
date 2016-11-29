@@ -44,7 +44,6 @@ val get_terrain : t -> terrain
 val set_terrain : t -> terrain -> t
 
 val is_settled : t -> bool
-val settle : t -> t
 val unsettle : t -> t
 
 val get_hub : t -> Hub.t option
