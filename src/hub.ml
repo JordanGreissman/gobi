@@ -70,22 +70,23 @@ let create_role ~name ~descr ~cost_to_make ~allowed_roles
   default_def             = default_def;
 }
 
-let extract_to_role name descr built_by default_def cost_to_make
-  resource amount entities entity_role_list =
+let extract_to_role ~name ~descr ~built_by ~default_def ~cost_to_make
+                    ~resource ~amount ~entities ~entity_role_list =
     let allowed_roles = [Entity.find_role built_by entity_role_list] in
     let prod_entity =
-      List.map (fun name -> Entity
-        (Entity.find_role name entity_role_list))
-      entities in
-    let prod_resource = Resource (Resource.str_to_res resource) in
-    let production = prod_entity@[prod_resource] in
+      let f name = Entity (Entity.find_role name entity_role_list) in
+      entities |> List.map f in
+    let prod_resource = Resource.str_to_res resource in
+    let production = match prod_resource with
+      | Some r -> (Resource r)::prod_entity
+      | None   -> prod_entity in
     let default_def = amount in
       create_role name descr cost_to_make allowed_roles
       production default_def
 
 let rec find_role role_str role_list =
   match role_list with
-  | [] -> failwith "Role doesn't exist"
+  | [] -> failwith (Printf.sprintf "Role %s doesn't exist" role_str)
   | h::t -> if h.name = role_str then h
     else find_role role_str t
 

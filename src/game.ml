@@ -179,7 +179,7 @@ let rec loop ui state_ref =
     loop ui state_ref)
 
 let main () =
-  let (s:state) = init_state "src/example.json" in
+  let (s:state) = init_state "src/game_data.json" in
   let state_ref = ref s in
   Lazy.force LTerm.stdout >>= fun term ->
   LTerm.enable_mouse term >>= fun () ->

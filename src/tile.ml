@@ -23,21 +23,16 @@ let create ~terrain ~pos = {
 
 
 let place_hub ~role ~starting_entity ~tile =
-  let production_rate = match starting_entity with
-    (* TODO production rate questions:
-     *  - how much does production increase per entity added? Is it the same for
-     *    all hubs?
-     *)
+  let d = Hub.get_role_default_production_rate role in
+  let p = match starting_entity with
     (* TODO remove the entity [e] from the game (it is consumed by the hub) *)
-    | Some e ->
-      List.map (fun x -> x+1) (Hub.get_role_default_production_rate role)
-    | None   -> Hub.get_role_default_production_rate role in
+    | Some e -> d+1
+    | None   -> d in
+  let a = Array.make (List.length (Hub.get_role_production role)) p in
+  let production_rate = Array.to_list a in
   let def = Hub.get_role_default_defense role in
-  let h = Hub.create
-      ~role:role
-      ~production_rate:production_rate
-      ~def:def
-      ~pos:tile.pos in
+  let pos = tile.pos in
+  let h = Hub.create role production_rate def pos in
   { tile with hub=(Some h) }
 
 let move_entity to_tile from_tile =
@@ -49,32 +44,20 @@ let move_entity to_tile from_tile =
 
 (* getters and setters *)
 
-let get_terrain t =
-  t.terrain
+let get_terrain t = t.terrain
+let set_terrain t terrain = {t with terrain=terrain}
 
-let set_terrain t terrain =
-  {t with terrain=terrain}
+let is_settled t = not(t.hub = None)
+let settle t = t (* TODO *)
+let unsettle t = {t with hub=None}
 
-let is_settled t =
-  not(t.hub = None)
+let get_hub t = t.hub
+let set_hub t hub = { t with hub=hub }
 
-let unsettle t =
-  {t with hub=None}
+let get_entity t = t.entity
+let set_entity t entity = { t with entity=entity }
 
-let get_hub t =
-  t.hub
-
-let set_hub t hub =
-  {t with hub=Some hub}
-
-let get_entity t =
-  t.entity
-
-let set_entity t entity =
-  {t with entity=Some entity}
-
-let get_pos t =
-  t.pos
+let get_pos t = t.pos
 
 (* terrain property queries *)
 

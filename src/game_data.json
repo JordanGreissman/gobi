@@ -13,7 +13,7 @@
           "cost": 10,
           "treasure": [
             {
-              "hub": "Farm",
+              "hub": "farm",
               "amount": 10,
               "entity": []
             }
@@ -25,7 +25,7 @@
           "cost": 50,
           "treasure": [
             {
-              "hub": "Farm",
+              "hub": "farm",
               "amount": 10,
               "entity": []
             }
@@ -37,7 +37,7 @@
           "cost": 50,
           "treasure": [
             {
-              "hub": "Farm",
+              "hub": "farm",
               "amount": 10,
               "entity": []
             }
@@ -49,7 +49,7 @@
           "cost": 200,
           "treasure": [
             {
-              "hub": "Farm",
+              "hub": "farm",
               "amount": 25,
               "entity": []
             }
@@ -61,7 +61,7 @@
           "cost": 500,
           "treasure": [
             {
-              "hub": "Farm",
+              "hub": "farm",
               "amount": 50,
               "entity": []
             }
@@ -126,7 +126,7 @@
           "cost": 1000,
           "treasure": [
             {
-              "hub": "Farm",
+              "hub": "farm",
               "amount": 50,
               "entity": []
             }
@@ -143,10 +143,10 @@
           "cost": 10,
           "treasure": [
             {
-              "hub": "Barracks",
+              "hub": "barracks",
               "amount": 0,
               "entity": [
-                "Archer"
+                "archer"
               ]
             }
           ]
@@ -157,10 +157,10 @@
           "cost": 10,
           "treasure": [
             {
-              "hub": "Barracks",
+              "hub": "barracks",
               "amount": 0,
               "entity": [
-                "Cavalry"
+                "cavalry"
               ]
             }
           ]
@@ -171,7 +171,7 @@
           "cost": 50,
           "treasure": [
             {
-              "hub": "Barracks",
+              "hub": "barracks",
               "amount": 0,
               "entity": [
                 "Spearman"
@@ -185,7 +185,7 @@
           "cost": 100,
           "treasure": [
             {
-              "hub": "Barracks",
+              "hub": "barracks",
               "amount": 10,
               "entity": []
             }
@@ -197,7 +197,7 @@
           "cost": 250,
           "treasure": [
             {
-              "hub": "Barracks",
+              "hub": "barracks",
               "amount": 0,
               "entity": [
                 "Heavy"
@@ -211,7 +211,7 @@
           "cost": 500,
           "treasure": [
             {
-              "hub": "Barracks",
+              "hub": "barracks",
               "amount": 20,
               "entity": []
             }
@@ -299,9 +299,9 @@
   ],
   "hubs": [
     {
-      "name": "Town Hall",
+      "name": "town_hall",
       "desc": "The 'center' of a town. Where happiness is produced.",
-      "built by": "Settler",
+      "built by": "settler",
       "generates": [
         {
           "resource": "",
@@ -309,16 +309,16 @@
         }
       ],
       "entities": [
-        "Worker",
-        "Settler"
+        "worker",
+        "settler"
       ],
       "defense": 100,
       "cost": 2
     },
     {
-      "name": "Farm",
+      "name": "farm",
       "desc": "Produces food",
-      "built by": "Worker",
+      "built by": "worker",
       "generates": [
         {
           "resource": "food",
@@ -330,9 +330,9 @@
       "cost": 2
     },
     {
-      "name": "Forge",
+      "name": "forge",
       "desc": "Produces iron",
-      "built by": "Worker",
+      "built by": "worker",
       "generates": [
         {
           "resource": "iron",
@@ -344,9 +344,9 @@
       "cost": 3
     },
     {
-      "name": "Mine",
+      "name": "mine",
       "desc": "Produces gold",
-      "built by": "Worker",
+      "built by": "worker",
       "generates": [
         {
           "resource": "gold",
@@ -358,9 +358,9 @@
       "cost": 3
     },
     {
-      "name": "Barracks",
+      "name": "barracks",
       "desc": "Trains soldiers",
-      "built by": "Worker",
+      "built by": "worker",
       "generates": [
         {
           "resource": "",
@@ -368,19 +368,19 @@
         }
       ],
       "entities": [
-        "Warrior",
-        "Archer",
-        "Cavalry",
-        "Spearman",
-        "Heavy"
+        "warrior",
+        "archer",
+        "cavalry",
+        "spearman",
+        "heavy"
       ],
       "defense": 25,
       "cost": 5
     },
     {
-      "name": "Library",
+      "name": "library",
       "desc": "Produces paper",
-      "built by": "Worker",
+      "built by": "worker",
       "generates": [
         {
           "resource": "paper",
@@ -412,7 +412,7 @@
   ],
   "entities": [
     {
-      "name": "Worker",
+      "name": "worker",
       "desc": "A normal, ordinary worker",
       "attack": 0,
       "defense": 0,
@@ -421,7 +421,7 @@
       "cost": 2
     },
     {
-      "name": "Settler",
+      "name": "settler",
       "desc": "Creates new town for your civilization",
       "attack": 0,
       "defense": 0,
@@ -430,7 +430,7 @@
       "cost": 5
     },
     {
-      "name": "Warrior",
+      "name": "warrior",
       "desc": "A basic soldier, melee attacks",
       "attack": 5,
       "defense": 5,
@@ -439,7 +439,7 @@
       "cost": 2
     },
     {
-      "name": "Archer",
+      "name": "archer",
       "desc": "High attack, very low defense",
       "attack": 8,
       "defense": 1,
@@ -448,7 +448,7 @@
       "cost": 3
     },
     {
-      "name": "Cavalry",
+      "name": "cavalry",
       "desc": "High mobility, average stats",
       "attack": 9,
       "defense": 3,
@@ -457,7 +457,7 @@
       "cost": 3
     },
     {
-      "name": "Spearman",
+      "name": "spearman",
       "desc": "Stronger than a warrior",
       "attack": 7,
       "defense": 7,
@@ -466,7 +466,7 @@
       "cost": 4
     },
     {
-      "name": "Heavy",
+      "name": "heavy",
       "desc": "Very high defense, low attack",
       "attack": 2,
       "defense": 20,

@@ -54,7 +54,9 @@ struct
             (Entity.find_role entity entity_role_list)) u_entity
         in Unlockable.create_treasure_prod hub prod_list
       ) in
-    let resource = Resource.str_to_res res_str in
+    let resource = match Resource.str_to_res res_str with
+      | Some r -> r
+      | None   -> failwith "no resource provided" in
     Unlockable.create_unlockable name resource cost treasure
 
   let add_unlockable_key key value research_list =
