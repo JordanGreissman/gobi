@@ -28,3 +28,6 @@ let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
     town_hall = town_hall;
     tiles = [town_hall];
   }, map)
+
+let get_town_hall cluster =
+  cluster.town_hall
