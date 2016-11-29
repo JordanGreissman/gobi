@@ -18,7 +18,7 @@ module Unlockable : sig
 	val create_treasure_prod : Hub.t -> Hub.production list -> treasure
 
 	(* create unlockable from a name, resource, and cost *)
-	val create_unlockable : name:string -> resource:Resource.t -> cost:int -> treasure:treasure -> t
+	val create_unlockable : string -> Resource.t -> int -> treasure -> t
 
 	(* returns true if unlockable is unlocked *)
 	val is_unlocked : t -> bool
@@ -47,7 +47,7 @@ module Research : sig
    * details: the affected hub's name (string), the amount (int) and
    * list of new production (can be empty ot a string list) *)
   val extract_to_value : string -> string -> int -> string -> int ->
-  	string list -> Entity.role list -> value
+  	string list -> Entity.role list -> t
 
   (* Creates a tree from a list of keys and values, which must be the same size *)
   val create_tree : key list -> value list -> 'a list -> research_list
