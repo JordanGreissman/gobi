@@ -47,18 +47,7 @@ type t = {
   pos: coord;
 }
 
-let extract_to_role name descr built_by default_def cost_to_make 
-  resource amount entities entity_role_list =
-    let allowed_roles = [Entity.find_role_by_name built_by entities] in
-    let prod_entity = 
-      List.map (fun name -> Entity 
-        (Entity.find_role_by_name name entity_role_list)) 
-      entities in
-    let prod_resource = Resource (Resource.str_to_res resource) in
-    let production = prod_entity@prod_resource
-    let default_def = amount in
-      Hub.create_role name descr cost_to_make allowed_roles 
-      production default_def
+
 
 let create ~role ~production_rate ~def ~pos = {
   role            = role;
@@ -80,6 +69,19 @@ let create_role ~name ~descr ~cost_to_make ~allowed_roles
   default_production_rate = 1;
   default_def             = default_def;
 }
+
+let extract_to_role name descr built_by default_def cost_to_make
+  resource amount entities entity_role_list =
+    let allowed_roles = [Entity.find_role_by_name built_by entities] in
+    let prod_entity =
+      List.map (fun name -> Entity
+        (Entity.find_role_by_name name entity_role_list))
+      entities in
+    let prod_resource = Resource (Resource.str_to_res resource) in
+    let production = prod_entity@prod_resource
+    let default_def = amount in
+      create_role name descr cost_to_make allowed_roles
+      production default_def
 
 let describe hub =
   failwith "Unimplemented"

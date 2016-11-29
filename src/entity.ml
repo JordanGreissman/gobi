@@ -32,10 +32,6 @@ type t = {
   pos: coordinate;
 }
 
-let extract_to_role name descr cost_to_make attack defense actions =
-  let unlocked = (requires = "") in
-  let default_power = (attack, defense) in
-  create_role name descr cost_to_make unlocked actions default_power 
 
 let rec find_role_by_name role_str role_list =
   match role_list with
@@ -56,7 +52,7 @@ let create ~role ?atk ?def ~pos =
     pos   = pos;
   }
 
-let create_role ~name ~descr ~cost_to_make ~unlocked ~actions 
+let create_role ~name ~descr ~cost_to_make ~unlocked ~actions
   ~default_power = {
     name          = name;
     descr         = descr;
@@ -65,7 +61,12 @@ let create_role ~name ~descr ~cost_to_make ~unlocked ~actions
     unlocked      = unlocked;
     actions       = actions;
     default_power = default_power;
-  }
+}
+
+let extract_to_role name descr cost_to_make attack defense actions =
+  let unlocked = (requires = "") in
+  let default_power = (attack, defense) in
+  create_role name descr cost_to_make unlocked actions default_power 
 
 let describe e =
   failwith "Unimplemented"
@@ -78,7 +79,7 @@ let describe_role r =
 let get_role entity = entity.role
 
 let get_attack e = fst e.power
- 
+
 let get_defense e = snd e.power
 
 let change_attack amt e = { e with power=(get_attack e + amt,get_defense e) }
@@ -86,7 +87,7 @@ let change_attack amt e = { e with power=(get_attack e + amt,get_defense e) }
 let change_defense amt e = { e with power=(get_attack e,get_defense e + amt) }
 
 (* Get total power level of entity, attack + defense *)
-let get_total_power e = 
+let get_total_power e =
   let (attack, defense) = e.power in
   attack + defense
 

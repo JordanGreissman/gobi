@@ -42,7 +42,7 @@ let extract_techs assoc =
   let hub = (List.assoc "hub" treasure) |> Basic.Util.to_string in
   let amount = (List.assoc "amount" treasure) |> Basic.Util.to_int in
   let entity = extract_list "entity" treasure in
-  Research.Research.tech_to_value tech resource cost hub amount entity
+  Research.Research.extract_to_value tech resource cost hub amount entity
   (* entity *)
 
 let extract_unlockable assoc =

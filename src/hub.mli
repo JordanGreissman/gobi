@@ -71,8 +71,7 @@ val describe_role : role -> string
  * entities, a string list of valid roles that it produces
  * entity_role_list, (entity role list) the master list of all roles in the game
  *)
-val extract_to_role : string -> string -> string -> int -> int -> string
-int -> string list -> role list -> Hub.role
+val extract_to_role : string -> string -> string -> int -> int -> string -> int -> string list -> role list -> role
 
 (** Add an entity to a hub. When this is done, the entity increases the
   * production rate of the hub by a set amount, and the entity cannot be
