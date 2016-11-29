@@ -6,11 +6,11 @@ type t = tile list list
 let tile_by_pos c map =
   let x,y = (Coord.get_x c,Coord.get_y c) in
   let row = try List.nth map y with
-    | Failure _ -> raise (Exception.Illegal "You've gone too far down!")
-    | Invalid_argument _ -> raise (Exception.Illegal "You've gone too far up!") in
+    | Failure _ -> List.nth map ((List.length map) - 1)
+    | Invalid_argument _ -> List.nth map 0 in
   try List.nth row x with
-    | Failure _ -> raise (Exception.Illegal "You've gone too far right!")
-    | Invalid_argument _ -> raise (Exception.Illegal "You've gone too far left!")
+    | Failure _ -> List.nth row ((List.length map) - 1)
+    | Invalid_argument _ -> List.nth row 0
 
 (* map generation *)
 let generate width height =
