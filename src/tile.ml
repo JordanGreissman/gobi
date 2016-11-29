@@ -20,7 +20,15 @@ let create ~terrain ~pos = {
   hub     = None;
 }
 
-let place_hub ~role ~starting_entity ~tile ~civ =
+(** Create a hub and place it on this tile, also returning a potentially
+  * different civ. For descriptions of the named parameters, see hub.mli.
+  * IMPORTANT: if entity not None you must call Civ.remove_entity starting_entity 
+  * civ after. 
+  * [starting_entity] is an entity that will automatically be consumed by the
+  *   new hub when it is finished being built, if such an entity exists.
+  *   Typically this is the first entity to start construction of the hub.
+  *)
+let place_hub ~role ~starting_entity ~tile =
   let d = Hub.get_role_default_production_rate role in
   let production_rate = match starting_entity with
     | Some e -> d+1
@@ -28,15 +36,8 @@ let place_hub ~role ~starting_entity ~tile ~civ =
   let def = Hub.get_role_default_defense role in
   let pos = tile.pos in
   let h = Hub.create role production_rate def pos in
-  let new_tile = { tile with hub=(Some h) } in
-  match starting_entity with 
-    | None -> (new_tile, civ)
-    | Some e -> 
-      let new_e_list = List.filter (fun e -> not (e = entity)) civ.entities in
-      let new_civ = { civ with entities = new_e_list } in
-        (new_tile, new_civ)
+    { tile with hub=(Some h) }
 
-(* what if tiles aren't in same cluster? can you? *)
 let move_entity to_tile from_tile =
   if to_tile.entity = None
   then

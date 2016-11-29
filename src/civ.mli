@@ -15,6 +15,9 @@ type t = {
   player_controlled : bool;
 }
 
+(* Returns civ with an entity list without the passed in entity *)
+val remove_entity : Entity.t -> t -> t
+
 (** Add entity to a hub, returning the new hub and new civ in a tuple.
   * Raise Illegal if entity role isn't allowed in the hub *)
 val add_entity_to_hub : Entity.t -> Hub.t -> t -> Hub.t * t
