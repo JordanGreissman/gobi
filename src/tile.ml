@@ -48,11 +48,13 @@ let get_terrain t = t.terrain
 let set_terrain t terrain = {t with terrain=terrain}
 
 let is_settled t = not(t.hub = None)
-let settle t = t (* TODO *)
 let unsettle t = {t with hub=None}
 
 let get_hub t = t.hub
-let set_hub t hub = { t with hub=hub }
+let set_hub t hub =
+  if is_settled t
+  then t
+  else {t with hub=hub}
 
 let get_entity t = t.entity
 let set_entity t entity = { t with entity=entity }
