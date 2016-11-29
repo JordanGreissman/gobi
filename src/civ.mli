@@ -8,7 +8,7 @@ type t = {
   (** list of clusters currently on the map *)
   clusters : Cluster.t list;
   (** list of techs that have been unlocked *)
-  techs : research_list;
+  techs : Research.Research.research_list;
   (** whether the civ is player or ai controlled *)
-  player_controlled : boolean;
+  player_controlled : bool;
 }
