@@ -14,3 +14,5 @@ type t = {
   (** whether the civ is player or ai controlled *)
   player_controlled : bool;
 }
+
+val get_player_controlled : t -> bool
