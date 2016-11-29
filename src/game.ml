@@ -109,15 +109,19 @@ let init_json json =
   {turns = fst meta; ai = snd meta; entities = entities; hubs = hubs;
     tech_tree = tree; civs = civs}
 
-let init_civ player_controlled hub_roles map civ : civ = {
+let init_civ player_controlled hub_roles map civ : civ =
+  let tup = Cluster.create  ~name:(fst civ)
+                              ~descr:"A soon to be booming metropolis"
+                              (* TODO this needs to be different *)
+                              ~town_hall_tile:(Mapp.get_random_tile !map)
+                              ~hub_role_list:hub_roles
+                              ~map:!map in
+  map := (snd tup);
+  {
   name = fst civ;
   desc = snd civ;
   entities = [];
-  clusters = [Cluster.create  ~name:(fst civ)
-                              ~descr:"A soon to be booming metropolis"
-                              (* TODO this needs to be different *)
-                              ~town_hall_tile:(Mapp.tile_by_pos (Coord.create 1 1) map)
-                              ~hub_role_list:hub_roles];
+  clusters = [fst tup];
   techs = [];
   player_controlled = player_controlled;
   }
@@ -126,7 +130,7 @@ let init_state json : state =
   let json = Basic.from_file json in
   let parsed = init_json json in
   (* TODO what should these values be? *)
-  let map = Mapp.generate 10 10 in
+  let map = ref (Mapp.generate 42 42) in
   let civs = List.mapi (fun i x -> init_civ (i=0) parsed.hubs map x)
               parsed.civs in
 {
@@ -135,7 +139,7 @@ let init_state json : state =
   hub_roles = parsed.hubs;
   entity_roles = parsed.entities;
   tech_tree = parsed.tech_tree;
-  map = map;
+  map = !map;
   screen_top_left = Coord.Screen.create 0 0;
   selected_tile = Coord.origin;
   messages = [];

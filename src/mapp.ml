@@ -14,6 +14,7 @@ let tile_by_pos c map =
 
 (* map generation *)
 let generate width height =
+  Random.self_init ();
   let generate_tile x y =
     let terrain = match Random.int 10 with
     | n when n < 5           -> Tile.Flatland
@@ -33,4 +34,21 @@ let generate width height =
   let arr_lst = Array.map Array.to_list a in
   Array.to_list arr_lst
 
+let set_tile tile map =
+  let arr_list = List.map Array.of_list map in
+  let arr_list = Array.of_list arr_list in
+  let c = Tile.get_pos tile in
+  let x,y = (Coord.get_x c, Coord.get_y c) in
+  let row = Array.get arr_list y in
+  row.(x) <- tile; arr_list.(y) <- row;
+  let arr_lst = Array.map Array.to_list arr_list in
+  Array.to_list arr_lst
 
+let rec get_random_tile map =
+  Random.self_init ();
+  let x,y = (Random.int (List.length map), Random.int (List.length map)) in
+  let row = List.nth map y in
+  let tile = List.nth row x in
+  if Tile.has_building_restriction tile then
+    get_random_tile map
+  else tile

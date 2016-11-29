@@ -17,14 +17,14 @@ type t = {
   tiles: tile list;
 }
 
-let create ~name ~descr ~town_hall_tile ~hub_role_list =
+let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
 
   let town_hall_hub = List.hd (Hub.find_role "town_hall" hub_role_list) in
   let town_hall = Tile.place_hub town_hall_hub None town_hall_tile in
-
-  {
+  let map = Mapp.set_tile town_hall map in
+  ({
     name = name;
     descr = descr;
     town_hall = town_hall;
     tiles = [town_hall];
-  }
+  }, map)
