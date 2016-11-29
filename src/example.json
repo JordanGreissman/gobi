@@ -301,6 +301,7 @@
     {
       "name": "Town Hall",
       "desc": "The 'center' of a town. Where happiness is produced.",
+      "art": "townhall",
       "built by": "Settler",
       "generates": [
         {
@@ -318,6 +319,7 @@
     {
       "name": "Farm",
       "desc": "Produces food",
+      "art": "farm",
       "built by": "Worker",
       "generates": [
         {
@@ -332,6 +334,7 @@
     {
       "name": "Forge",
       "desc": "Produces iron",
+      "art": "forge",
       "built by": "Worker",
       "generates": [
         {
@@ -346,6 +349,7 @@
     {
       "name": "Mine",
       "desc": "Produces gold",
+      "art": "mine",
       "built by": "Worker",
       "generates": [
         {
@@ -360,6 +364,7 @@
     {
       "name": "Barracks",
       "desc": "Trains soldiers",
+      "art": "barracks",
       "built by": "Worker",
       "generates": [
         {
@@ -380,6 +385,7 @@
     {
       "name": "Library",
       "desc": "Produces paper",
+      "art": "library",
       "built by": "Worker",
       "generates": [
         {
@@ -414,6 +420,7 @@
     {
       "name": "Worker",
       "desc": "A normal, ordinary worker",
+      "art": "worker",
       "attack": 0,
       "defense": 0,
       "actions": 2,
@@ -423,6 +430,7 @@
     {
       "name": "Settler",
       "desc": "Creates new town for your civilization",
+      "art": "settler",
       "attack": 0,
       "defense": 0,
       "actions": 2,
@@ -432,6 +440,7 @@
     {
       "name": "Warrior",
       "desc": "A basic soldier, melee attacks",
+      "art": "warrior",
       "attack": 5,
       "defense": 5,
       "actions": 2,
@@ -441,6 +450,7 @@
     {
       "name": "Archer",
       "desc": "High attack, very low defense",
+      "art": "archer",
       "attack": 8,
       "defense": 1,
       "actions": 2,
@@ -450,6 +460,7 @@
     {
       "name": "Cavalry",
       "desc": "High mobility, average stats",
+      "art": "cavalry",
       "attack": 9,
       "defense": 3,
       "actions": 4,
@@ -459,6 +470,7 @@
     {
       "name": "Spearman",
       "desc": "Stronger than a warrior",
+      "art": "spearman",
       "attack": 7,
       "defense": 7,
       "actions": 2,
@@ -468,6 +480,7 @@
     {
       "name": "Heavy",
       "desc": "Very high defense, low attack",
+      "art": "heavy",
       "attack": 2,
       "defense": 20,
       "actions": 2,
