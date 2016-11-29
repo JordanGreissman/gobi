@@ -12,7 +12,7 @@ val extract_to_role : string -> string -> string ->
                       int -> int -> int -> int -> role
 
 (* Returns the role with the name of a certain string, failwith otherwise *)
-val find_role : string -> role list -> role
+val find_role_by_name : string -> role list -> role
 
 (** Create and return an entity. An entity has a role, an attack level, a defense
   * level, and a position.

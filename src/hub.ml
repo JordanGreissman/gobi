@@ -78,7 +78,7 @@ let extract_to_role name descr built_by default_def cost_to_make
         (Entity.find_role_by_name name entity_role_list))
       entities in
     let prod_resource = Resource (Resource.str_to_res resource) in
-    let production = prod_entity@prod_resource
+    let production = prod_entity@prod_resource in
     let default_def = amount in
       create_role name descr cost_to_make allowed_roles
       production default_def

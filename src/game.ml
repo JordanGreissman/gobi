@@ -91,7 +91,6 @@ let init_json json =
     (get_assoc "hubs" json) in
   let unlockables = List.map (extract_unlockable entities hubs)
     (get_assoc "entities" json) in
-  let unlockables = List.map extract_unlockable unlockables in
   let branches = List.map fst unlockables in
   let techs = List.map snd unlockables in
   let tree = Research.Research.create_tree branches techs [] in
