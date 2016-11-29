@@ -174,7 +174,7 @@
               "hub": "barracks",
               "amount": 0,
               "entity": [
-                "Spearman"
+                "spearman"
               ]
             }
           ]
@@ -200,7 +200,7 @@
               "hub": "barracks",
               "amount": 0,
               "entity": [
-                "Heavy"
+                "heavy"
               ]
             }
           ]
@@ -264,7 +264,7 @@
           "cost": 500,
           "treasure": [
             {
-              "hub": "libary",
+              "hub": "library",
               "amount": 50,
               "entity": []
             }
