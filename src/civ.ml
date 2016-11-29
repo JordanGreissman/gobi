@@ -17,7 +17,7 @@ let add_entity_to_hub entity hub civ =
     let new_civ = { civ with entities = new_e_list } in
     let new_hub = { hub with production_rate = Hub.get_production_rate hub + 1 } in
       (new_hub, new_civ)
-  else raise (Exception.Illegal "This entity has the wrong role for the hub"); hub 
+  else raise (Exception.Illegal "This entity has the wrong role for the hub"); (hub, civ)
 
 let get_player_controlled civ =
   civ.player_controlled
