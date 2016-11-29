@@ -17,17 +17,14 @@ type t = {
   tiles: tile list;
 }
 
-let create ~name ~descr ~town_hall_tile = {
-  name = name;
-  descr = descr;
-  town_hall = Tile.place_hub
-    ~name: "Town Hall"
-    ~descr: "The Town Hall" (* TODO *)
-    ~starting_entity: None
-    ~production:            (* TODO *)
-    ~production_rate: 1.0   (* TODO *)
-    ~allowed_roles:         (* TODO *)
-    ~def: 1000              (* TODO *)
-    ~tile: town_hall_tile;
-  tiles = [town_hall];
-}
+let create ~name ~descr ~town_hall_tile ~hub_role_list = 
+
+  let town_hall = Tile.place_hub 
+    (Hub.find_role "Town Hall" hub_role_list) None town_hall_tile
+
+  {
+    name = name;
+    descr = descr;
+    town_hall = town_hall
+    tiles = [town_hall];
+  } 
