@@ -43,14 +43,14 @@ struct
 
   type research_list = (key * value) list
 
-  let extract_to_value name res_str cost u_hub u_amt u_entity 
+  let extract_to_value name res_str cost u_hub u_amt u_entity
   entity_role_list hub_role_list =
-    let hub = Hub.find_role u_hub hub_role_list
+    let hub = Hub.find_role u_hub hub_role_list in
     let treasure = ( if u_entity = []
       then Unlockable.create_treasure_hub hub u_amt
       else
         let prod_list = List.map
-          (fun entity -> Hub.Entity 
+          (fun entity -> Hub.Entity
             (Entity.find_role entity entity_role_list)) u_entity
         in Unlockable.create_treasure_prod hub prod_list
       ) in
