@@ -25,11 +25,11 @@ val place_hub :
   tile : t ->
   t
 
-(** Move the entity from [to_tile] (the tile at the position specified by the
-  * first arg) to [from_tile] (the tile at the position specified by the second
-  * arg). Return a 2-tuple [(updated_to_tile,updated_from_tile)].
+(** [move_entity from to] is a 2-tuple [(from',to')] where [from'] is the updated
+  * version of [from] and [to'] is the updated version of [to]. The tiles are
+  * updated by moving the entity on [to] to [from].
   *)
-val move_entity : Coord.t -> Coord.t -> t*t
+val move_entity : t -> t -> t*t
 
 (** [get_art_char c t] is the art cell for the absolute screen coordinate [c],
   * which is contained within tile [t]. This is the art cell for the entity on
@@ -44,7 +44,6 @@ val get_terrain : t -> terrain
 val set_terrain : t -> terrain -> t
 
 val is_settled : t -> bool
-val settle : t -> t
 val unsettle : t -> t
 
 val get_hub : t -> Hub.t option

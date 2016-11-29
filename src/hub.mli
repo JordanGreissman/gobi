@@ -59,17 +59,35 @@ val create_role :
 val describe : t -> string
 val describe_role : role -> string
 
-(* Faciliate going from JSON to a hub role. Hold on to your hats.
- * name, description (string)
- * built_by, a string that's a valid Entity role
- * default_def, an int that's the health or defense
- * cost_to_make, an int
- * resource, a string of a valid Resource
- * amount, an int
- * entities, a string list of valid roles that it produces
- * entity_role_list, (entity role list) the master list of all roles in the game
- *)
-val extract_to_role : string -> string -> string -> int -> int -> string -> int -> string list -> Entity.role list -> role
+(** Faciliate going from JSON to a hub role. Hold on to your hats.
+  * [name] is the name of the role
+  * [description] is a description of the role that the player would find useful
+  *   if they wanted to know more about the role and its capabilities
+  * [built_by] is the entity role that can build a hub of this role. This string
+  *   should therefore be a valid entity role name
+  * [default_def] is the default defense (AKA health) of hubs of this role
+  * [cost_to_make] is the number of turns after construction of a hub of this
+  *   role is started that the hub will be ready for use
+  * [resource] is the resource this hub produces, if any. This argument should
+  *   therefore be a string representing a valid resource
+  * [amount] is the amount of [resource] that hubs of this role produce every
+  *   turn by default (when there are no entities increasing the production rate
+  *   of the hub)
+  * [entities] is the list of entity roles that hubs of this role can produce
+  * [entity_role_list] is the master list of all the entity roles that exist in
+  *   the game
+  *)
+val extract_to_role :
+  name:string ->
+  descr:string ->
+  built_by:string ->
+  default_def:int ->
+  cost_to_make:int ->
+  resource:string ->
+  amount:int ->
+  entities:string list ->
+  entity_role_list:Entity.role list ->
+  role
 
 (* Return a role matching the string *)
 val find_role : string -> role list -> role list

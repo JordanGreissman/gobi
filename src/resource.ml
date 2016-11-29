@@ -18,12 +18,12 @@
 
 type t = Food | Gold | Iron | Paper
 
-let str_to_res str = match str with
-	| "iron" | "Iron" -> Iron
-	| "gold" | "Gold" -> Gold
-	| "paper" | "Paper" -> Paper
-	| "food" | "Food" -> Food
-	| _ -> failwith "Precondition violated" 
+let str_to_res str = match String.lowercase_ascii str with
+ | "iron"  -> Some Iron
+ | "gold"  -> Some Gold
+ | "paper" -> Some Paper
+ | "food"  -> Some Food
+ | _       -> None
 
 (* (\* comprehensive list of resource amounts for every resource in the game *\) *)
 (* let res_lst = [ *)

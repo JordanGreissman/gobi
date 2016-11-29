@@ -23,8 +23,6 @@ let load name =
     let f i = (List.nth lines i,List.nth lines (i+6)) in
     [0;1;2;3;4] |> List.map f in
   let f (chars,colors) =
-    print_endline chars;
-    print_endline colors;
     let explode s =
       let rec exp i l =
         if i < 0 then l else exp (i - 1) (s.[i] :: l) in
