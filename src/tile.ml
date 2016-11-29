@@ -20,18 +20,23 @@ let create ~terrain ~pos = {
   hub     = None;
 }
 
-
-let place_hub ~role ~starting_entity ~tile =
+let place_hub ~role ~starting_entity ~tile ~civ =
   let d = Hub.get_role_default_production_rate role in
   let production_rate = match starting_entity with
-    (* TODO remove the entity [e] from the game (it is consumed by the hub) *)
     | Some e -> d+1
     | None   -> d in
   let def = Hub.get_role_default_defense role in
   let pos = tile.pos in
   let h = Hub.create role production_rate def pos in
-  { tile with hub=(Some h) }
+  let new_tile = { tile with hub=(Some h) } in
+  match starting_entity with 
+    | None -> (new_tile, civ)
+    | Some e -> 
+      let new_e_list = List.filter (fun e -> not (e = entity)) civ.entities in
+      let new_civ = { civ with entities = new_e_list } in
+        (new_tile, new_civ)
 
+(* what if tiles aren't in same cluster? can you? *)
 let move_entity to_tile from_tile =
   if to_tile.entity = None
   then

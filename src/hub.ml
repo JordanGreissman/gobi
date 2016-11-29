@@ -47,8 +47,6 @@ type t = {
   pos: coord;
 }
 
-
-
 let create ~role ~production_rate ~def ~pos = {
   role            = role;
   is_finished     = false;
