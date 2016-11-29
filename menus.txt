@@ -111,3 +111,62 @@ Enemy tiles
     describe
   [h] hub
     describe
+
+[0] -----------------------------------
+Action for:
+  [t] Tile           => [1]
+  [h] Hub            => [2]
+  [e] Entity         => [3]
+  [r] Research       => [4]
+  [n] Next turn      => next_turn(), [0]
+  [?] Tutorial       => tutorial(), [0]
+---------------------------------------
+
+[1]------------------------------------
+  [d] describe       => describe(), [0]
+  [s] settle         => settle(), [0]   (only for unsettled tiles w/o building obstruction)
+  [c] clear          => clear(), [0]    (only for uncleared forests)
+  [b] build hub      => [5]             (only on tiles w/o building obstruction)
+
+  [<] back           => [0]
+---------------------------------------
+
+[2]------------------------------------
+  [d] describe       => describe(), [0]
+  [p] produce        => [6]
+---------------------------------------
+
+[3]------------------------------------
+  [d] describe       => describe(), [0]
+  [m] move           => * requires selection *
+  [a] attack         => * requires selection *
+  [s] skip           => skip(), [0]
+  [h] add to hub     => * requires selection *
+---------------------------------------
+
+[4]------------------------------------
+Select research branch:
+  [1] Agriculture    => [7]
+  [2] Transportation => [7]
+  [3] Combat         => [7]
+  [4] Productivity   => [7]
+---------------------------------------
+
+[5]------------------------------------
+  * list of possible hubs that can be built *
+  [a] Hub role A     => place_hub(), [0]
+  [b] Hub role B     => place_hub(), [0]
+       ...
+---------------------------------------
+
+[6]------------------------------------
+  * list of possible things this hub can produce *
+  [a] Production A   => produce(), [0]
+  [b] Production B   => produce(), [0]
+       ...
+---------------------------------------
+
+[7]------------------------------------
+  [d] describe       => describe, [0]
+  [r] begin researching * next research in branch *
+---------------------------------------
