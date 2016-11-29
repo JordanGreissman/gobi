@@ -18,7 +18,8 @@ module Unlockable : sig
 	val create_treasure_prod : Hub.t -> Hub.production list -> treasure
 
 	(* create unlockable from a name, resource, and cost *)
-	val create_unlockable : string -> Resource.t -> int -> treasure -> t
+	val create_unlockable : name:string -> resource:Resource.t -> cost:int ->
+                          treasure:treasure -> t
 
 	(* returns true if unlockable is unlocked *)
 	val is_unlocked : t -> bool

@@ -52,7 +52,7 @@ let extract_unlockable tup =
   let techs = (List.assoc "techs" assoc) |> Basic.Util.to_list
     |> Basic.Util.filter_assoc in
   let techs = List.map (fun tech -> (tech, foo)) techs in
-  let techs = List.map extract_techs techs |> List.flatten in
+  let techs = List.map extract_techs techs in
   (branch, techs)
 
 let extract_hub assoc =
