@@ -41,7 +41,7 @@ struct
 
   type value = t list
 
-  type research_list = (key * value) list 
+  type research_list = (key * value) list
 
   let extract_to_value name res_str cost u_hub u_amt u_entity =
     let treasure = ( if u_entity = []
@@ -53,19 +53,12 @@ struct
     match key_list, value_list with
       | [], [] -> acc_tree
       | key::key_tail, value::value_tail ->
-        let tree = add_unlockable_value key value
-          (add_unlockable_key key acc_tree) in
-        create_tree key_tail value_tail tree
+        let key_value_tree = add_unlockable_key key value acc_tree in
+        create_tree key_tail value_tail key_value_tree
       | _ -> failwith "Precondition violation"
 
-  let add_unlockable_key key research_list =
-    (key * []) @ research_list
-
-  let add_unlockable_value key value research_list =
-    let value_list = List.assoc key research_list in
-    let new_value_list = value_list @ [value] in
-    let value_list_before_update = List.remove_assoc key research_list in
-    (key * new_value_list) @ value_list_before_update
+  let add_unlockable_key key value research_list =
+    (key,value)::research_list
 
   let get_next_unlockable key research_list =
     let value_list = List.assoc key research_list in
