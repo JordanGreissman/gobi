@@ -115,7 +115,7 @@ let init_civ player_controlled hub_roles map civ : civ = {
   entities = [];
   clusters = [Cluster.create  ~name:(fst civ)
                               ~descr:"A soon to be booming metropolis"
-                              ~town_hall_tile:(Mapp.tile_by_pos (Coord.create 0 0) map)
+                              ~town_hall_tile:(Mapp.tile_by_pos (Coord.create 1 1) map)
                               ~hub_role_list:hub_roles];
   techs = [];
   player_controlled = player_controlled;
@@ -124,7 +124,7 @@ let init_civ player_controlled hub_roles map civ : civ = {
 let init_state json : state =
   let json = Basic.from_file json in
   let parsed = init_json json in
-  let map = Mapp.generate 0 0 in
+  let map = Mapp.generate 10 10 in
   let civs = List.mapi (fun i x -> init_civ (i=0) parsed.hubs map x)
               parsed.civs in
 {

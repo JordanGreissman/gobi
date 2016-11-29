@@ -28,7 +28,7 @@ let draw_map ctx w h (s:State.t) =
       | Contained c ->
         let t = Mapp.tile_by_pos c s.map in
         let cell = Tile.get_art_char screen_cur t in
-        print_endline "here";
+        (* print_endline "here"; *)
         let style = match cell with
           | Some c ->
             { LTerm_style.none with foreground = Some (Art.get_color c) }
