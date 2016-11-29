@@ -17,14 +17,14 @@ type t = {
   tiles: tile list;
 }
 
-let create ~name ~descr ~town_hall_tile ~hub_role_list = 
+let create ~name ~descr ~town_hall_tile ~hub_role_list =
 
-  let town_hall = Tile.place_hub 
-    (Hub.find_role "Town Hall" hub_role_list) None town_hall_tile
+  let town_hall = Tile.place_hub
+    (Hub.find_role "Town Hall" hub_role_list) None town_hall_tile in
 
   {
     name = name;
     descr = descr;
-    town_hall = town_hall
+    town_hall = town_hall;
     tiles = [town_hall];
-  } 
+  }

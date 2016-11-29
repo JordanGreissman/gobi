@@ -20,8 +20,7 @@ let create ~terrain ~pos = {
   hub     = None;
 }
 
-let describe t =
-  failwith "Unimplemented"
+
 
 let place_hub ~role ~starting_entity ~tile =
   let production_rate = match starting_entity with
@@ -42,38 +41,40 @@ let place_hub ~role ~starting_entity ~tile =
   { tile with hub=(Some h) }
 
 let move_entity to_tile from_tile =
-  failwith "Unimplemented"
+  if to_tile.entity = None
+  then
+    let current_entity = to_tile.entity in
+    ({to_tile with entity=current_entity}, {from_tile with entity=None})
+  else (to_tile, from_tile)
 
 (* getters and setters *)
 
 let get_terrain t =
-  failwith "Unimplemented"
+  t.terrain
 
 let set_terrain t terrain =
-  failwith "Unimplemented"
+  {t with terrain=terrain}
 
 let is_settled t =
-  failwith "Unimplemented"
-
-let settle t =
-  failwith "Unimplemented"
+  not(t.hub = None)
 
 let unsettle t =
-  failwith "Unimplemented"
+  {t with hub=None}
 
 let get_hub t =
-  failwith "Unimplemented"
+  t.hub
 
 let set_hub t hub =
-  failwith "Unimplemented"
+  {t with hub=Some hub}
 
 let get_entity t =
-  failwith "Unimplemented"
+  t.entity
 
-let set_entity t =
-  failwith "Unimplemented"
+let set_entity t entity =
+  {t with entity=Some entity}
 
-let get_pos t = t.pos
+let get_pos t =
+  t.pos
 
 (* terrain property queries *)
 
@@ -82,6 +83,17 @@ let describe_terrain = function
   | Mountain -> "This is a mountain"
   | Forest -> "This is a forest"
   | Desert -> "This is a desert"
+
+  let describe t =
+    match t.entity, t.hub with
+    | None, None ->
+      (describe_terrain t.terrain)^"."
+    | Some x, None ->
+      (describe_terrain t.terrain)^". "^"It currently has a"^(Entity.describe x)^"on it."
+    | None, Some y ->
+      (describe_terrain t.terrain)^". "^"It currently has a"^(Hub.describe y)^"on it."
+    | Some x, Some y ->
+      (describe_terrain t.terrain)^". "^"It currently has a "^(Entity.describe x)^" and a "^(Hub.describe y)^"on it."
 
 let flatland_art = Art.load "flatland"
 let mountain_art = Art.load "mountain"

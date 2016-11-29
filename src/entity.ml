@@ -69,10 +69,10 @@ let extract_to_role name descr requires cost_to_make attack defense actions =
   create_role name descr cost_to_make unlocked actions default_power
 
 let describe e =
-  failwith "Unimplemented"
+  e.role.name
 
 let describe_role r =
-  failwith "Unimplemented"
+  r.descr
 
 (* [t] getters and setters *)
 

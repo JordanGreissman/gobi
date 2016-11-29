@@ -90,7 +90,7 @@ let rec find_role role_str role_list =
     else find_role role_str t
 
 let describe hub =
-  failwith "Unimplemented"
+  hub.role.name
 
 let describe_role r = r.descr
 
