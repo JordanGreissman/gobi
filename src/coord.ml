@@ -14,15 +14,17 @@ module Screen = struct
   let origin = (0,0)
   let create x y = (x,y)
   let add (x1,y1) (x2,y2) = (x1+x2,y1+y2)
+  let get_x (x,y) = x
+  let get_y (x,y) = y
+  let to_string (x,y) = Printf.sprintf "(%d,%d)" x y
 end
 
 let origin = (0,0)
-
 let create x y = (x,y)
-
 let add (x1,y1) (x2,y2) = (x1+x2,y1+y2)
-
 let to_string (x,y) = Printf.sprintf "(%d,%d)" x y
+let get_x (x,y) = x
+let get_y (x,y) = y
 
 (* coordinate conversion functions *)
 
@@ -50,7 +52,7 @@ let offset_from_axial (ac : axial_coordinate) : offset_coordinate =
   offset_from_cube cc
 
 let screen_from_offset ((x,y) : offset_coordinate) : Screen.t list list =
-  let ox,oy = if y mod 2 = 0 then (9*x,6*y) else (9*x,6*y+3) in
+  let ox,oy = if x mod 2 = 0 then (9*x,6*y) else (9*x,6*y+3) in
   let l1 = [3;4;5;6;7;8;9] |> List.map (fun i -> (ox+i,oy+1)) in
   let l2 = [2;3;4;5;6;7;8;9;10] |> List.map (fun i -> (ox+i,oy+2)) in
   let l3 = [1;2;3;4;5;6;7;8;9;10;11] |> List.map (fun i -> (ox+i,oy+3)) in

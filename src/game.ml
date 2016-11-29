@@ -56,7 +56,6 @@ let extract_hub assoc =
   let name = (List.assoc "name" assoc) |> Basic.Util.to_string in
   let desc = (List.assoc "desc" assoc) |> Basic.Util.to_string in
   let builder = (List.assoc "built by" assoc) |> Basic.Util.to_string in
-  let upgrades = (List.assoc "upgrades to" assoc) |> Basic.Util.to_string in
   let defense = (List.assoc "defense" assoc) |> Basic.Util.to_int in
   let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
   let entities = extract_list "entities" assoc in
@@ -65,7 +64,7 @@ let extract_hub assoc =
   let generates = List.nth generates 0 in
     let resource = (List.assoc "resource" generates) |> Basic.Util.to_string in
     let amount = (List.assoc "amount" generates) |> Basic.Util.to_int in
-  (name, desc, builder, upgrades, cost, defense, entities, (resource, amount))
+  (name, desc, builder, cost, defense, entities, (resource, amount))
 
 let extract_civ assoc =
   let name = (List.assoc "name" assoc) |> Basic.Util.to_string in

@@ -23,6 +23,10 @@ val origin : t
 val create : int -> int -> t
 (** [add a b] is the offset coordinate obtained when [a] is added to [b] *)
 val add : t -> t -> t
+(** [get_x c] is the x component of offset coordinate [c] *)
+val get_x : t -> int
+(** [get_y c] is the y component of offset coordinate [c] *)
+val get_y : t -> int
 (** [to_string c] is the string representation of [c] *)
 val to_string : t -> string
 
@@ -44,6 +48,12 @@ module Screen : sig
   val create : int -> int -> t
   (** [add a b] is the screen coordinate obtained when [a] is added to [b] *)
   val add : t -> t -> t
+  (** [get_x c] is the x component of screen coordinate [c] *)
+  val get_x : t -> int
+  (** [get_y c] is the y component of screen coordinate [c] *)
+  val get_y : t -> int
+  (** [to_string c] is the string representation of [c] *)
+  val to_string : t -> string
 end
 
 (** [screen_from_offset c] is a list of lists of [Screen.t] coordinates contained

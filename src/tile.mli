@@ -8,7 +8,7 @@ type terrain = Flatland | Mountain | Forest | Desert
 (** Create and return a tile.
   * [terrain] is the terrain type for the tile.
   *)
-val create : terrain:terrain -> t
+val create : terrain:terrain -> pos:Coord.t -> t
 
 val describe : t -> string
 val describe_terrain : terrain -> string
@@ -52,6 +52,8 @@ val set_hub : t -> Hub.t option -> t
 
 val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
+
+val get_pos : t -> Coord.t
 
 (* terrain property queries *)
 
