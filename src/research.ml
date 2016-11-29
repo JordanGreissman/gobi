@@ -8,7 +8,7 @@ struct
 
   type t = {
     name: string;
-    resource: string;
+    resource: Resource.t;
     cost: int;
     is_unlocked: bool;
     treasure: treasure;
@@ -43,15 +43,19 @@ struct
 
   type research_list = (key * value) list
 
-  let extract_to_value name res_str cost u_hub u_amt u_entity =
+  let extract_to_value name res_str cost u_hub u_amt u_entity role_list =
     let treasure = ( if u_entity = []
       then Unlockable.create_treasure_hub u_hub u_amt
       else 
         let prod_list = List.map 
-          (fun entity -> Hub.Entity (Entity.find_role_by_name entity)) u_entity
+          (fun entity -> Hub.Entity (Entity.find_role_by_name entity role_list)) u_entity
         in Unlockable.create_treasure_prod u_hub prod_list
       ) in
-    Unlockable.create_unlockable name (str_to_res res_str) cost treasure
+    let resource = Resource.str_to_res res_str in
+    Unlockable.create_unlockable name resource cost treasure
+
+  let add_unlockable_key key value research_list =
+    (key,value)::research_list
 
   let rec create_tree key_list value_list acc_tree =
     match key_list, value_list with
@@ -61,13 +65,10 @@ struct
         create_tree key_tail value_tail key_value_tree
       | _ -> failwith "Precondition violation"
 
-  let add_unlockable_key key value research_list =
-    (key,value)::research_list
-
   let get_next_unlockable key research_list =
     let value_list = List.assoc key research_list in
     try
-      let next_unlockable = List.find (fun x -> not (x.is_unlocked)) value_list in
+      let next_unlockable = List.find (fun x -> not (Unlockable.is_unlocked x)) value_list in
       Some next_unlockable
     with
     | Not_found -> None
@@ -80,5 +81,5 @@ struct
 
   let get_unlocked key research_list =
     let value_list = List.assoc key research_list in
-    List.filter (fun x -> x.is_unlocked) value_list
+    List.filter (fun x -> Unlockable.is_unlocked x) value_list
 end
