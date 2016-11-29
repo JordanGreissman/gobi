@@ -8,7 +8,7 @@ let compute_weights attack defend =
   int_of_float percent
 
 let get_random_number =
-let _ = Random.init (int_of_float (Unix.time ())) in
+let _ = Random.self_init () in
 Random.int 100
 
 let attack_hub attack_tile hub_tile =
