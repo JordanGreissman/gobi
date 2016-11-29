@@ -19,6 +19,9 @@ type t = {
   (** a list of messages (strings) to draw in the message pane. More recent
     * messages first, with the most recent message having index 0 *)
   messages : string list;
+  (** the menu that is currently being displayed along the left side of the
+    * screen. *)
+  menu : Menu.t list;
   (** whether the player has quit the game *)
   is_quit : bool;
 }
