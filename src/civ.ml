@@ -7,3 +7,6 @@ type t = {
    techs : Research.Research.research_list;
    player_controlled : bool;
 }
+
+let get_player_controlled civ =
+  civ.player_controlled

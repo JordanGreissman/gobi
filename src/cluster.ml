@@ -39,3 +39,6 @@ let add_entity_to_hub entity hub civ =
     let new_hub = { hub with production_rate = hub.production_rate + 1 } in
       (hub, civ)
   else raise (Exception.Illegal "This entity has the wrong role for the hub"); hub 
+
+let get_town_hall cluster =
+  cluster.town_hall

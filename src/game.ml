@@ -125,6 +125,15 @@ let init_civ player_controlled hub_roles map civ : civ =
   player_controlled = player_controlled;
   }
 
+let get_player_start_coords civs =
+  let player = List.find (fun civ -> Civ.get_player_controlled civ) civs in
+  let cluster = List.nth player.clusters 0 in
+  let c = Tile.get_pos (Cluster.get_town_hall cluster) in
+  let coord = Coord.screen_from_offset c in
+  let origin = List.nth (List.nth coord 0) 0 in
+  let offset = Coord.Screen.create (-5) (-2) in
+  (c, Coord.Screen.add offset origin)
+
 let init_state json : state =
   let json = Basic.from_file json in
   let parsed = init_json json in
@@ -132,6 +141,7 @@ let init_state json : state =
   let map = ref (Mapp.generate 42 42) in
   let civs = List.mapi (fun i x -> init_civ (i=0) parsed.hubs map x)
               parsed.civs in
+  let coords = get_player_start_coords civs in
 {
   civs = civs;
   turns_left = parsed.turns;
@@ -139,8 +149,8 @@ let init_state json : state =
   entity_roles = parsed.entities;
   tech_tree = parsed.tech_tree;
   map = !map;
-  screen_top_left = Coord.Screen.create 0 0;
-  selected_tile = Coord.origin;
+  screen_top_left = snd coords;
+  selected_tile = fst coords;
   messages = [];
   is_quit = false;
 }
