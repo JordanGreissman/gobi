@@ -1,16 +1,5 @@
-module type Unlockable =
-sig
-  type treasure
-  type t
-  val create_treasure_hub : Hub.hub * int -> treasure
-  val create_treasure_prod : (Hub.hub * Hub.production) list -> treasure
-  val create_unlockable : string -> string -> int -> t
-  val is_unlocked : t -> bool
-  val resource_needed : t -> int
-  val resource : t -> string
-end
 
-module Unlockables (U: Unlockable) =
+module Unlockable =
 struct
 
   type treasure =
@@ -44,23 +33,9 @@ struct
     t.resource
 end
 
-module type Research =
-sig
-  type t
-  type key
-  type value
-type research_list
-  val add_unlockable_key: key -> research_list -> research_list
-  val add_unlockable_value: key -> value -> research_list -> research_list
-  val get_next_unlockable: key -> research_list -> t option
-  val unlock : key -> research_list -> unlockable option
-  val get_key_list : key -> research_list -> value
-  val get_unlocked : key -> research_list -> list
-end
-
-module Researches (R: Research) =
+module Research =
 struct
-  type t = Unlockables.t
+  type t = Unlockable.t
 
   type key = string
 
@@ -109,5 +84,4 @@ struct
   let get_unlocked key research_list =
     let value_list = List.assoc key research_list in
     List.filter (fun x -> x.is_unlocked) value_list
-
 end

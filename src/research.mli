@@ -1,8 +1,8 @@
-module type Unlockable = sig
+module Unlockable : sig
 
-	type treasure = 
-	  | Hub (hub * int) list
-    | Production of (hub * production) list
+	type treasure =
+	  | Hub of (Hub.t * int) list
+    | Production of (Hub.t * Hub.production) list
 
 	(* culmination of all of the above *)
 	type t = {
@@ -14,8 +14,8 @@ module type Unlockable = sig
 	}
 
 	(* creates various treasures *)
-	val create_treasure_hub : hub * int -> treasure
-	val create_treasure_prod : (hub * production) list -> treasure
+	val create_treasure_hub : Hub.t * int -> treasure
+	val create_treasure_prod : (Hub.t * Hub.production) list -> treasure
 
 	(* create unlockable from a name, resource, and cost *)
 	val create_unlockable : string -> string -> int -> t
@@ -31,27 +31,26 @@ module type Unlockable = sig
 
 end
 
-module type Research = sig
+module Research : sig
 
-  type t
+  type t = Unlockable.t
 
-  type key
+  type key = string
 
   type value = t list
 
-  type research_list
+  type research_list = (key * value) list
 
-  (* Faciliate going from JSON to research tree. Respectively takes 
+  (* Faciliate going from JSON to research tree. Respectively takes
    * the tech name, the resource type string (lower / uppercase of resource)
-   * the amount (int) of the treasure / upgrade, and then then the upgrade 
-   * details: the affected hub's name (string), the amount (int) and 
+   * the amount (int) of the treasure / upgrade, and then then the upgrade
+   * details: the affected hub's name (string), the amount (int) and
    * list of new production (can be empty ot a string list) *)
   val extract_to_value : string -> string -> int -> string -> int -> 
   	string list -> value
 
-  (* Creates a tree from a list of keys and list of list of values, which 
-   * must be the same size. Pass an empty list for the third parameter. *)
-  val create_tree : key list -> value list -> research_list -> research_list
+  (* Creates a tree from a list of keys and values, which must be the same size *)
+  val create_tree : key list -> value list -> 'a list -> research_list
 
   val add_unlockable_key: key -> research_list -> research_list
 
@@ -63,12 +62,12 @@ module type Research = sig
 
 	(* unlock and return a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
      * otheriwse, returns none *)
-	val unlock : key -> research_list -> unlockable option
+	val unlock : key -> research_list -> t option
 
 	(* returns the list of unlockables based on the key*)
  val get_key_list : key -> research_list ->  value
 
 	(* returns a list of every unlocked unlockable *)
- val get_unlocked : key -> research_list -> list
+ val get_unlocked : key -> research_list -> t list
 
 end
