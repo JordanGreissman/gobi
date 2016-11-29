@@ -3,6 +3,8 @@
 type t = {
   (** name of the civilization *)
   name : string;
+  (** description of the civ *)
+  desc : string;
   (** list of entities currently on the map *)
   entities : Entity.t list;
   (** list of clusters currently on the map *)
