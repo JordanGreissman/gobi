@@ -30,7 +30,7 @@ struct
     t.cost
 
   let resource t =
-    t.resource
+    t.name
 end
 
 module Research =
@@ -46,8 +46,8 @@ struct
   let extract_to_value name res_str cost u_hub u_amt u_entity role_list =
     let treasure = ( if u_entity = []
       then Unlockable.create_treasure_hub u_hub u_amt
-      else 
-        let prod_list = List.map 
+      else
+        let prod_list = List.map
           (fun entity -> Hub.Entity (Entity.find_role_by_name entity role_list)) u_entity
         in Unlockable.create_treasure_prod u_hub prod_list
       ) in

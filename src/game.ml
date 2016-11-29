@@ -32,7 +32,8 @@ let extract_game assoc =
   let ai = (List.assoc "ai" assoc) |> Basic.Util.to_int in
   (turns, ai)
 
-let extract_techs assoc =
+let extract_techs tup =
+  let assoc = fst tup in
   let tech = (List.assoc "tech" assoc) |> Basic.Util.to_string in
   let resource = (List.assoc "resource" assoc) |> Basic.Util.to_string in
   let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
@@ -42,13 +43,15 @@ let extract_techs assoc =
   let hub = (List.assoc "hub" treasure) |> Basic.Util.to_string in
   let amount = (List.assoc "amount" treasure) |> Basic.Util.to_int in
   let entity = extract_list "entity" treasure in
-  Research.Research.extract_to_value tech resource cost hub amount entity
-  (* (tech, resource, cost, (hub, amount, entity)) *)
+  Research.Research.extract_to_value tech resource cost hub amount entity (snd tup)
 
-let extract_unlockable assoc =
+let extract_unlockable tup =
+  let assoc = fst tup in
+  let foo = snd tup in
   let branch = (List.assoc "branch" assoc) |> Basic.Util.to_string in
   let techs = (List.assoc "techs" assoc) |> Basic.Util.to_list
     |> Basic.Util.filter_assoc in
+  let techs = List.map (fun tech -> (tech, foo)) techs in
   let techs = List.map extract_techs techs |> List.flatten in
   (branch, techs)
 
@@ -79,13 +82,16 @@ let extract_entity assoc =
   let actions = (List.assoc "actions" assoc) |> Basic.Util.to_int in
   let cost = (List.assoc "cost" assoc) |> Basic.Util.to_int in
   let requires = (List.assoc "requires" assoc) |> Basic.Util.to_string in
-  (name, desc, attack, defense, actions, cost, requires)
+  Entity.extract_to_role name desc requires cost attack defense actions
 
 let init_json json =
   let meta = json |> Yojson.Basic.Util.member "game"
     |> Basic.Util.to_assoc |> extract_game in
-  let unlockables = List.map extract_unlockable
-    (get_assoc "techtree" json) in
+  let entities = List.map extract_entity
+    (get_assoc "entities" json) in
+  let unlockables = List.map
+                    (fun x -> (x, entities)) (get_assoc "techtree" json) in
+  let unlockables = List.map extract_unlockable unlockables in
   let branches = List.map fst unlockables in
   let techs = List.map snd unlockables in
   let tree = Research.Research.create_tree branches techs [] in
@@ -93,8 +99,6 @@ let init_json json =
     (get_assoc "hubs" json) in
   let civs = List.map extract_civ
     (get_assoc "civilizations" json) in
-  let entities = List.map extract_entity
-    (get_assoc "entities" json) in
   (meta, unlockables, hubs, civs, entities)
 
 let init_state json : state = {

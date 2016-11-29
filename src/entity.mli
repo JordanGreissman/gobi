@@ -4,11 +4,12 @@ type t
 (** the different roles entities can have; e.g. lumberjack, farmer, etc. *)
 type role
 
-(* Faciliate going from JSON to role. Respectively takes 
+(* Faciliate going from JSON to role. Respectively takes
    * the role name and description (strings)
    * the cost to make, attack, and defense values (int),
    * and the number of actions (int) *)
-val extract_to_role : string -> string -> int -> int -> int -> int -> role
+val extract_to_role : string -> string -> string ->
+                      int -> int -> int -> int -> role
 
 (* Returns the role with the name of a certain string, failwith otherwise *)
 val find_role_by_name : string -> role list -> role
