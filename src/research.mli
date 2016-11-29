@@ -44,11 +44,15 @@ module Research : sig
 
   (* Faciliate going from JSON to research tree. Respectively takes
    * the tech name, the resource type string (lower / uppercase of resource)
-   * the amount (int) of the treasure / upgrade, and then then the upgrade
-   * details: the affected hub's name (string), the amount (int) and
-   * list of new production (can be empty ot a string list) *)
+   * the amount (int) of the treasure / upgrade
+   * the affected hub's name (string),
+   * the amount (int)
+   * the string list of roles made, if any
+   * the list of all Entity.role(s) made
+   * the list of all Hub.role(s) made
+   *)
   val extract_to_value : string -> string -> int -> string -> int ->
-  	string list -> Entity.role list -> t
+  	string list -> Entity.role list -> Hub.role list -> t
 
   (* Creates a tree from a list of keys and values, which must be the same size *)
   val create_tree : key list -> value list -> 'a list -> research_list
