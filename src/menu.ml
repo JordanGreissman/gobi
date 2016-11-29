@@ -1,25 +1,32 @@
 type t = {
-  (* the text of the menu item, displayed next to the key binding *)
-  text : string;
-  (* the key this menu item is bound to *)
-  key : CamomileLibrary.UChar.t;
-  action : ;
+  text: string;
+  key: LTerm_key.code;
+  action: action;
 }
 
 and action =
-  (* [SubMenu m] displays the menu [m] *)
   | SubMenu of t list
-
-  | MoveEntity (Tile.t,Coo)
-  (* [Attack o d] commands the entity on tile [o] to attack the hub or entity on
-   * tile [d] *)
-  | Attack of (Tile.t,Tile.t)
+  | Research of Research.Research.key
+  | DisplayResearch of Research.Research.key
   | Skip
+  | Move of Tile.t*Tile.t
+  | Attack of Tile.t*Tile.t
+  | PlaceHub of Tile.t*Hub.role
+  | Produce of Tile.t*Entity.role
+  | AddEntityToHub of Tile.t*Tile.t
 
-  (* [PlaceHub (t,r)] places a hub of role [r] on the tile [t] *)
-  | PlaceHub of (Tile.t,Hub.role)
-  (* [Produce (t,r)] produces one entity of role [r] from the hub on tile [t] *)
-  | Produce of (Tile.t,Entity.role)
-  (* [AddEntityToHub (e,h)] deletes the entity on tile *)
-  | AddEntityToHub of (Tile.t,Tile.t)
-  | Research
+let get_menu t =
+  failwith "Menu.get_menu is unimplemented"
+
+(* [execute s a] returns the next state of the game given the current state [s]
+ * and the action [a]. *)
+let execute state = function
+  | SubMenu m            -> state (* TODO *)
+  | Research r           -> state (* TODO *)
+  | DisplayResearch t    -> state (* TODO *)
+  | Skip                 -> state (* TODO *)
+  | Move (from,to)       -> state (* TODO *)
+  | Attack (o,d)         -> state (* TODO *)
+  | PlaceHub (t,r)       -> state (* TODO *)
+  | Produce (t,r)        -> state (* TODO *)
+  | AddEntityToHub (e,h) -> state (* TODO *)

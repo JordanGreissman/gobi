@@ -134,6 +134,15 @@ So make the menu options and the associated commands part of the json for each
 entity type. These will be parsed into part of the each Hub.role_info and
 Entity.role_info records. Then
 
+Some commands require two selected tiles (such as move entity from tile A to
+tile B). Then the game state must have a pending_cmd field, which is a partially
+defined command that will be executed as soon as all its parameters have been
+provided. When we get an input event, the game should check if there's a
+pending_cmd, and if so, parse the input event as the pending_cmd's next
+parameter. At that point, if the pending_cmd has no more pending params, then
+execute the command, otherwise add the new pending_cmd (the same command with
+one more param provided) to the state.
+
 TODO: how to implement town hall?
   => Town hall is special because it's the only hub to produce both
      resources (one of everything?) and units.

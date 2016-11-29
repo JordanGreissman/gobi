@@ -180,6 +180,11 @@ let get_next_state (s:state) = function
     { s with screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0) }
   | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
     { s with is_quit = true }
+  | LTerm_event.Key { code = c } ->
+    let menu_item = s.menu |> List.find (fun x -> x.key = c) in
+    (match menu_item with
+    | Some c -> execute s c.action
+    | None -> s)
   | _ -> s
 
 let rec loop ui state_ref =

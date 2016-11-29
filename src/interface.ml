@@ -36,7 +36,7 @@ let draw_map ctx w h (s:State.t) =
         let ch = match cell with
           | Some c -> Art.get_char c
           | None   -> 'x' in
-        LTerm_draw.draw_char ctx y x ~style (UChar.of_char ch);
+        LTerm_draw.draw_char ctx y x ~style (UChar.of_char ch)
         (* LTerm_draw.draw_char ctx y x (UChar.of_char '~') *)
       (* we're on the border between two hexes *)
       | Border (h1,h2,h3) ->

@@ -1,7 +1,4 @@
-
-module Unlockable =
-struct
-
+module Unlockable = struct
   type treasure =
     | Hub of Hub.role list * int
     | Production of Hub.role * Hub.production list
@@ -33,14 +30,10 @@ struct
     t.name
 end
 
-module Research =
-struct
+module Research = struct
   type t = Unlockable.t
-
   type key = string
-
   type value = t list
-
   type research_list = (key * value) list
 
   let extract_to_value name res_str cost u_hub u_amt u_entity
