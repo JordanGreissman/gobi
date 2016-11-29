@@ -54,21 +54,14 @@ Multiple workers can be tasked with the construction of a hub, however when the
 hub is completed, only one worker is "put inside" the hub (and contributes to
 its production), the others are simply consumed.
 
-TODO: procedural map generation
-TODO: exception architecture?
-  => When the player performs an illegal action or the like, how does this get
-  propagated up to the interface so that they can see it? How do we separate
-  errors that are routine and expected from those which are game-breaking?
-    => create custom exception types for the game
-  => functions which raise exceptions must be documented in their mli files
-  => in the case that a function raises an exception, how do we know the latest
-  state of the data structure that function was modifying? (e.g. if
-  Hub.add_entity raises an exception, do we assume that the hub was unchanged?)
-  Seems like a good assumption
-
-NOTE that functions should be able to generate info messages to. That is, the
-function completes successfully, but a message is added to the queue as a side-effect.
-
+TODO: add clusters to initial map generation
+TODO: implement "clearing" mechanic
+  - Forest tiles cannot be built on until they are "cleared"
+  - Cleared forest tiles become flatland tiles
+    => so it's possible to change the type of a tile, but I don't think
+       this one case merits exposing a function because the type can be changed internally
+  - Forests can only be cleared by a certain type of unit, and only once a
+    certain research is acquired
 TODO: menus
   => when you click on a tile, the menu along the left side (which doesn't exist
   yet) should be populated with things you can do on that tile. There are two
@@ -134,14 +127,19 @@ So make the menu options and the associated commands part of the json for each
 entity type. These will be parsed into part of the each Hub.role_info and
 Entity.role_info records. Then
 
-Some commands require two selected tiles (such as move entity from tile A to
-tile B). Then the game state must have a pending_cmd field, which is a partially
-defined command that will be executed as soon as all its parameters have been
-provided. When we get an input event, the game should check if there's a
-pending_cmd, and if so, parse the input event as the pending_cmd's next
-parameter. At that point, if the pending_cmd has no more pending params, then
-execute the command, otherwise add the new pending_cmd (the same command with
-one more param provided) to the state.
+TODO: exception architecture?
+  => When the player performs an illegal action or the like, how does this get
+  propagated up to the interface so that they can see it? How do we separate
+  errors that are routine and expected from those which are game-breaking?
+    => create custom exception types for the game
+  => functions which raise exceptions must be documented in their mli files
+  => in the case that a function raises an exception, how do we know the latest
+  state of the data structure that function was modifying? (e.g. if
+  Hub.add_entity raises an exception, do we assume that the hub was unchanged?)
+  Seems like a good assumption
+
+NOTE that functions should be able to generate info messages to. That is, the
+function completes successfully, but a message is added to the queue as a side-effect.
 
 TODO: how to implement town hall?
   => Town hall is special because it's the only hub to produce both
@@ -149,13 +147,6 @@ TODO: how to implement town hall?
 TODO: implement describable interface
 TODO: need to be careful of range issues with `change_*' functions
   => make sure that value can't overflow
-TODO: implement "clearing" mechanic
-  - Forest tiles cannot be built on until they are "cleared"
-  - Cleared forest tiles become flatland tiles
-    => so it's possible to change the type of a tile, but I don't think
-       this one case merits exposing a function because the type can be changed internally
-  - Forests can only be cleared by a certain type of unit, and only once a
-    certain research is acquired
 
 - Map => Mapp
 - [create] functions now take labeled arguments instead of positional ones

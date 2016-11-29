@@ -118,6 +118,7 @@ Action for:
   [h] Hub            => [2]
   [e] Entity         => [3]
   [r] Research       => [4]
+
   [n] Next turn      => next_turn(), [0]
   [?] Tutorial       => tutorial(), [0]
 ---------------------------------------
@@ -134,6 +135,9 @@ Action for:
 [2]------------------------------------
   [d] describe       => describe(), [0]
   [p] produce        => [6]
+  [e] add entities   => * requires selection *
+
+  [<] back           => [0]
 ---------------------------------------
 
 [3]------------------------------------
@@ -142,6 +146,8 @@ Action for:
   [a] attack         => * requires selection *
   [s] skip           => skip(), [0]
   [h] add to hub     => * requires selection *
+
+  [<] back           => [0]
 ---------------------------------------
 
 [4]------------------------------------
@@ -150,6 +156,8 @@ Select research branch:
   [2] Transportation => [7]
   [3] Combat         => [7]
   [4] Productivity   => [7]
+
+  [<] back           => [0]
 ---------------------------------------
 
 [5]------------------------------------
@@ -157,6 +165,8 @@ Select research branch:
   [a] Hub role A     => place_hub(), [0]
   [b] Hub role B     => place_hub(), [0]
        ...
+
+  [<] back           => [0]
 ---------------------------------------
 
 [6]------------------------------------
@@ -164,9 +174,13 @@ Select research branch:
   [a] Production A   => produce(), [0]
   [b] Production B   => produce(), [0]
        ...
+
+  [<] back           => [0]
 ---------------------------------------
 
 [7]------------------------------------
   [d] describe       => describe, [0]
   [r] begin researching * next research in branch *
+
+  [<] back           => [0]
 ---------------------------------------
