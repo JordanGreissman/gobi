@@ -7,8 +7,8 @@ module Unlockable : sig
 	(* culmination of all of the above *)
 	type t = {
 		name: string;
-		resource: Resource.t;
-		cost: int;
+		resource: Resource.t; (* type needed to unlock *)
+		cost: int; (* how much of above resource *)
 		is_unlocked: bool;
 		treasure: treasure
 	}
