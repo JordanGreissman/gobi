@@ -53,7 +53,6 @@ val create_role :
   name:string ->
   descr:string ->
   cost_to_make:int ->
-  unlocked:bool ->
   allowed_roles : Entity.role list ->
   production : production list ->
   default_def : int ->
@@ -62,12 +61,18 @@ val create_role :
 val describe : t -> string
 val describe_role : role -> string
 
-(* Faciliate going from JSON to research tree. Respectively takes 
- * the tech name, the resource type string (lower / uppercase of resource)
- * the amount (int) of the treasure / upgrade, and then then the upgrade 
- * details: the affected hub's name (string), the amount (int) and 
- * list of new production (can be empty ot a string list) *)
-val extract_to_hub : string -> string
+(* Faciliate going from JSON to a hub role. Hold on to your hats.
+ * name, description (string)
+ * built_by, a string that's a valid Entity role
+ * default_def, an int that's the health or defense
+ * cost_to_make, an int
+ * resource, a string of a valid Resource
+ * amount, an int
+ * entities, a string list of valid roles that it produces
+ * entity_role_list, (entity role list) the master list of all roles in the game
+ *)
+val extract_to_role : string -> string -> string -> int -> int -> string
+int -> string list -> role list -> Hub.role
 
 (** Add an entity to a hub. When this is done, the entity increases the
   * production rate of the hub by a set amount, and the entity cannot be

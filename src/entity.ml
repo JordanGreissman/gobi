@@ -32,9 +32,16 @@ type t = {
   pos: coordinate;
 }
 
-let extract_to_role name desc cost_to_make attack defense
+let extract_to_role name descr cost_to_make attack defense actions =
+  let unlocked = (requires = "") in
+  let default_power = (attack, defense) in
+  create_role name descr cost_to_make unlocked actions default_power 
 
-let find_role
+let rec find_role_by_name role_str role_list =
+  match role_list with
+  | [] -> failwith "Role doesn't exist"
+  | h::t -> if h.name = role_str then h
+    else find_role_by_name role_str t
 
 let create ~role ?atk ?def ~pos =
   let attack = match atk with
