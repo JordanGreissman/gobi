@@ -41,7 +41,7 @@ struct
 
   type value = t list
 
-  type research_list = (key * value) list
+  type research_list = (key * value) list 
 
   let extract_to_value name res_str cost u_hub u_amt u_entity =
     let treasure = ( if u_entity = []
