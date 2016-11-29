@@ -1,13 +1,14 @@
 (** represents the state of the game *)
 type t = {
-  (* civs : civ list; *)
-  (* turn : int; *)
+  civs : Civ.t list;
+  turns_left : int;
   (** a list of all the possible kinds of hubs that the player can make and
     * their attributes *)
   hub_roles : Hub.role list;
   (** a list of all the possible kinds of entities that the player can make and
     * their attributes *)
   entity_roles : Entity.role list;
+  tech_tree : Research.Research.research_list;
   (** the game map (containing all the tiles in the game) *)
   map : Mapp.t;
   (** what absolute screen coordinate is currently in the top left corner of the

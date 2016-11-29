@@ -4,6 +4,7 @@ type t = {
   turns_left : int;
   hub_roles : Hub.role list;
   entity_roles : Entity.role list;
+  tech_tree : Research.Research.research_list;
   map : Mapp.t;
   screen_top_left : Coord.Screen.t;
   selected_tile : Coord.t;

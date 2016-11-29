@@ -3,6 +3,16 @@ open Lwt
 open CamomileLibrary
 
 type state = State.t
+type civ = Civ.t
+
+type parsed_json = {
+  turns: int;
+  ai: int;
+  entities: Entity.role list;
+  hubs: Hub.role list;
+  civs: (string * string) list;
+  tech_tree: Research.Research.research_list;
+}
 
 let make_move st cmd =
   failwith "Unimplemented"
@@ -90,19 +100,34 @@ let init_json json =
   let hubs = List.map (extract_hub entities)
     (get_assoc "hubs" json) in
   let unlockables = List.map (extract_unlockable entities hubs)
-    (get_assoc "entities" json) in
+    (get_assoc "techtree" json) in
   let branches = List.map fst unlockables in
   let techs = List.map snd unlockables in
   let tree = Research.Research.create_tree branches techs [] in
   let civs = List.map extract_civ
     (get_assoc "civilizations" json) in
-  (meta, unlockables, hubs, civs, entities)
+  {turns = fst meta; ai = snd meta; entities = entities; hubs = hubs;
+    tech_tree = tree; civs = civs;}
 
-let init_state json : state = {
-  (*   let json = Yojson.Basic.from_file json in
-       let initialized = init_json json in  *)
-  hub_roles = []; (* TODO *)
-  entity_roles = []; (* TODO *)
+let init_civ player_controlled civ : civ = {
+  name = fst civ;
+  desc = snd civ;
+  entities = [];
+  clusters = [];
+  techs = [];
+  player_controlled = player_controlled;
+  }
+
+let init_state json : state =
+  let json = Basic.from_file json in
+  let parsed = init_json json in
+  let civs = List.mapi (fun i x -> init_civ (i=0) x) parsed.civs in
+{
+  civs = civs;
+  turns_left = parsed.turns;
+  hub_roles = parsed.hubs;
+  entity_roles = parsed.entities;
+  tech_tree = parsed.tech_tree;
   map = Mapp.generate 0 0;
   screen_top_left = Coord.Screen.create 0 0;
   selected_tile = Coord.origin;
@@ -149,7 +174,7 @@ let rec loop ui state_ref =
     loop ui state_ref)
 
 let main () =
-  let (s:state) = init_state () in
+  let (s:state) = init_state "src/example.json" in
   let state_ref = ref s in
   Lazy.force LTerm.stdout >>= fun term ->
   LTerm.enable_mouse term >>= fun () ->
