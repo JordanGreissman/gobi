@@ -113,10 +113,10 @@
             "type": "array",
             "items": {}
           },
-          "upgrades to": {
-            "type": "string"
+          "defense": {
+            "type": "integer"
           },
-          "health": {
+          "cost": {
             "type": "integer"
           }
         },
@@ -126,8 +126,8 @@
           "built by",
           "generates",
           "entities",
-          "upgrades to",
-          "health"
+          "defense",
+          "cost"
         ]
       }
     },
@@ -171,16 +171,19 @@
           },
           "requires": {
             "type": "string"
+          },
+          "cost": {
+            "type": "integer"
           }
         },
         "required": [
           "name",
           "desc",
-          "builds",
           "attack",
           "defense",
           "actions",
-          "requires"
+          "requires",
+          "cost"
         ]
       }
     }

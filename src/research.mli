@@ -46,7 +46,8 @@ module Research : sig
    * the amount (int) of the treasure / upgrade, and then then the upgrade
    * details: the affected hub's name (string), the amount (int) and
    * list of new production (can be empty ot a string list) *)
-  val tech_to_value : string -> string -> int -> string -> int -> string list -> value
+  val extract_to_value : string -> string -> int -> string -> int -> 
+  	string list -> value
 
   (* Creates a tree from a list of keys and values, which must be the same size *)
   val create_tree : key list -> value list -> 'a list -> research_list
@@ -59,7 +60,7 @@ module Research : sig
  (* gets the next locked unlockable from the [key]*)
 	val get_next_unlockable: key -> research_list -> t option
 
-	(* unlock and return  a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
+	(* unlock and return a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
      * otheriwse, returns none *)
 	val unlock : key -> research_list -> t option
 

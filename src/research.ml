@@ -43,8 +43,8 @@ struct
 
   type research_list = (key * value) list
 
-  let tech_to_value name res_str cost u_hub u_amt u_unit =
-    let treasure = ( if u_unit = []
+  let extract_to_value name res_str cost u_hub u_amt u_entity = 
+    let treasure = ( if u_unit = [] 
       then Unlockables.create_treasure_hub u_hub u_amt
       else Unlockables.create_treasure_prod [(hub, u_unit)]) in
     Unlockable.create_unlockable name (str_to_res res_str) cost treasure

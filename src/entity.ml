@@ -15,6 +15,8 @@ type role = {
   art: art;
   (* whether the entity role has been unlocked and can be made *)
   unlocked: bool;
+  (* the number of actions an entity has *)
+  actions: int;
   (* the default (starting) power of entities of this entity role *)
   default_power: int*int;
 }
@@ -30,6 +32,17 @@ type t = {
   pos: coordinate;
 }
 
+let extract_to_role name descr cost_to_make attack defense actions =
+  let unlocked = (requires = "") in
+  let default_power = (attack, defense) in
+  create_role name descr cost_to_make unlocked actions default_power 
+
+let rec find_role_by_name role_str role_list =
+  match role_list with
+  | [] -> failwith "Role doesn't exist"
+  | h::t -> if h.name = role_str then h
+    else find_role_by_name role_str t
+
 let create ~role ?atk ?def ~pos =
   let attack = match atk with
     | Some a -> a
@@ -43,14 +56,16 @@ let create ~role ?atk ?def ~pos =
     pos   = pos;
   }
 
-let create_role ~name ~descr ~cost_to_make ~unlocked ~default_power = {
-  name          = name;
-  descr         = descr;
-  cost_to_make  = cost_to_make;
-  art           = Art.load name;
-  unlocked      = unlocked;
-  default_power = default_power;
-}
+let create_role ~name ~descr ~cost_to_make ~unlocked ~actions 
+  ~default_power = {
+    name          = name;
+    descr         = descr;
+    cost_to_make  = cost_to_make;
+    art           = Art.load name;
+    unlocked      = unlocked;
+    actions       = actions;
+    default_power = default_power;
+  }
 
 let describe e =
   failwith "Unimplemented"
@@ -91,6 +106,7 @@ let unlock_role r = { r with unlocked = true }
 let get_role_default_power r = r.default_power
 
 (* convenience functions *)
+let get_actions e = e.role.actions
 let get_name e = e.role.name
 let get_cost_to_make e = e.role.cost_to_make
 let get_art e = e.role.art

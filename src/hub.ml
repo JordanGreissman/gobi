@@ -19,8 +19,6 @@ type role = {
   cost_to_make : int;
   (* the ascii art for a hub of this role *)
   art : art;
-  (* whether this hub role has been unlocked and can be made *)
-  unlocked : bool;
   (* the types of entities (roles) that are allowed to be consumed by this hub
    * in order to increase its production. E.g. only farmer entities should be
    * able to increase the production of a farm because soldiers and other entity
@@ -29,7 +27,7 @@ type role = {
   (* the types of things that hubs of this hub role can produce *)
   production: production list;
   (* the production rate of hubs of this hub role when they contain 0 entities *)
-  default_production_rate: int list;
+  default_production_rate: int;
   (* the default (starting) defense of hubs of this hub role *)
   default_def: int;
 }
@@ -49,6 +47,19 @@ type t = {
   pos: coord;
 }
 
+let extract_to_role name descr built_by default_def cost_to_make 
+  resource amount entities entity_role_list =
+    let allowed_roles = [Entity.find_role_by_name built_by entities] in
+    let prod_entity = 
+      List.map (fun name -> Entity 
+        (Entity.find_role_by_name name entity_role_list)) 
+      entities in
+    let prod_resource = Resource (Resource.str_to_res resource) in
+    let production = prod_entity@prod_resource
+    let default_def = amount in
+      Hub.create_role name descr cost_to_make allowed_roles 
+      production default_def
+
 let create ~role ~production_rate ~def ~pos = {
   role            = role;
   is_finished     = false;
@@ -57,17 +68,16 @@ let create ~role ~production_rate ~def ~pos = {
   pos             = pos;
 }
 
-let create_role ~name ~descr ~cost_to_make ~unlocked ~allowed_roles
-                ~production ~default_production_rate ~default_def =
+let create_role ~name ~descr ~cost_to_make ~allowed_roles
+                ~production ~default_def =
 {
   name                    = name;
   descr                   = descr;
   cost_to_make            = cost_to_make;
   art                     = Art.load name;
-  unlocked                = unlocked;
   allowed_roles           = allowed_roles;
   production              = production;
-  default_production_rate = default_production_rate;
+  default_production_rate = 1;
   default_def             = default_def;
 }
 

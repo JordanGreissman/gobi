@@ -312,7 +312,6 @@
         "Worker",
         "Settler"
       ],
-      "upgrades to": "",
       "defense": 100,
       "cost": 2
     },
@@ -327,7 +326,6 @@
         }
       ],
       "entities": [],
-      "upgrades to": "",
       "defense": 50,
       "cost": 2
     },
@@ -342,7 +340,6 @@
         }
       ],
       "entities": [],
-      "upgrades to": "",
       "defense": 50,
       "cost": 3
     },
@@ -357,7 +354,6 @@
         }
       ],
       "entities": [],
-      "upgrades to": "",
       "defense": 50,
       "cost": 3
     },
@@ -378,7 +374,6 @@
         "Spearman",
         "Heavy"
       ],
-      "upgrades to": "",
       "defense": 25,
       "cost": 5
     },
@@ -393,7 +388,6 @@
         }
       ],
       "entities": [],
-      "upgrades to": "",
       "defense": 50,
       "cost": 5
     }
