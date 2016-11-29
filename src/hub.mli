@@ -72,7 +72,7 @@ val describe_role : role -> string
 val extract_to_role : string -> string -> string -> int -> int -> string -> int -> string list -> Entity.role list -> role
 
 (* Return a role matching the string *)
-val find_role : string -> role list -> role
+val find_role : string -> role list -> role list
 
 (** Add an entity to a hub. When this is done, the entity increases the
   * production rate of the hub by a set amount, and the entity cannot be

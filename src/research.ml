@@ -3,7 +3,7 @@ module Unlockable =
 struct
 
   type treasure =
-    | Hub of Hub.role * int
+    | Hub of Hub.role list * int
     | Production of Hub.role * Hub.production list
 
   type t = {
@@ -14,8 +14,8 @@ struct
     treasure: treasure;
   }
 
-  let create_treasure_hub hub amt =
-    Hub (hub, amt)
+  let create_treasure_hub hub_list amt =
+    Hub (hub_list, amt)
 
   let create_treasure_prod hub prod_list =
     Production (hub, prod_list)
@@ -45,14 +45,14 @@ struct
 
   let extract_to_value name res_str cost u_hub u_amt u_entity
   entity_role_list hub_role_list =
-    let hub = Hub.find_role u_hub hub_role_list in
+    let hub_list = Hub.find_role u_hub hub_role_list in
     let treasure = ( if u_entity = []
-      then Unlockable.create_treasure_hub hub u_amt
+      then Unlockable.create_treasure_hub hub_list u_amt
       else
         let prod_list = List.map
           (fun entity -> Hub.Entity
             (Entity.find_role entity entity_role_list)) u_entity
-        in Unlockable.create_treasure_prod hub prod_list
+        in Unlockable.create_treasure_prod (List.hd hub_list) prod_list
       ) in
     let resource = Resource.str_to_res res_str in
     Unlockable.create_unlockable name resource cost treasure

@@ -300,7 +300,7 @@
   "hubs": [
     {
       "name": "Town Hall",
-      "desc": "The 'center' of a town. Where happiness is produced.",
+      "desc": "The Town Hall is the apex of your town. ",
       "built by": "Settler",
       "generates": [
         {

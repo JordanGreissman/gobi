@@ -1,7 +1,7 @@
 module Unlockable : sig
 
 	type treasure =
-	  | Hub of Hub.role * int
+	  | Hub of Hub.role list * int
     | Production of Hub.role * Hub.production list
 
 	(* culmination of all of the above *)
@@ -14,7 +14,7 @@ module Unlockable : sig
 	}
 
 	(* creates various treasures *)
-	val create_treasure_hub : Hub.role -> int -> treasure
+	val create_treasure_hub : Hub.role list -> int -> treasure
 	val create_treasure_prod : Hub.role -> Hub.production list -> treasure
 
 	(* create unlockable from a name, resource, and cost *)

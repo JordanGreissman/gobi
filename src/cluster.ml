@@ -19,8 +19,8 @@ type t = {
 
 let create ~name ~descr ~town_hall_tile ~hub_role_list =
 
-  let town_hall = Tile.place_hub
-    (Hub.find_role "Town Hall" hub_role_list) None town_hall_tile in
+  let town_hall_hub = List.hd (Hub.find_role "Town Hall" hub_role_list) in
+  let town_hall = Tile.place_hub town_hall_hub None town_hall_tile in
 
   {
     name = name;

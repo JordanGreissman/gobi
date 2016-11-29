@@ -84,9 +84,10 @@ let extract_to_role name descr built_by default_def cost_to_make
       production default_def
 
 let rec find_role role_str role_list =
+  if role_str = "all" then role_list else
   match role_list with
   | [] -> failwith "Role doesn't exist"
-  | h::t -> if h.name = role_str then h
+  | h::t -> if h.name = role_str then [h]
     else find_role role_str t
 
 let describe hub =
