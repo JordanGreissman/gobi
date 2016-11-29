@@ -3,8 +3,8 @@ module Unlockable =
 struct
 
   type treasure =
-    | Hub of Hub.hub * int
-    | Production of (Hub.hub * Hub.production) list
+    | Hub of Hub.t * int
+    | Production of (Hub.t * Hub.production) list
 
   type t = {
     name: string;
@@ -46,7 +46,7 @@ struct
   let extract_to_value name res_str cost u_hub u_amt u_entity =
     let treasure = ( if u_entity = []
       then Unlockable.create_treasure_hub u_hub u_amt
-      else Unlockable.create_treasure_prod [(hub, u_entity)]) in
+      else Unlockable.create_treasure_prod [(u_hub, u_entity)]) in
     Unlockable.create_unlockable name (str_to_res res_str) cost treasure
 
   let rec create_tree key_list value_list acc_tree =
