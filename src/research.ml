@@ -46,7 +46,8 @@ struct
   let extract_to_value name res_str cost u_hub u_amt u_entity =
     let treasure = ( if u_entity = []
       then Unlockable.create_treasure_hub u_hub u_amt
-      else Unlockable.create_treasure_prod [(u_hub, u_entity)]) in
+      else Unlockable.create_treasure_prod 
+        List.map (fun entity -> u_hub, Entity entity) u_entity) in
     Unlockable.create_unlockable name (str_to_res res_str) cost treasure
 
   let rec create_tree key_list value_list acc_tree =
