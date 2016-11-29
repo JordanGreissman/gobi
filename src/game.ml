@@ -42,7 +42,7 @@ let extract_techs assoc =
   let hub = (List.assoc "hub" treasure) |> Basic.Util.to_string in
   let amount = (List.assoc "amount" treasure) |> Basic.Util.to_int in
   let entity = extract_list "entity" treasure in
-  Research.Researches.tech_to_value name resource cost hub amount entity
+  Research.Research.tech_to_value tech resource cost hub amount entity
   (* entity *)
 
 let extract_unlockable assoc =
@@ -89,7 +89,7 @@ let init_json json =
     (get_assoc "techtree" json) in
   let branches = List.map fst unlockables in
   let techs = List.map snd unlockables in
-  let tree = Research.Researches.create_tree branches techs [] in
+  let tree = Research.Research.create_tree branches techs [] in
   let hubs = List.map extract_hub
     (get_assoc "hubs" json) in
   let civs = List.map extract_civ
