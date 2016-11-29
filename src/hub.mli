@@ -1,14 +1,29 @@
-(** the type of a hub. This type represents a specific instance of a hub, which
-  * has a location, production levels, etc., and should not be conflated with
-  * the [role] type, described below.
-  *)
-type t
-
 (** the type of a hub role. Hub roles are just another name for hub types (e.g.
   * post office, mill, armory, etc.) because it would be confusing to use the
   * word "type" in two different ways at once.
   *)
 type role
+
+type coord = Coord.t
+
+(** the type of a hub. This type represents a specific instance of a hub, which
+  * has a location, production levels, etc., and should not be conflated with
+  * the [role] type, described below.
+  *)
+type t = {
+  role: role;
+  (* whether the hub is finished being built *)
+  is_finished: bool;
+  (* the number of production units this hub generates every turn. This number
+   * can be increased by adding entities to the hub *)
+  production_rate: int;
+  (* the defense of this hub (for when it is attacked by entities)
+   * NOTE that the defense is allowed to be negative! It is the responsibility
+   * of the caller to check the updated defense value after changing it *)
+  def: int;
+  (* the position of this hub (in rectangular map coordinates) *)
+  pos: coord;
+}
 
 (** the production type of a hub. Hubs can produce either resources or entities *)
 type production =
@@ -27,7 +42,7 @@ type production =
   *)
 val create :
   role : role ->
-  production_rate : int list ->
+  production_rate : int ->
   def : int ->
   pos : Coord.t ->
   t
@@ -89,14 +104,8 @@ val extract_to_role :
   entity_role_list:Entity.role list ->
   role
 
-(* Return a role matching the string *)
+(* Return a role matching the string. "all" returns role_list. Otherwise, Illegal exception *)
 val find_role : string -> role list -> role list
-
-(** Add an entity to a hub. When this is done, the entity increases the
-  * production rate of the hub by a set amount, and the entity cannot be
-  * reclaimed.
-  *)
-val add_entity : Entity.t -> t -> t
 
 (* [t] getters and setters *)
 
@@ -108,7 +117,7 @@ val is_finished : t -> bool
 (** mark this hub as finished (construction is complete) *)
 val set_finished : t -> t
 
-val get_production_rate : t -> int list
+val get_production_rate : t -> int
 
 val get_defense : t -> int
 

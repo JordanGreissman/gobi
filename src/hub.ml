@@ -38,7 +38,7 @@ type t = {
   is_finished: bool;
   (* the number of production units this hub generates every turn. This number
    * can be increased by adding entities to the hub *)
-  production_rate: int list;
+  production_rate: int;
   (* the defense of this hub (for when it is attacked by entities)
    * NOTE that the defense is allowed to be negative! It is the responsibility
    * of the caller to check the updated defense value after changing it *)
@@ -87,7 +87,7 @@ let extract_to_role ~name ~descr ~built_by ~default_def ~cost_to_make
 let rec find_role role_str role_list =
   if role_str = "all" then role_list else
   match role_list with
-  | [] -> failwith (Printf.sprintf "Role %s doesn't exist" role_str)
+  | [] -> raise (Exception.Illegal (role_str^" is not a valid role."))
   | h::t -> if h.name = role_str then [h]
     else find_role role_str t
 
@@ -95,16 +95,6 @@ let describe hub =
   hub.role.name
 
 let describe_role r = r.descr
-
-(** Add entity to a hub, returning the new hub *)
-let add_entity new_entity hub =
-  failwith "Unimplemented"
-(*   if List.mem (Entity.get_role new_entity) hub.allowed_roles *)
-(*   then *)
-(*     (\* TODO: delete this entity *\) *)
-(*     { hub with production_rate = hub.production_rate + 1 } *)
-(*   (\* TODO: handle exceptions when bad stuff happens *\) *)
-(*   else hub *)
 
 (* [t] getters and setters *)
 

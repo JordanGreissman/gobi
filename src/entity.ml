@@ -35,7 +35,7 @@ type t = {
 
 let rec find_role role_str role_list =
   match role_list with
-  | [] -> failwith (Printf.sprintf "Role %s does not exist" role_str)
+  | [] -> raise (Exception.Illegal (role_str^" is not a valid role."))
   | h::t -> if h.name = role_str then h
     else find_role role_str t
 

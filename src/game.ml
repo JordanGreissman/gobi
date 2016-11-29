@@ -26,8 +26,7 @@ let turn st =
 (* Error handling necessary? *)
 let load_json s =
   try Yojson.Basic.from_file s with
-  | _ -> print_endline "Illegal: File does not exist or is not a JSON\n";
-          failwith "whoops"
+  | _ -> raise (Exception.CriticalError "File does not exist or is not a JSON")
 
 let get_assoc s json =
   json |> Yojson.Basic.Util.member s
