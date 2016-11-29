@@ -27,7 +27,7 @@ type production =
   *)
 val create :
   role : role ->
-  production_rate : int list ->
+  production_rate : int ->
   def : int ->
   pos : Coord.t ->
   t
@@ -89,13 +89,10 @@ val extract_to_role :
   entity_role_list:Entity.role list ->
   role
 
-(* Return a role matching the string *)
+(* Return a role matching the string. "all" returns role_list. Otherwise, Illegal exception *)
 val find_role : string -> role list -> role list
 
-(** Add an entity to a hub. When this is done, the entity increases the
-  * production rate of the hub by a set amount, and the entity cannot be
-  * reclaimed.
-  *)
+(** Add entity to a hub, returning the new hub. Raise Illegal if role not right *)
 val add_entity : Entity.t -> t -> t
 
 (* [t] getters and setters *)

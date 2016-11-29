@@ -7,7 +7,6 @@ type cell = {
 
 type t = cell option list list
 
-(* TODO what exception to throw if file read unsuccessful? (Sys_error) *)
 let load name =
   (* open and read the art file *)
   let lines = ref [] in

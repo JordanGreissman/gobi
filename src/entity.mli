@@ -11,7 +11,7 @@ type role
 val extract_to_role : string -> string -> string ->
                       int -> int -> int -> int -> role
 
-(* Returns the role with the name of a certain string, failwith otherwise *)
+(* Returns the role with the name of a certain string, exception Illegal otherwise *)
 val find_role: string -> role list -> role
 
 (** Create and return an entity. An entity has a role, an attack level, a defense
