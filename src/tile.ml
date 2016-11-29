@@ -21,15 +21,12 @@ let create ~terrain ~pos = {
 }
 
 
-
 let place_hub ~role ~starting_entity ~tile =
   let d = Hub.get_role_default_production_rate role in
-  let p = match starting_entity with
+  let production_rate = match starting_entity with
     (* TODO remove the entity [e] from the game (it is consumed by the hub) *)
     | Some e -> d+1
     | None   -> d in
-  let a = Array.make (List.length (Hub.get_role_production role)) p in
-  let production_rate = Array.to_list a in
   let def = Hub.get_role_default_defense role in
   let pos = tile.pos in
   let h = Hub.create role production_rate def pos in
