@@ -1,8 +1,8 @@
 module Unlockable : sig
 
 	type treasure =
-	  | Hub of Hub.t * int
-    | Production of Hub.t * Hub.production list
+	  | Hub of Hub.role * int
+    | Production of Hub.role * Hub.production list
 
 	(* culmination of all of the above *)
 	type t = {
@@ -14,8 +14,8 @@ module Unlockable : sig
 	}
 
 	(* creates various treasures *)
-	val create_treasure_hub : Hub.t -> int -> treasure
-	val create_treasure_prod : Hub.t -> Hub.production list -> treasure
+	val create_treasure_hub : Hub.role -> int -> treasure
+	val create_treasure_prod : Hub.role -> Hub.production list -> treasure
 
 	(* create unlockable from a name, resource, and cost *)
 	val create_unlockable : name:string -> resource:Resource.t -> cost:int ->
@@ -55,7 +55,7 @@ module Research : sig
   	string list -> Entity.role list -> Hub.role list -> t
 
   (* Creates a tree from a list of keys and values, which must be the same size *)
-  val create_tree : key list -> value list -> 'a list -> research_list
+  val create_tree : key list -> value list -> research_list -> research_list
 
   val add_unlockable_key: key -> value -> research_list -> research_list
 

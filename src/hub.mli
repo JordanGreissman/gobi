@@ -38,8 +38,6 @@ val create :
   *   be useful to the player if they wanted to know more about this hub role.
   * [cost_to_make] is the number of turns after initiating construction of this
   *   hub type that the hub type will be ready for use.
-  * [unlocked] is whether the player is allowed to build hubs of this hub role.
-  *   Some hub roles are initially locked, and are unlocked through research.
   * [allowed_roles] is a list of the types of entities that are allowed inside
   *   this hub role in order to increase its production. For example, only farmers
   *   are allowed inside a "Farm" hub (no other role types make sense), so for
@@ -72,6 +70,9 @@ val describe_role : role -> string
  * entity_role_list, (entity role list) the master list of all roles in the game
  *)
 val extract_to_role : string -> string -> string -> int -> int -> string -> int -> string list -> Entity.role list -> role
+
+(* Return a role matching the string *)
+val find_role : string -> role list -> role
 
 (** Add an entity to a hub. When this is done, the entity increases the
   * production rate of the hub by a set amount, and the entity cannot be
@@ -110,15 +111,9 @@ val get_role_name : role -> string
 val get_role_cost_to_make : role -> int
 val get_role_art : role -> Art.t
 
-val is_role_unlocked : role -> bool
-
-(** [unlock_role r] is [r] where [is_role_unlocked r] is guaranteed to be [true].
-  *)
-val unlock_role : role -> role
-
 val get_role_allowed_roles : role -> Entity.role list
 val get_role_production : role -> production list
-val get_role_default_production_rate : role -> int list
+val get_role_default_production_rate : role -> int
 val get_role_default_defense : role -> int
 
 (* convenience functions *)
@@ -127,5 +122,5 @@ val get_cost_to_make : t -> int
 val get_art : t -> Art.t
 val get_allowed_roles : t -> Entity.role list
 val get_production : t -> production list
-val get_default_production_rate : t -> int list
+val get_default_production_rate : t -> int
 val get_default_defense : t -> int

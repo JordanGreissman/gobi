@@ -72,13 +72,13 @@ let create_role ~name ~descr ~cost_to_make ~allowed_roles
 
 let extract_to_role name descr built_by default_def cost_to_make
   resource amount entities entity_role_list =
-    let allowed_roles = [Entity.find_role_by_name built_by entities] in
+    let allowed_roles = [Entity.find_role built_by entity_role_list] in
     let prod_entity =
       List.map (fun name -> Entity
-        (Entity.find_role_by_name name entity_role_list))
+        (Entity.find_role name entity_role_list))
       entities in
     let prod_resource = Resource (Resource.str_to_res resource) in
-    let production = prod_entity@prod_resource in
+    let production = prod_entity@[prod_resource] in
     let default_def = amount in
       create_role name descr cost_to_make allowed_roles
       production default_def
@@ -126,9 +126,6 @@ let change_position delta hub =
 let get_role_name r = r.name
 let get_role_cost_to_make r = r.cost_to_make
 let get_role_art r = r.art
-
-let is_role_unlocked r = r.unlocked
-let unlock_role r = { r with unlocked = true }
 
 let get_role_allowed_roles r = r.allowed_roles
 let get_role_production r = r.production
