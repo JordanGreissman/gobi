@@ -22,6 +22,9 @@ type t = {
   (** the menu that is currently being displayed along the left side of the
     * screen. *)
   menu : Menu.t list;
+  (** a command that needs more inputs before it can be executed. A value of
+    * [None] indicates that the game is not waiting for any such input. *)
+  pending_cmd : Cmd.t option;
   (** whether the player has quit the game *)
   is_quit : bool;
 }

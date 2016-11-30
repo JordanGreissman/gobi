@@ -125,7 +125,6 @@ Action for:
 
 [1]------------------------------------
   [d] describe       => describe(), [0]
-  [s] settle         => settle(), [0]   (only for unsettled tiles w/o building obstruction)
   [c] clear          => clear(), [0]    (only for uncleared forests)
   [b] build hub      => [5]             (only on tiles w/o building obstruction)
 

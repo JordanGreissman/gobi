@@ -153,38 +153,83 @@ let init_state json : state =
   selected_tile = fst coords;
   messages = [];
   is_quit = false;
+  menu = Menu.main_menu;
+  pending_cmd = None;
 }
+
+(* [execute s e c] returns the next state of the game given the current state
+ * [s], the input event [e], and the command [c]. *)
+let rec execute (s:State.t) e c : State.t =
+  let open Cmd in
+  match fst c with
+  | NextTurn        -> s (* TODO *)
+  | Tutorial        -> s (* TODO *)
+  | Describe        -> s (* TODO *)
+  | Research        -> s (* TODO *)
+  | DisplayResearch -> s (* TODO *)
+  | Skip            -> s (* TODO *)
+  | Move            -> s (* TODO *)
+  | Attack          -> s (* TODO *)
+  | PlaceHub        -> s (* TODO *)
+  | Clear           -> s (* TODO *)
+  | Produce         -> s (* TODO *)
+  | AddEntityToHub  -> s (* TODO *)
+  | SelectTile      ->
+    let (cmd,req_list) = match s.pending_cmd with
+      | Some p -> p
+      | None -> failwith "No pending command found when executing Selection" in
+    let req_list' = satisfy_next_req e req_list in
+    if are_all_reqs_satisfied req_list'
+    then execute { s with pending_cmd=Some (cmd,req_list') } e (cmd,req_list')
+    else { s with pending_cmd=Some (cmd,req_list') }
+  | SelectHub       -> s (* TODO *)
+  | SelectEntity    -> s (* TODO *)
 
 (* [get_next_state s e] is the next state of the game, given the current state
  * [s] and the input event [e] *)
-let get_next_state (s:state) = function
+let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
+  (* ------------------------------------------------------------------------- *)
+  (* these keys are not affected by the pending command status *)
+  | LTerm_event.Key { code = LTerm_key.Up } ->
+    { s with screen_top_left =
+      Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1)) }
+  | LTerm_event.Key { code = LTerm_key.Down } ->
+    { s with screen_top_left =
+      Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1) }
+  | LTerm_event.Key { code = LTerm_key.Left } ->
+    { s with screen_top_left =
+      Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0) }
+  | LTerm_event.Key { code = LTerm_key.Right } ->
+    { s with screen_top_left =
+      Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0) }
+  | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
+    { s with is_quit = true }
+  (* ------------------------------------------------------------------------- *)
+  (* mouse events as well as any key that is not one of the above must check for
+   * a pending command *)
+  (* | LTerm_event.Key { code = c } -> *)
+  (*   let f = function *)
+  (*     | Some m -> execute s (LTerm_event.Key { code = c }) m.cmd *)
+  (*     | None -> s in *)
+  (*   s.menu *)
+  (*   |> try Some (List.find (fun (x:Menu.t) -> x.key = c)) with Not_found -> None *)
+  (*   |> f *)
+  (*   |> (fun s -> { s with menu = s.menu.next_menu }) *)
   | LTerm_event.Mouse e ->
     (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)
     (* state.ctx.messages <- new_msg'::state.ctx.messages; *)
-    let abs_click_coord =
-      Coord.Screen.add
-        s.screen_top_left
-        (Coord.Screen.create (LTerm_mouse.col e) (LTerm_mouse.row e)) in
-    (match Coord.offset_from_screen abs_click_coord with
-    | Contained c ->
-      let new_msg = Printf.sprintf "Selected tile is now %s" (Coord.to_string c) in
-      { s with messages = new_msg::s.messages; selected_tile = c }
-    | _ -> s)
-  | LTerm_event.Key { code = LTerm_key.Up } ->
-    { s with screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1)) }
-  | LTerm_event.Key { code = LTerm_key.Down } ->
-    { s with screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1) }
-  | LTerm_event.Key { code = LTerm_key.Left } ->
-    { s with screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0) }
-  | LTerm_event.Key { code = LTerm_key.Right } ->
-    { s with screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0) }
-  | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
-    { s with is_quit = true }
-  | LTerm_event.Key { code = c } ->
-    let menu_item = s.menu |> List.find (fun x -> x.key = c) in
-    (match menu_item with
-    | Some c -> execute s c.action
-    | None -> s)
+    let f c = match (c,s.pending_cmd) with
+      | (Coord.Contained c,Some cmd) ->
+        let cmd = Cmd.create Cmd.SelectTile in
+        execute s (LTerm_event.Mouse e) cmd
+      | (Coord.Contained c,None) ->
+        let new_msg = Printf.sprintf "Selected tile is now %s" (Coord.to_string c) in
+        { s with messages = new_msg::s.messages; selected_tile = c }
+      | (_,_) -> s in
+    s.screen_top_left
+    |> Coord.Screen.add (Coord.Screen.create (LTerm_mouse.col e) (LTerm_mouse.row e))
+    |> Coord.offset_from_screen
+    |> f
   | _ -> s
 
 let rec loop ui state_ref =
