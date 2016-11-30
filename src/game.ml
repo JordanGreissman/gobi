@@ -111,12 +111,12 @@ let init_json json =
     tech_tree = tree; civs = civs}
 
 let init_civ player_controlled hub_roles map civ : civ =
-  let tup = Cluster.create  ~name:(fst civ)
-                              ~descr:"A soon to be booming metropolis"
-                              (* TODO this needs to be different *)
-                              ~town_hall_tile:(Mapp.get_random_tile !map)
-                              ~hub_role_list:hub_roles
-                              ~map:!map in
+  let tup = Cluster.create
+      ~name:(fst civ)
+      ~descr:"A soon to be booming metropolis"
+      ~town_hall_tile:(Mapp.get_random_tile !map)
+      ~hub_role_list:hub_roles
+      ~map:!map in
   map := (snd tup);
   {
   name = fst civ;
@@ -130,7 +130,7 @@ let init_civ player_controlled hub_roles map civ : civ =
   }
 
 let get_player_start_coords civs =
-  let player = List.find (fun civ -> Civ.get_player_controlled civ) civs in
+  let player = List.find Civ.get_player_controlled civs in
   let cluster = List.nth player.clusters 0 in
   let c = Tile.get_pos (Cluster.get_town_hall cluster) in
   let coord = Coord.screen_from_offset c in
@@ -141,10 +141,10 @@ let get_player_start_coords civs =
 let init_state json : state =
   let json = Basic.from_file json in
   let parsed = init_json json in
-  (* TODO what should these values be? *)
   let map = ref (Mapp.generate 42 42) in
-  let civs = List.mapi (fun i x -> init_civ (i=0) parsed.hubs map x)
-              parsed.civs in
+  let civs = List.mapi
+      (fun i x -> init_civ (i=0) parsed.hubs map x)
+      parsed.civs in
   let coords = get_player_start_coords civs in
 {
   civs = civs;
@@ -276,7 +276,7 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
         { s with messages = new_msg::s.messages; selected_tile = c }
       | (_,_) -> s in
     s.screen_top_left
-    |> Coord.Screen.add (Coord.Screen.create (LTerm_mouse.col e) (LTerm_mouse.row e))
+    |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
     |> Coord.offset_from_screen
     |> f
   | _ -> s

@@ -20,7 +20,7 @@ let draw_map ctx w h x_offset (s:State.t) =
   for y = 0 to h do
     for x = 0 to w do
       (* the cell we're currently drawing in absolute lambda-term coords *)
-      let delta = Coord.Screen.create (x+x_offset) y in
+      let delta = Coord.Screen.create x y in
       let screen_cur = Coord.Screen.add s.screen_top_left delta in
       (* the hex or hexes containing that cell *)
       match Coord.offset_from_screen screen_cur with
@@ -99,6 +99,6 @@ let draw s ui matrix =
   let map_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=menu_width;col2=w} in
   let message_ctx = LTerm_draw.sub ctx {row1=(h-message_box_height);row2=h;col1=0;col2=w} in
   let menu_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=0;col2=menu_width} in
-  draw_map map_ctx w (h-message_box_height) menu_width !s;
+  draw_map map_ctx (w-menu_width) (h-message_box_height) menu_width !s;
   draw_messages message_ctx w message_box_height !s.messages;
   draw_menu menu_ctx menu_width (h-message_box_height) !s.menu
