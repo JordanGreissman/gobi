@@ -17,6 +17,7 @@ type t = {
   tiles: tile list;
 }
 
+(** creates a new cluster with a name on a settled tile *)
 let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
 
   let town_hall_hub = List.hd (Hub.find_role "town_hall" hub_role_list) in
@@ -29,6 +30,34 @@ let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
     tiles = [town_hall];
   }, map)
 
+(* Returns the cluster's town hall *)
+let get_town_hall cluster =
+  cluster.town_hall
+
+(* Adds a hub to a cluster, finding the nearest one based on hub coord.,
+ * returning the cluster with the new tile w/ hub on it *)
+let add_hub hub cluster_list map = 
+
+  let hub_pos = Hub.get_position hub in
+
+  let tuple_compare t1 t2 = compare (snd t1) (snd t2) in
+  
+  let distance_to town_hall = 
+    let x_del = Coord.get_x hub_pos - Coord.get_x town_hall in
+    let y_del = Coord.get_y hub_pos - Coord.get_y town_hall in
+      ((float_of_int x_del)**2.0 +. (float_of_int y_del)**2.0)**0.5 
+  in
+
+  let fold_func acc cluster = 
+    acc@[distance_to (Tile.get_pos (get_town_hall cluster))] in
+
+  let distance_list = List.fold_left fold_func [] cluster_list in
+  let cluster = fst (List.hd (List.sort tuple_compare 
+      (List.combine cluster_list distance_list))) in
+
+  let new_hub_tile = Mapp.tile_by_pos hub_pos map in
+    { cluster with tiles = new_hub_tile::cluster.tiles }
+
 (** Applies a function for tiles on every tile in a cluster. Acc should be [].
   * Returns cluster with new tile list *)
 let rec tile_map tile_func acc cluster = match cluster.tiles with
@@ -37,18 +66,14 @@ let rec tile_map tile_func acc cluster = match cluster.tiles with
     tile_map tile_func (acc@[tile_func tile]) { cluster with tiles = lst}
 
 (* Returns cluster with an updated tile list with entity added to hub *)
-let rec add_entity_to_hub entity hub acc cluster = match cluster.tiles with
-  | [] -> { cluster with tiles = acc }
-  | tile::lst -> begin match Tile.get_hub tile with Some tile_hub ->
-    let new_tile = 
-      if tile_hub = hub then
-      let new_hub = { tile_hub with 
-        production_rate = Hub.get_production_rate tile_hub + 1 }
-      in Tile.set_hub tile (Some new_hub)
-      else tile
-    in add_entity_to_hub entity hub (acc@[new_tile]) { cluster with tiles = lst }
-    | _ -> failwith "Tile doesn't have hub, precondition violated" end
-
-
-let get_town_hall cluster =
-  cluster.town_hall
+let rec add_entity_to_hub entity hub cluster = 
+  let tile_func tile = (
+    match Tile.get_hub tile with 
+      | Some tile_hub ->
+        if tile_hub = hub then
+          let new_hub = { tile_hub with 
+            production_rate = Hub.get_production_rate tile_hub + 1 }
+          in Tile.set_hub tile (Some new_hub)
+        else tile
+      | _ -> failwith "Tile doesn't have hub, precondition violated"; tile
+    ) in tile_map (tile_func) [] cluster
