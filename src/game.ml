@@ -1,6 +1,8 @@
 open Yojson
 open Lwt
 open CamomileLibrary
+open State
+open Civ
 
 type state = State.t
 type civ = Civ.t
@@ -120,6 +122,8 @@ let init_civ player_controlled hub_roles map civ : civ =
   name = fst civ;
   desc = snd civ;
   entities = [];
+  pending_entities = [];
+  pending_hubs = [];
   clusters = [fst tup];
   techs = [];
   player_controlled = player_controlled;
@@ -155,23 +159,69 @@ let init_state json : state =
   is_quit = false;
   menu = Menu.main_menu;
   pending_cmd = None;
+  current_civ = 0;
 }
 
 (* [execute s e c] returns the next state of the game given the current state
  * [s], the input event [e], and the command [c]. *)
 let rec execute (s:State.t) e c : State.t =
   match fst c with
+  | Cmd.NoCmd           -> s
   | Cmd.NextTurn        -> s (* TODO *)
   | Cmd.Tutorial        -> s (* TODO *)
-  | Cmd.Describe        ->
+  | Cmd.Describe        -> begin
+                            let tile = Mapp.tile_by_pos s.selected_tile s.map in
+                            let desc = Tile.describe(tile) in
+                            {s with messages = desc::s.messages}
+                          end
   | Cmd.Research        -> s (* TODO *)
   | Cmd.DisplayResearch -> s (* TODO *)
   | Cmd.Skip            -> s (* TODO *)
   | Cmd.Move            -> s (* TODO *)
   | Cmd.Attack          -> s (* TODO *)
   | Cmd.PlaceHub        -> s (* TODO *)
-  | Cmd.Clear           -> s (* TODO *)
-  | Cmd.Produce         -> s (* TODO *)
+  | Cmd.Clear           -> begin
+                            let tile = Mapp.tile_by_pos s.selected_tile s.map in
+                            let entity = Tile.get_entity tile in
+                            if entity <> None then
+                              if Tile.needs_clearing tile then
+                                let tile = Tile.set_terrain tile Tile.Flatland in
+                                let map = Mapp.set_tile tile s.map in
+                                {s with map = map}
+                              else {s with messages =
+                                    "No forest to be cleared!"::s.messages}
+                            else {s with messages =
+                                  "No entity to clear this forest!"::s.messages}
+                            end
+  | Cmd.Produce         -> begin
+                            if Cmd.are_all_reqs_satisfied (snd c) then
+(*                               let role = List.nth (snd c) 1 in
+                              let role = match role with
+                                        | EntityRole x -> begin match x with
+                                                        | Some y -> y
+                                                        | None -> failwith "lol"
+                                                        end
+                                        | _ -> failwith "Whoops" in *)
+                              let role = List.nth s.entity_roles 0 in
+                              let pos = s.selected_tile in
+                              let entity = Entity.create role pos in
+                              let civ = State.get_current_civ s in
+                              let civ = {civ with pending_entities =
+                                          entity::civ.pending_entities} in
+                              State.update_civ s.current_civ civ s
+                            else
+                              let tile = Mapp.tile_by_pos
+                                          s.selected_tile s.map in
+                                          (* TODO fix this *)
+                              let req_list = Cmd.satisfy_next_req e (snd c) in
+                              let hub = Tile.get_hub tile in
+                              match hub with
+                              | Some x -> {s with
+                                  pending_cmd=Some ((fst c), req_list);
+                                  menu=Menu.get_produce_entity_menu x}
+                              | None -> {s with
+                                  messages = "No hub selected!"::s.messages}
+  end
   | Cmd.AddEntityToHub  -> s (* TODO *)
   | Cmd.SelectTile      ->
     let (cmd,req_list) = match s.pending_cmd with

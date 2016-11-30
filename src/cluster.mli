@@ -1,3 +1,5 @@
+type tile = Tile.t
+
 (** A cluster is a collection of tiles, all of which contain
 	* hubs ("are settled") *)
 type t

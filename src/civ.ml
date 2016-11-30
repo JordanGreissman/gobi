@@ -3,7 +3,9 @@ type t = {
    name : string;
    desc : string;
    entities : Entity.t list;
+   pending_entities : Entity.t list;
    clusters : Cluster.t list;
+   pending_hubs : Hub.t list;
    techs : Research.Research.research_list;
    player_controlled : bool;
 }
@@ -22,7 +24,7 @@ let add_entity_to_hub entity hub civ =
       (fun c -> Cluster.add_entity_to_hub entity hub [] c) civ.clusters in
     let new_civ = { civ with clusters = parsed_clusters } in
       remove_entity entity new_civ
-  else raise (Exception.Illegal "This entity has the wrong role for the hub"); (hub, civ)
+  else raise (Exception.Illegal "This entity has the wrong role for the hub"); civ
 
 (** Returns true if the civ isn't run by AI *)
 let get_player_controlled civ =

@@ -22,8 +22,8 @@ let create ~terrain ~pos = {
 
 (** Create a hub and place it on this tile, also returning a potentially
   * different civ. For descriptions of the named parameters, see hub.mli.
-  * IMPORTANT: if entity not None you must call Civ.remove_entity starting_entity 
-  * civ after. 
+  * IMPORTANT: if entity not None you must call Civ.remove_entity starting_entity
+  * civ after.
   * [starting_entity] is an entity that will automatically be consumed by the
   *   new hub when it is finished being built, if such an entity exists.
   *   Typically this is the first entity to start construction of the hub.
@@ -76,16 +76,16 @@ let describe_terrain = function
   | Forest -> "This is a forest"
   | Desert -> "This is a desert"
 
-  let describe t =
-    match t.entity, t.hub with
-    | None, None ->
-      (describe_terrain t.terrain)^"."
-    | Some x, None ->
-      (describe_terrain t.terrain)^". "^"It currently has a"^(Entity.describe x)^"on it."
-    | None, Some y ->
-      (describe_terrain t.terrain)^". "^"It currently has a"^(Hub.describe y)^"on it."
-    | Some x, Some y ->
-      (describe_terrain t.terrain)^". "^"It currently has a "^(Entity.describe x)^" and a "^(Hub.describe y)^"on it."
+let describe t =
+  match t.entity, t.hub with
+  | None, None ->
+    (describe_terrain t.terrain)^"."
+  | Some x, None ->
+    (describe_terrain t.terrain)^". "^"It currently has a"^(Entity.describe x)^"on it."
+  | None, Some y ->
+    (describe_terrain t.terrain)^". "^"It currently has a"^(Hub.describe y)^"on it."
+  | Some x, Some y ->
+    (describe_terrain t.terrain)^". "^"It currently has a "^(Entity.describe x)^" and a "^(Hub.describe y)^"on it."
 
 let flatland_art = Art.load "flatland"
 let mountain_art = Art.load "mountain"
