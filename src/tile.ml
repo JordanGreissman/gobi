@@ -50,20 +50,12 @@ let move_entity to_tile from_tile =
 let get_terrain t = t.terrain
 let set_terrain t terrain = {t with terrain=terrain}
 
-<<<<<<< 9a9e97ce1c9ed12ede1e716b710a5c5fec6c0b00
 let is_settled t = not(t.hub = None)
 let unsettle t = {t with hub=None}
-=======
-let unsettle t =
-  failwith "Unimplemented"
 
 let clear t = match t.terrain with
   | Flatland | Mountain | Desert -> failwith "Cannot clear this terrain type"
   | Forest -> { t with terrain = Flatland }
-
-let get_hub t =
-  failwith "Unimplemented"
->>>>>>> Help I broke it
 
 let get_hub t = t.hub
 let set_hub t hub =
