@@ -69,19 +69,17 @@ let parse_event r e =
   | (Tile _,Mouse m) -> (* get the tile at screen coord [m] *)
     let f c = match Coord.offset_from_screen c with
       | Contained c -> Tile (Some c)
-      (* TODO: make this an Illegal exception *)
-      | _ -> failwith "Not a contained coordinate" in
+      | _ -> raise (Expception.Illegal "Not Contained in parse_event") in
     let x,y = (LTerm_mouse.col m,LTerm_mouse.row m) in
     let c = Coord.Screen.create x y in
     f c
   | (HubRole _,Key k) -> HubRole (Some k)
   | (EntityRole _,Key k) -> EntityRole (Some k)
-  (* TODO: make this an Illegal exception *)
-  | (_,_) -> failwith (Printf.sprintf
+  | (_,_) -> raise (Expception.Illegal (Printf.sprintf
                     "Requirement %s expected input event %s put got %s instead"
                     (get_req_name r)
                     (get_expected_event r)
-                    (get_event_name e))
+                    (get_event_name e)))
 
 let is_some = function
   | Some x -> true

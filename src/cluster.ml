@@ -29,5 +29,18 @@ let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
     tiles = [town_hall];
   }, map)
 
+(* Returns cluster with an updated tile list with entity added to hub *)
+let add_entity_to_hub entity hub acc cluster = match cluster.tiles with
+  | [] -> { cluster with tiles = acc }
+  | tile::lst -> let tile_hub = Tile.get_hub tile in
+    let new_tile = 
+      if tile_hub = hub then
+      let new_hub = { tile_hub with 
+        production_rate = Hub.get_production_rate tile_hub + 1 }
+      in Tile.set_hub tile (Some new_hub) 
+      else tile
+    in add_entity_to_hub entity hub acc@new_tile { cluster with tiles = lst }
+
+
 let get_town_hall cluster =
   cluster.town_hall
