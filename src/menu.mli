@@ -37,3 +37,8 @@ val main_menu : t list
 val hub_menu : t list
 val entity_menu : t list
 val research_menu : t list
+
+val get_cmd : t -> Cmd.t
+val get_next_menu : t option-> menu
+
+val get_menu : menu -> t list

@@ -271,7 +271,7 @@ let rec execute (s:State.t) e c : State.t =
   end
   | Cmd.AddEntityToHub  ->  s
     (* TODO: set pending commands to get tiles of e and hmatch s.pending_cmd with
-    | None -> s 
+    | None -> s
     | Some (_, t1::t2::[]) ->
       let entity = Tile.get_entity (Mapp.tile_by_pos t1 s.map) in
       let hub = Tile.get_hub (Mapp.tile_by_pos t2 s.map) in
@@ -311,14 +311,13 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
   (* ------------------------------------------------------------------------- *)
   (* mouse events as well as any key that is not one of the above must check for
    * a pending command *)
-  (* | LTerm_event.Key { code = c } -> *)
-  (*   let f = function *)
-  (*     | Some m -> execute s (LTerm_event.Key { code = c }) m.cmd *)
-  (*     | None -> s in *)
-  (*   s.menu *)
-  (*   |> try Some (List.find (fun (x:Menu.t) -> x.key = c)) with Not_found -> None *)
-  (*   |> f *)
-  (*   |> (fun s -> { s with menu = s.menu.next_menu }) *)
+  | LTerm_event.Key { code = c } ->
+    let f = function
+      | Some m -> execute s e (Menu.get_cmd m)
+      | None -> s in
+    let foo = try Some (List.find (fun (x:Menu.t) -> x.key = c) s.menu) with Not_found -> None in
+    foo |> f
+    |> (fun arg -> { s with menu = (Menu.get_menu (Menu.get_next_menu foo)) })
   | LTerm_event.Mouse e ->
     (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)
     (* state.ctx.messages <- new_msg'::state.ctx.messages; *)

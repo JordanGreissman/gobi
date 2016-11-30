@@ -59,29 +59,29 @@ and main_menu = [
     text = "tile";
     key = Char (UChar.of_char 't');
     cmd = Cmd.create Cmd.NoCmd;
-    (* next_menu = TileMenu get_tile_menu; *)
-    next_menu = NoMenu;
+    next_menu = TileMenu get_tile_menu;
+    (* next_menu = NoMenu; *)
   };
   {
     text = "hub";
     key = Char (UChar.of_char 'h');
     cmd = Cmd.create Cmd.NoCmd;
-    (* next_menu = StaticMenu hub_menu; *)
-    next_menu = NoMenu;
+    next_menu = StaticMenu hub_menu;
+    (* next_menu = NoMenu; *)
   };
   {
     text = "entity";
     key = Char (UChar.of_char 'e');
     cmd = Cmd.create Cmd.NoCmd;
-    (* next_menu = StaticMenu entity_menu; *)
-    next_menu = NoMenu;
+    next_menu = StaticMenu entity_menu;
+    (* next_menu = NoMenu; *)
   };
   {
     text = "research";
     key = Char (UChar.of_char 'r');
     cmd = Cmd.create Cmd.NoCmd;
-    (* next_menu = StaticMenu research_menu; *)
-    next_menu = NoMenu;
+    next_menu = StaticMenu research_menu;
+    (* next_menu = NoMenu; *)
   };
   {
     text = "next turn";
@@ -195,3 +195,14 @@ and research_menu : t list = [
     next_menu = StaticMenu main_menu;
   };
 ]
+
+let get_cmd t = t.cmd
+
+let get_next_menu = function
+  | Some t -> t.next_menu
+  | None -> (StaticMenu main_menu)
+
+let get_menu = function
+  | NoMenu -> []
+  | StaticMenu x -> x
+  | _ -> []
