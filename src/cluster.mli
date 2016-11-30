@@ -13,7 +13,7 @@ val get_town_hall : t -> Tile.t
 
 (* Adds a hub to a cluster, finding the nearest one based on hub coord.,
  * returning the cluster with the new tile w/ hub on it *)
-val add_hub : Hub.t -> t list -> Mapp.t -> t
+val add_hub : t list -> Mapp.t -> Hub.t -> t list
 
 (** Applies a function for tiles on every tile in a cluster. Acc should be [].
   * Returns cluster with new tile list *)

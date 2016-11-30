@@ -155,7 +155,12 @@ let init_state json : state =
   current_civ = 0;
 }
 
-let tick_pending civ =
+let rec add_hubs clusters map hubs =
+  match hubs with
+  | [] -> clusters
+  | h::t -> add_hubs (Cluster.add_hub clusters map h) map t
+
+let tick_pending map civ =
   let ticked = List.map Entity.tick_cost civ.pending_entities in
   let done_entities = List.filter
                       Entity.is_done ticked in
@@ -165,19 +170,18 @@ let tick_pending civ =
   let ticked = List.map Hub.tick_cost civ.pending_hubs in
   let done_hubs = List.filter
                   Hub.is_done civ.pending_hubs in
-  (* let clusters = List.map Cluster.add_hub civ.clusters in *)
-  (* let hubs = done_hubs@civ.hubs in *)
+  let clusters = add_hubs civ.clusters map done_hubs in
   let pending_hubs = List.filter
                 (fun x -> not (Hub.is_done x)) ticked in
   {civ with entities=entities;
             pending_entities=pending_entities;
-            (* hubs=hubs; *)
+            clusters=clusters;
             pending_hubs=pending_hubs;}
 
 let next_turn s =
   let civs = State.get_civs s in
   let ai = Ai.attempt_turns civs s in
-  let civs = List.map tick_pending civs in
+  let civs = List.map (tick_pending s.map) civs in
   {s with civs = civs; turns_left = (s.turns_left - 1)}
 
 (* [execute s e c] returns the next state of the game given the current state
