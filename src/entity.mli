@@ -17,7 +17,7 @@ val find_role: string -> role list -> role
 (** Create and return an entity. An entity has a role, an attack level, a defense
   * level, and a position.
   *)
-val create : role:role -> ?atk:int -> ?def:int -> pos:Coord.t -> t
+val create : role:role -> ?atk:int -> ?def:int -> pos:Coord.t -> id:int -> t
 
 (** Create and return a role.
   * [name] is the name of this entity role (e.g. "Lumberjack", "Farmer", etc.)
@@ -85,3 +85,7 @@ val get_actions : t -> int
 val get_name : t -> string
 val get_cost_to_make : t -> int
 val get_art : t -> Art.t
+
+(* id getter / setter *)
+val get_id : t -> int
+val set_id : int -> t -> t
