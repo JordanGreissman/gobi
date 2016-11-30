@@ -30,6 +30,7 @@ module Unlockable : sig
 	(* returns the name of the resource *)
 	val resource : t -> string
 
+  val describe_unlocked : t list -> string
 end
 
 module Research : sig

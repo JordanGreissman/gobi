@@ -34,8 +34,6 @@ type role = {
 
 type t = {
   role: role;
-  (* whether the hub is finished being built *)
-  is_finished: bool;
   (* the number of production units this hub generates every turn. This number
    * can be increased by adding entities to the hub *)
   production_rate: int;
@@ -49,7 +47,6 @@ type t = {
 
 let create ~role ~production_rate ~def ~pos = {
   role            = role;
-  is_finished     = false;
   production_rate = production_rate;
   def             = def;
   pos             = pos;
@@ -94,12 +91,15 @@ let describe hub =
 
 let describe_role r = r.descr
 
+let tick_cost t =
+  {t with role = {t.role with cost_to_make = t.role.cost_to_make - 1}}
+
+let is_done t =
+  t.role.cost_to_make = 0
+
 (* [t] getters and setters *)
 
 let get_role hub = hub.role
-
-let is_finished hub = hub.is_finished
-let set_finished hub = { hub with is_finished = true }
 
 let get_production_rate hub = hub.production_rate
 

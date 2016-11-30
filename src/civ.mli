@@ -15,13 +15,14 @@ type t = {
   techs : Research.Research.research_list;
   (** whether the civ is player or ai controlled *)
   player_controlled : bool;
+  next_id : int;
 }
 
 (** Returns civ with an entity list without the passed in entity *)
 val remove_entity : Entity.t -> t -> t
 
 (** Add entity to a hub in existing civ, returning the new civ.
-  * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub 
+  * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub
   * doesn't exist in clusters. *)
 val add_entity_to_hub : Entity.t -> Hub.t -> t -> t
 

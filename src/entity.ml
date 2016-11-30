@@ -32,7 +32,6 @@ type t = {
   pos: coordinate;
 }
 
-
 let rec find_role role_str role_list =
   match role_list with
   | [] -> raise (Exception.Illegal (role_str^" is not a valid role."))
@@ -74,6 +73,12 @@ let describe e =
 let describe_role r =
   r.descr
 
+let tick_cost t =
+  {t with role = {t.role with cost_to_make = t.role.cost_to_make - 1}}
+
+let is_done t =
+  t.role.cost_to_make = 0
+
 (* [t] getters and setters *)
 
 let get_role entity = entity.role
@@ -105,6 +110,8 @@ let is_role_unlocked r = r.unlocked
 let unlock_role r = { r with unlocked = true }
 
 let get_role_default_power r = r.default_power
+
+let set_actions x t = {t with role = {t.role with actions = x}}
 
 (* convenience functions *)
 let get_actions e = e.role.actions

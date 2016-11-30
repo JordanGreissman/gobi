@@ -22,3 +22,6 @@ let update_civ i civ s =
   arr.(i) <- civ;
   let civs = Array.to_list arr in
   {s with civs = civs}
+
+let get_civs s =
+  s.civs

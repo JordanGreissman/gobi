@@ -12,8 +12,6 @@ type coord = Coord.t
   *)
 type t = {
   role: role;
-  (* whether the hub is finished being built *)
-  is_finished: bool;
   (* the number of production units this hub generates every turn. This number
    * can be increased by adding entities to the hub *)
   production_rate: int;
@@ -107,15 +105,13 @@ val extract_to_role :
 (* Return a role matching the string. "all" returns role_list. Otherwise, Illegal exception *)
 val find_role : string -> role list -> role list
 
+val tick_cost : t -> t
+
+val is_done : t -> bool
+
 (* [t] getters and setters *)
 
 val get_role : t -> role
-
-(** is the construction of this hub finished? *)
-val is_finished : t -> bool
-
-(** mark this hub as finished (construction is complete) *)
-val set_finished : t -> t
 
 val get_production_rate : t -> int
 

@@ -33,3 +33,5 @@ type t = {
 val get_current_civ : t -> Civ.t
 
 val update_civ : int -> Civ.t -> t -> t
+
+val get_civs : t -> Civ.t list
