@@ -27,4 +27,7 @@ type t = {
   pending_cmd : Cmd.t option;
   (** whether the player has quit the game *)
   is_quit : bool;
+  current_civ : int;
 }
+
+val get_current_civ : t -> Civ.t

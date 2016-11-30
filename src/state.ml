@@ -11,4 +11,8 @@ type t = {
   menu : Menu.t list;
   pending_cmd : Cmd.t option;
   is_quit : bool;
+  current_civ : int;
 }
+
+let get_current_civ s =
+  List.nth s.civs s.current_civ
