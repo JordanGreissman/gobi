@@ -30,6 +30,8 @@ type t = {
   power: int*int;
   (* this entity's current position on the map *)
   pos: coordinate;
+  (* unique id for each entity*)
+  id: int;
 }
 
 let rec find_role role_str role_list =
@@ -38,7 +40,7 @@ let rec find_role role_str role_list =
   | h::t -> if h.name = role_str then h
     else find_role role_str t
 
-let create ~role ?atk ?def ~pos =
+let create ~role ?atk ?def ~pos ~id =
   let attack = match atk with
     | Some a -> a
     | None -> fst role.default_power in
@@ -49,6 +51,7 @@ let create ~role ?atk ?def ~pos =
     role  = role;
     power = (attack,defense);
     pos   = pos;
+    id    = id;
   }
 
 let create_role ~name ~descr ~cost_to_make ~unlocked ~actions
@@ -118,3 +121,8 @@ let get_actions e = e.role.actions
 let get_name e = e.role.name
 let get_cost_to_make e = e.role.cost_to_make
 let get_art e = e.role.art
+
+(* id getter / setter *)
+let get_id e = e.id 
+let set_id id e = { e with id = id }
+

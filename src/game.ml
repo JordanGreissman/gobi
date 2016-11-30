@@ -215,10 +215,8 @@ let rec execute (s:State.t) e c : State.t =
                                           let entity =
                                             Entity.set_actions 0 e in
                                           let civ = State.get_current_civ s in
-                                          (* let civ = Civ.update_entity entity civ in *)
-                                            (* TODO swap this entity in civ's list,
-                                                return state with new civ *)
-                                          State.update_civ s.current_civ civ s
+                                          let new_civ = Civ.replace_entity entity civ in
+                                          State.update_civ s.current_civ new_civ s
                                         end
                               | None -> {s
                                 with messages =
@@ -253,8 +251,8 @@ let rec execute (s:State.t) e c : State.t =
                                         | _ -> failwith "Whoops" in *)
                               let role = List.nth s.entity_roles 0 in
                               let pos = s.selected_tile in
-                              let entity = Entity.create role pos in
                               let civ = State.get_current_civ s in
+                              let entity = Entity.create role pos civ.next_id in
                               let civ = {civ with pending_entities =
                                           entity::civ.pending_entities} in
                               State.update_civ s.current_civ civ s
@@ -271,7 +269,15 @@ let rec execute (s:State.t) e c : State.t =
                               | None -> {s with
                                   messages = "No hub selected!"::s.messages}
   end
-  | Cmd.AddEntityToHub  -> s (* TODO *)
+  | Cmd.AddEntityToHub  ->  s
+    (* TODO: set pending commands to get tiles of e and hmatch s.pending_cmd with
+    | None -> s 
+    | Some (_, t1::t2::[]) ->
+      let entity = Tile.get_entity (Mapp.tile_by_pos t1 s.map) in
+      let hub = Tile.get_hub (Mapp.tile_by_pos t2 s.map) in
+      { s with current_civ = Civ.add_entity_to_hub entity hub (State.get_current_civ civ) }
+    | _ -> failwith "AddEntityToHub's stored data isn't None or two tiles w/ coor"
+  *)
   | Cmd.SelectTile      ->
     let (cmd,req_list) = match s.pending_cmd with
       | Some p -> p

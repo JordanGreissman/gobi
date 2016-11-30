@@ -16,6 +16,13 @@ let remove_entity entity civ =
   let new_e_list = List.filter (fun e -> not (e = entity)) civ.entities in
     { civ with entities = new_e_list }
 
+(** Replace entity with id of new_entity with new_entity *)
+let replace_entity new_entity civ =
+  let id = Entity.get_id new_entity in
+  let to_be_removed = List.find (fun e -> (Entity.get_id e) = id) civ.entities in
+  let new_e_list = new_entity::(remove_entity to_be_removed civ).entities in
+    { civ with entities = new_e_list }
+
 (** Add entity to a hub in existing civ, returning the new civ.
   * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub
   * doesn't exist in clusters. *)
