@@ -40,6 +40,10 @@ val create_role :
 val describe : t -> string
 val describe_role : role -> string
 
+val tick_cost : t -> t
+
+val is_done : t -> bool
+
 (* [t] getters and setters *)
 
 val get_role : t -> role
@@ -80,6 +84,7 @@ val unlock_role : role -> role
 
 val get_role_default_power : role -> int*int
 
+val set_actions : int -> t -> t
 (* convenience functions *)
 val get_actions : t -> int
 val get_name : t -> string

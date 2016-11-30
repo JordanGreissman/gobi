@@ -3,6 +3,7 @@ open Lwt
 open CamomileLibrary
 open State
 open Civ
+open Cmd
 
 type state = State.t
 type civ = Civ.t
@@ -15,15 +16,6 @@ type parsed_json = {
   civs: (string * string) list;
   tech_tree: Research.Research.research_list;
 }
-
-let make_move st cmd =
-  failwith "Unimplemented"
-
-let parse_input s =
-  failwith "Unimplemented"
-
-let turn st =
-  failwith "Unimplemented"
 
 (* Error handling necessary? *)
 let load_json s =
@@ -111,12 +103,12 @@ let init_json json =
     tech_tree = tree; civs = civs}
 
 let init_civ player_controlled hub_roles map civ : civ =
-  let tup = Cluster.create  ~name:(fst civ)
-                              ~descr:"A soon to be booming metropolis"
-                              (* TODO this needs to be different *)
-                              ~town_hall_tile:(Mapp.get_random_tile !map)
-                              ~hub_role_list:hub_roles
-                              ~map:!map in
+  let tup = Cluster.create
+      ~name:(fst civ)
+      ~descr:"A soon to be booming metropolis"
+      ~town_hall_tile:(Mapp.get_random_tile !map)
+      ~hub_role_list:hub_roles
+      ~map:!map in
   map := (snd tup);
   {
   name = fst civ;
@@ -127,10 +119,11 @@ let init_civ player_controlled hub_roles map civ : civ =
   clusters = [fst tup];
   techs = [];
   player_controlled = player_controlled;
+  next_id = 0;
   }
 
 let get_player_start_coords civs =
-  let player = List.find (fun civ -> Civ.get_player_controlled civ) civs in
+  let player = List.find Civ.get_player_controlled civs in
   let cluster = List.nth player.clusters 0 in
   let c = Tile.get_pos (Cluster.get_town_hall cluster) in
   let coord = Coord.screen_from_offset c in
@@ -141,10 +134,10 @@ let get_player_start_coords civs =
 let init_state json : state =
   let json = Basic.from_file json in
   let parsed = init_json json in
-  (* TODO what should these values be? *)
   let map = ref (Mapp.generate 42 42) in
-  let civs = List.mapi (fun i x -> init_civ (i=0) parsed.hubs map x)
-              parsed.civs in
+  let civs = List.mapi
+      (fun i x -> init_civ (i=0) parsed.hubs map x)
+      parsed.civs in
   let coords = get_player_start_coords civs in
 {
   civs = civs;
@@ -162,12 +155,37 @@ let init_state json : state =
   current_civ = 0;
 }
 
+let tick_pending civ =
+  let ticked = List.map Entity.tick_cost civ.pending_entities in
+  let done_entities = List.filter
+                      Entity.is_done ticked in
+  let entities = done_entities@civ.entities in
+  let pending_entities = List.filter
+                (fun x -> not (Entity.is_done x)) ticked in
+  let ticked = List.map Hub.tick_cost civ.pending_hubs in
+  let done_hubs = List.filter
+                  Hub.is_done civ.pending_hubs in
+  (* let clusters = List.map Cluster.add_hub civ.clusters in *)
+  (* let hubs = done_hubs@civ.hubs in *)
+  let pending_hubs = List.filter
+                (fun x -> not (Hub.is_done x)) ticked in
+  {civ with entities=entities;
+            pending_entities=pending_entities;
+            (* hubs=hubs; *)
+            pending_hubs=pending_hubs;}
+
+let next_turn s =
+  let civs = State.get_civs s in
+  let ai = Ai.attempt_turns civs s in
+  let civs = List.map tick_pending civs in
+  {s with civs = civs; turns_left = (s.turns_left - 1)}
+
 (* [execute s e c] returns the next state of the game given the current state
  * [s], the input event [e], and the command [c]. *)
 let rec execute (s:State.t) e c : State.t =
   match fst c with
   | Cmd.NoCmd           -> s
-  | Cmd.NextTurn        -> s (* TODO *)
+  | Cmd.NextTurn        -> next_turn s
   | Cmd.Tutorial        -> s (* TODO *)
   | Cmd.Describe        -> begin
                             let tile = Mapp.tile_by_pos s.selected_tile s.map in
@@ -175,8 +193,33 @@ let rec execute (s:State.t) e c : State.t =
                             {s with messages = desc::s.messages}
                           end
   | Cmd.Research        -> s (* TODO *)
-  | Cmd.DisplayResearch -> s (* TODO *)
-  | Cmd.Skip            -> s (* TODO *)
+  | Cmd.DisplayResearch -> s (* This needs to be commented out until we fixe
+                                Cmd.required type *)
+                            (* begin
+                            let key = snd c in
+                            let civ = State.get_current_civ s in
+                            let research_list = List.assoc key civ.techs in
+                            let desc = Research.Unlockable.describe_unlocked
+                                        research_list in
+                            {s with messages = desc::s.messages}
+                          end *)
+  | Cmd.Skip            -> begin
+                            let tile = Mapp.tile_by_pos s.selected_tile s.map in
+                            let entity = Tile.get_entity tile in
+                            match entity with
+                              | Some e -> begin
+                                          let entity =
+                                            Entity.set_actions 0 e in
+                                          let civ = State.get_current_civ s in
+                                          (* let civ = Civ.update_entity entity civ in *)
+                                            (* TODO swap this entity in civ's list,
+                                                return state with new civ *)
+                                          State.update_civ s.current_civ civ s
+                                        end
+                              | None -> {s
+                                with messages =
+                                  "No entity selected!"::s.messages}
+                          end
   | Cmd.Move            -> s (* TODO *)
   | Cmd.Attack          -> s (* TODO *)
   | Cmd.PlaceHub        -> s (* TODO *)
@@ -195,6 +238,8 @@ let rec execute (s:State.t) e c : State.t =
                             end
   | Cmd.Produce         -> begin
                             if Cmd.are_all_reqs_satisfied (snd c) then
+                            (* This needs to be commented out until we fixe
+                                                            Cmd.required type *)
 (*                               let role = List.nth (snd c) 1 in
                               let role = match role with
                                         | EntityRole x -> begin match x with
@@ -276,21 +321,21 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
         { s with messages = new_msg::s.messages; selected_tile = c }
       | (_,_) -> s in
     s.screen_top_left
-    |> Coord.Screen.add (Coord.Screen.create (LTerm_mouse.col e) (LTerm_mouse.row e))
+    |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
     |> Coord.offset_from_screen
     |> f
   | _ -> s
 
-let rec loop ui state_ref =
+let rec player_loop ui state_ref =
   let state = !state_ref in
   LTerm_ui.wait ui >>= fun e ->
   let state' = get_next_state state e in
-  if state'.is_quit
+  if state'.is_quit (* TODO end game when turns = 0 *)
   then return ()
   else (
     state_ref := state';
     LTerm_ui.draw ui;
-    loop ui state_ref)
+    player_loop ui state_ref)
 
 let main () =
   let (s:state) = init_state "src/game_data.json" in
@@ -298,7 +343,7 @@ let main () =
   Lazy.force LTerm.stdout >>= fun term ->
   LTerm.enable_mouse term >>= fun () ->
   LTerm_ui.create term (Interface.draw state_ref) >>= fun ui ->
-  loop ui state_ref >>= fun () ->
+  player_loop ui state_ref >>= fun () ->
   LTerm.disable_mouse term >>= fun () ->
   LTerm_ui.quit ui
 

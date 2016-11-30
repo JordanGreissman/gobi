@@ -49,6 +49,6 @@ let rec get_random_tile map =
   let x,y = (Random.int (List.length map), Random.int (List.length map)) in
   let row = List.nth map y in
   let tile = List.nth row x in
-  if Tile.has_building_restriction tile then
-    get_random_tile map
+  if Tile.has_building_restriction tile
+  then get_random_tile map
   else tile

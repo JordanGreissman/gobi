@@ -28,6 +28,12 @@ module Unlockable = struct
 
   let resource t =
     t.name
+
+  let describe_unlocked t =
+    let unlocked = List.filter (fun x -> x.is_unlocked) t in
+    (* let desc = List.map resource unlocked in *)
+    let desc = List.fold_right (fun x y -> y^(resource x)) unlocked "" in
+    desc
 end
 
 module Research = struct
