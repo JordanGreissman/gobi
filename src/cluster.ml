@@ -29,6 +29,13 @@ let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
     tiles = [town_hall];
   }, map)
 
+(** Applies a function for tiles on every tile in a cluster. Acc should be [].
+  * Returns cluster with new tile list *)
+let rec tile_map tile_func acc cluster = match cluster.tiles with
+  | [] -> { cluster with tiles = acc }
+  | tile::lst -> 
+    tile_map tile_func (acc@[tile_func tile]) { cluster with tiles = lst}
+
 (* Returns cluster with an updated tile list with entity added to hub *)
 let rec add_entity_to_hub entity hub acc cluster = match cluster.tiles with
   | [] -> { cluster with tiles = acc }

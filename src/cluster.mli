@@ -8,6 +8,10 @@ type t
 val create : name:string -> descr:string -> town_hall_tile:Tile.t ->
 	hub_role_list:Hub.role list -> map:Mapp.t -> t * Mapp.t
 
+(** Applies a function for tiles on every tile in a cluster. Acc should be [].
+  * Returns cluster with new tile list *)
+val tile_map : (tile -> tile) -> Tile.t list -> t -> t
+
 (* Returns cluster with an updated tile list with entity added to hub *)
 val add_entity_to_hub : Entity.t -> Hub.t -> Tile.t list -> t -> t
 
