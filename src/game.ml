@@ -160,26 +160,25 @@ let init_state json : state =
 (* [execute s e c] returns the next state of the game given the current state
  * [s], the input event [e], and the command [c]. *)
 let rec execute (s:State.t) e c : State.t =
-  let open Cmd in
   match fst c with
-  | NextTurn        -> s (* TODO *)
-  | Tutorial        -> s (* TODO *)
-  | Describe        -> s (* TODO *)
-  | Research        -> s (* TODO *)
-  | DisplayResearch -> s (* TODO *)
-  | Skip            -> s (* TODO *)
-  | Move            -> s (* TODO *)
-  | Attack          -> s (* TODO *)
-  | PlaceHub        -> s (* TODO *)
-  | Clear           -> s (* TODO *)
-  | Produce         -> s (* TODO *)
-  | AddEntityToHub  -> s (* TODO *)
-  | SelectTile      ->
+  | Cmd.NextTurn        -> s (* TODO *)
+  | Cmd.Tutorial        -> s (* TODO *)
+  | Cmd.Describe        ->
+  | Cmd.Research        -> s (* TODO *)
+  | Cmd.DisplayResearch -> s (* TODO *)
+  | Cmd.Skip            -> s (* TODO *)
+  | Cmd.Move            -> s (* TODO *)
+  | Cmd.Attack          -> s (* TODO *)
+  | Cmd.PlaceHub        -> s (* TODO *)
+  | Cmd.Clear           -> s (* TODO *)
+  | Cmd.Produce         -> s (* TODO *)
+  | Cmd.AddEntityToHub  -> s (* TODO *)
+  | Cmd.SelectTile      ->
     let (cmd,req_list) = match s.pending_cmd with
       | Some p -> p
       | None -> failwith "No pending command found when executing Selection" in
-    let req_list' = satisfy_next_req e req_list in
-    if are_all_reqs_satisfied req_list'
+    let req_list' = Cmd.satisfy_next_req e req_list in
+    if Cmd.are_all_reqs_satisfied req_list'
     then execute { s with pending_cmd=Some (cmd,req_list') } e (cmd,req_list')
     else { s with pending_cmd=Some (cmd,req_list') }
   | SelectHub       -> s (* TODO *)
