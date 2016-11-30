@@ -265,13 +265,15 @@ let rec execute (s:State.t) e c : State.t =
                               | None -> {s with
                                   messages = "No hub selected!"::s.messages}
   end
-  | Cmd.AddEntityToHub  -> match s.pending_cmd with
-    | None -> (* TODO: set pending commands to get tiles of e and h *)
-    | Some (_, Some (Some t1)::(Some t2)::[]) -> 
+  | Cmd.AddEntityToHub  ->  s
+    (* TODO: set pending commands to get tiles of e and hmatch s.pending_cmd with
+    | None -> s 
+    | Some (_, t1::t2::[]) ->
       let entity = Tile.get_entity (Mapp.tile_by_pos t1 s.map) in
-      let hub = Tile.get_hub (Mapp.tile_by_pos tw s.map) in
+      let hub = Tile.get_hub (Mapp.tile_by_pos t2 s.map) in
       { s with current_civ = Civ.add_entity_to_hub entity hub (State.get_current_civ civ) }
     | _ -> failwith "AddEntityToHub's stored data isn't None or two tiles w/ coor"
+  *)
   | Cmd.SelectTile      ->
     let (cmd,req_list) = match s.pending_cmd with
       | Some p -> p
