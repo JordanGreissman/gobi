@@ -15,7 +15,7 @@ and menu =
   | ProduceEntityMenu of (Hub.t -> t list)
   | NextResearchMenu of (Research.Research.key -> t list)
 
-let get_tile_menu t =
+let rec get_tile_menu t =
   let describe = {
     text = "describe";
     key = Char (UChar.of_char 'd');
@@ -54,7 +54,7 @@ and get_produce_entity_menu roles =
 and get_research_menu r =
   failwith "get_research_menu is unimplemented"
 
-let main_menu = [
+and main_menu = [
   {
     text = "tile";
     key = Char (UChar.of_char 't');

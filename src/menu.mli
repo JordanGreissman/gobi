@@ -26,7 +26,12 @@ and menu =
 (** [get_menu t] is the list of menu options to be displayed for the tile [t].
   * Menu options are listed in the order they should be displayed (from top to
   * bottom). *)
-val get_menu : Tile.t -> t list
+(* val get_menu : Tile.t -> t list *)
+
+val get_tile_menu : Tile.t -> t list
+val get_build_hub_menu : Hub.role list -> t list
+val get_produce_entity_menu : Hub.t -> t list
+val get_research_menu : Research.Research.key -> t list
 
 val main_menu : t list
 val hub_menu : t list

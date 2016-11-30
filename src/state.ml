@@ -1,6 +1,6 @@
 type t = {
-  (* civs : Civ.t list; *)
-  (* turns_left : int; *)
+  civs : Civ.t list;
+  turns_left : int;
   hub_roles : Hub.role list;
   entity_roles : Entity.role list;
   tech_tree : Research.Research.research_list;
