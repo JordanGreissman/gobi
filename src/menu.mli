@@ -11,7 +11,6 @@ type t = {
     * indicates to keep displaying the same menu. *)
   next_menu: menu;
 }
-
 (** represents the different types of menus that exist in the game and how to
   * access them. Many menu types depend on contextual information from the
   * game state, so their types are functions *)
@@ -41,4 +40,5 @@ val research_menu : t list
 val get_cmd : t -> Cmd.t
 val get_next_menu : t option-> menu
 
-val get_menu : menu -> t list
+val get_menu : menu -> Tile.t option -> Hub.role list ->
+              Hub.t option -> Research.Research.key option -> t list

@@ -6,7 +6,6 @@ type t = {
   cmd: Cmd.t;
   next_menu: menu;
 }
-
 and menu =
   | NoMenu
   | StaticMenu of t list
@@ -14,6 +13,12 @@ and menu =
   | BuildHubMenu of (Hub.role list -> t list)
   | ProduceEntityMenu of (Hub.t -> t list)
   | NextResearchMenu of (Research.Research.key -> t list)
+
+type menu_arg =
+  | Tile of Tile.t
+  | Hub_roles of Hub.role list
+  | Hub of Hub.t
+  | Research_key of Research.Research.key
 
 let rec get_tile_menu t =
   let describe = {
@@ -204,7 +209,11 @@ let get_next_menu = function
 
 (* TODO I don't think this works for any other menu type,
   but we'll have to figure that out *)
-let get_menu = function
+let get_menu menu tile hub_roles hub research_key =
+  match menu with
   | NoMenu -> []
-  | StaticMenu x -> x
+  | StaticMenu menu -> menu
+  | TileMenu f -> match tile with
+                  | Some tile -> f tile
+                  | None -> failwith "Incorrect arg for menu"
   | _ -> []

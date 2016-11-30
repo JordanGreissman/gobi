@@ -316,9 +316,12 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
       | Some m -> execute s e (Menu.get_cmd m)
       | None -> s in
     let foo = try Some (List.find (fun (x:Menu.t) -> x.key = c) s.menu) with Not_found -> None in
+    let tile = Mapp.tile_by_pos s.selected_tile s.map in
+    let hub = Tile.get_hub tile in
+    let tile = Some tile in
     foo |> f
     (* TODO pass in argument (like selected tile?) in order to get next menu *)
-    |> (fun arg -> { s with menu = (Menu.get_menu (Menu.get_next_menu foo)) })
+    |> (fun s -> { s with menu = (Menu.get_menu (Menu.get_next_menu foo) tile s.hub_roles hub None) })
   | LTerm_event.Mouse e ->
     (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)
     (* state.ctx.messages <- new_msg'::state.ctx.messages; *)

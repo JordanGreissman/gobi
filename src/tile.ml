@@ -71,21 +71,25 @@ let get_pos t = t.pos
 (* terrain property queries *)
 
 let describe_terrain = function
-  | Flatland -> "This is a flatland"
-  | Mountain -> "This is a mountain"
-  | Forest -> "This is a forest"
-  | Desert -> "This is a desert"
+  | Flatland -> "This is a flatland tile"
+  | Mountain -> "This is a mountain tile"
+  | Forest -> "This is a forest tile"
+  | Desert -> "This is a desert tile"
 
 let describe t =
   match t.entity, t.hub with
   | None, None ->
     (describe_terrain t.terrain)^"."
   | Some x, None ->
-    (describe_terrain t.terrain)^". "^"It currently has a"^(Entity.describe x)^"on it."
+    (describe_terrain t.terrain)^". "^
+      "It currently has a "^(Entity.describe x)^" on it."
   | None, Some y ->
-    (describe_terrain t.terrain)^". "^"It currently has a"^(Hub.describe y)^"on it."
+    (describe_terrain t.terrain)^". "^
+      "It currently has a "^(Hub.describe y)^" on it."
   | Some x, Some y ->
-    (describe_terrain t.terrain)^". "^"It currently has a "^(Entity.describe x)^" and a "^(Hub.describe y)^"on it."
+    (describe_terrain t.terrain)^". "^
+      "It currently has a "^(Entity.describe x)^" and a "
+      ^(Hub.describe y)^"on it."
 
 let flatland_art = Art.load "flatland"
 let mountain_art = Art.load "mountain"
