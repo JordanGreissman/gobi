@@ -317,6 +317,7 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
       | None -> s in
     let foo = try Some (List.find (fun (x:Menu.t) -> x.key = c) s.menu) with Not_found -> None in
     foo |> f
+    (* TODO pass in argument (like selected tile?) in order to get next menu *)
     |> (fun arg -> { s with menu = (Menu.get_menu (Menu.get_next_menu foo)) })
   | LTerm_event.Mouse e ->
     (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)

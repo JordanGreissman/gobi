@@ -202,6 +202,8 @@ let get_next_menu = function
   | Some t -> t.next_menu
   | None -> (StaticMenu main_menu)
 
+(* TODO I don't think this works for any other menu type,
+  but we'll have to figure that out *)
 let get_menu = function
   | NoMenu -> []
   | StaticMenu x -> x
