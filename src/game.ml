@@ -161,9 +161,10 @@ let init_state json : state =
  * [s], the input event [e], and the command [c]. *)
 let rec execute (s:State.t) e c : State.t =
   match fst c with
+  | Cmd.NoCmd           -> s
   | Cmd.NextTurn        -> s (* TODO *)
   | Cmd.Tutorial        -> s (* TODO *)
-  | Cmd.Describe        ->
+  | Cmd.Describe        -> s (* TODO *)
   | Cmd.Research        -> s (* TODO *)
   | Cmd.DisplayResearch -> s (* TODO *)
   | Cmd.Skip            -> s (* TODO *)
