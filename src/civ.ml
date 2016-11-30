@@ -8,7 +8,6 @@ type t = {
    pending_hubs : Hub.t list;
    techs : Research.Research.research_list;
    player_controlled : bool;
-
 }
 
 let remove_entity entity civ =

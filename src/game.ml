@@ -1,6 +1,8 @@
 open Yojson
 open Lwt
 open CamomileLibrary
+open State
+open Civ
 
 type state = State.t
 type civ = Civ.t
@@ -202,8 +204,11 @@ let rec execute (s:State.t) e c : State.t =
                                         | _ -> failwith "Whoops" in *)
                               let role = List.nth s.entity_roles 0 in
                               let pos = s.selected_tile in
-                              let x = Entity.create ~role:role ~pos:pos in
-                              s
+                              let entity = Entity.create role pos in
+                              let civ = State.get_current_civ s in
+                              let civ = {civ with pending_entities =
+                                          entity::civ.pending_entities} in
+                              State.update_civ s.current_civ civ s
                             else
                               let tile = Mapp.tile_by_pos
                                           s.selected_tile s.map in

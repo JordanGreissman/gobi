@@ -16,3 +16,9 @@ type t = {
 
 let get_current_civ s =
   List.nth s.civs s.current_civ
+
+let update_civ i civ s =
+  let arr = Array.of_list s.civs in
+  arr.(i) <- civ;
+  let civs = Array.to_list arr in
+  {s with civs = civs}
