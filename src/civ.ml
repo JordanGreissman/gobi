@@ -22,7 +22,7 @@ let remove_entity entity civ =
 let add_entity_to_hub entity hub civ =
   if List.mem (Entity.get_role entity) (Hub.get_allowed_roles hub) then
     let parsed_clusters = List.map
-      (fun c -> Cluster.add_entity_to_hub entity hub [] c) civ.clusters in
+      (fun c -> Cluster.add_entity_to_hub entity hub c) civ.clusters in
     let new_civ = { civ with clusters = parsed_clusters } in
       remove_entity entity new_civ
   else raise (Exception.Illegal "This entity has the wrong role for the hub"); civ
