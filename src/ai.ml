@@ -8,6 +8,16 @@ let select_random_from_list lst =
   let x = Random.int (List.length lst) in
   List.nth lst x
 
+let attempt_move_entity s civ =
+  civ
+
+let attempt_technology_victory s civ =
+  Random.self_init ();
+  let state = !s in
+  let x = Random.int ((state.total_turns - state.turn) + 10) in
+  if x = 0 then {civ with techs = state.tech_tree}
+  else civ
+
 let attempt_build_hub s civ =
   let state = !s in
   let role = select_random_from_list state.hub_roles in
@@ -39,13 +49,12 @@ let attempt_make_entity s civ =
 
 let rec attempt_turn s civ =
   Random.self_init ();
-  let x = Random.int 4 in
+  let x = Random.int 10 in
   match x with
   | 0 | 1 -> attempt_make_entity s civ
   | 2 | 3 -> attempt_build_hub s civ
-  | 4 | 5 -> civ
-  | 6 | 7 -> civ
-  | 8 | 9 -> civ
+  | 4 | 5 | 6 | 7 -> attempt_move_entity s civ
+  | 8 -> attempt_technology_victory s civ
   | _ -> civ
 
 let attempt_turns civs (s:State.t ref) =
