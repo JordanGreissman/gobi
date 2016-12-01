@@ -12,6 +12,69 @@ let tile_by_pos c map =
     | Failure _ -> List.nth row ((List.length map) - 1)
     | Invalid_argument _ -> List.nth row 0
 
+
+let get_adjacent_tiles map tile =
+  let x = Coord.get_x (Tile.get_pos tile) in
+  let y = Coord.get_y (Tile.get_pos tile) in
+  match x,y with
+    | (x,y) when (x < 41 && x > 0) && (y < 41 && y > 0) ->
+      let top_tile = tile_by_pos (Coord.create x (y-1)) map in
+      let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
+      let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
+      let bottom_tile = tile_by_pos (Coord.create x (y+1)) map in
+      let lower_left_tile = tile_by_pos (Coord.create (x-1) y) map in
+      let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
+      [top_tile;upper_right_tile;lower_right_tile;bottom_tile;lower_left_tile;upper_left_tile]
+    | (x,y) when (x =41) && (y < 41 && y > 0) ->
+      let top_tile = tile_by_pos (Coord.create x (y-1)) map in
+      let bottom_tile = tile_by_pos (Coord.create x (y+1)) map in
+      let lower_left_tile = tile_by_pos (Coord.create (x-1) y) map in
+      let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
+      [top_tile;bottom_tile;lower_left_tile;upper_left_tile]
+    | (x,y) when (x = 0) && (y < 41 && y > 0) ->
+      let top_tile = tile_by_pos (Coord.create x (y-1)) map in
+      let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
+      let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
+      let bottom_tile = tile_by_pos (Coord.create x (y+1)) map in
+      [top_tile;upper_right_tile;lower_right_tile;bottom_tile]
+    | (x,y) when (x < 41 && x > 0) && (y = 41) ->
+      let top_tile = tile_by_pos (Coord.create x (y-1)) map in
+      let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
+      let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
+      let lower_left_tile = tile_by_pos (Coord.create (x-1) y) map in
+      let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
+      if x mod 2 = 0
+      then [top_tile;upper_right_tile;lower_right_tile]
+      else [upper_left_tile;top_tile;upper_right_tile]
+    | (x,y) when (x < 41 && x > 0) && (y = 0) ->
+      let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
+      let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
+      let bottom_tile = tile_by_pos (Coord.create x (y+1)) map in
+      let lower_left_tile = tile_by_pos (Coord.create (x-1) y) map in
+      let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
+      if x mod 2 = 0
+      then [lower_right_tile;bottom_tile;lower_left_tile]
+      else [upper_right_tile;lower_right_tile;bottom_tile;lower_left_tile;upper_left_tile]
+    | (x,y) when (x = 0  && y = 0) ->
+      let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
+      let bottom_tile = tile_by_pos (Coord.create x (y+1)) map in
+      [lower_right_tile;bottom_tile]
+    | (x,y) when (x = 41 && y = 0) ->
+      let bottom_tile = tile_by_pos (Coord.create x (y+1)) map in
+      let lower_left_tile = tile_by_pos (Coord.create (x-1) y) map in
+      let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
+      [bottom_tile;lower_left_tile;upper_left_tile]
+    | (x,y) when (x = 41 && y = 41) ->
+      let top_tile = tile_by_pos (Coord.create x (y-1)) map in
+      let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
+      [top_tile;upper_left_tile]
+    | (x,y) when (x = 0 && y = 41) ->
+      let top_tile = tile_by_pos (Coord.create x (y-1)) map in
+      let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
+      let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
+      [top_tile;upper_right_tile;lower_right_tile]
+
+
 (* map generation *)
 let generate width height =
   Random.self_init ();

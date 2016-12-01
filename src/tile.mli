@@ -15,8 +15,8 @@ val describe_terrain : terrain -> string
 
 (** Create a hub and place it on this tile, also returning a potentially
   * different civ. For descriptions of the named parameters, see hub.mli.
-  * IMPORTANT: if entity not None you must call Civ.remove_entity starting_entity 
-  * civ after. 
+  * IMPORTANT: if entity not None you must call Civ.remove_entity starting_entity
+  * civ after.
   * [starting_entity] is an entity that will automatically be consumed by the
   *   new hub when it is finished being built, if such an entity exists.
   *   Typically this is the first entity to start construction of the hub.

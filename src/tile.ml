@@ -57,6 +57,7 @@ let clear t = match t.terrain with
   | Flatland | Mountain | Desert -> failwith "Cannot clear this terrain type"
   | Forest -> { t with terrain = Flatland }
 
+
 let get_hub t = t.hub
 let set_hub t hub =
   if is_settled t
