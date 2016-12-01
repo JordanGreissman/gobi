@@ -1,7 +1,8 @@
 (** represents the state of the game *)
 type t = {
   civs : Civ.t list;
-  turns_left : int;
+  turn : int;
+  total_turns : int;
   (** a list of all the possible kinds of hubs that the player can make and
     * their attributes *)
   hub_roles : Hub.role list;

@@ -82,3 +82,5 @@ let rec add_entity_to_hub entity hub cluster =
         else tile
       | _ -> failwith "Tile doesn't have hub, precondition violated"; tile
     ) in tile_map (tile_func) [] cluster
+
+let get_tiles t = t.tiles

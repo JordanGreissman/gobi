@@ -31,3 +31,4 @@ val add_entity_to_hub : Entity.t -> Hub.t -> t -> t
 
 (** Returns true if the civ isn't run by AI *)
 val get_player_controlled : t -> bool
+

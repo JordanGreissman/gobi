@@ -130,3 +130,4 @@ let get_allowed_roles hub = hub.role.allowed_roles
 let get_production hub = hub.role.production
 let get_default_production_rate hub = hub.role.default_production_rate
 let get_default_defense hub = hub.role.default_def
+

@@ -35,5 +35,4 @@ let add_entity_to_hub entity hub civ =
   else raise (Exception.Illegal "This entity has the wrong role for the hub"); civ
 
 (** Returns true if the civ isn't run by AI *)
-let get_player_controlled civ =
-  civ.player_controlled
+let get_player_controlled civ = civ.player_controlled

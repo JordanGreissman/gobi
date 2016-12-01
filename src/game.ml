@@ -141,7 +141,8 @@ let init_state json : state =
   let coords = get_player_start_coords civs in
 {
   civs = civs;
-  turns_left = parsed.turns;
+  turn = 1;
+  total_turns = parsed.turns;
   hub_roles = parsed.hubs;
   entity_roles = parsed.entities;
   tech_tree = parsed.tech_tree;
@@ -180,9 +181,9 @@ let tick_pending map civ =
 
 let next_turn s =
   let civs = State.get_civs s in
-  let ai = Ai.attempt_turns civs s in
+  let s = Ai.attempt_turns civs (ref s) in
   let civs = List.map (tick_pending s.map) civs in
-  {s with civs = civs; turns_left = (s.turns_left - 1)}
+  {s with civs = civs; turn = (s.turn + 1)}
 
 (* [execute s e c] returns the next state of the game given the current state
  * [s], the input event [e], and the command [c]. *)

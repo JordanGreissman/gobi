@@ -147,3 +147,4 @@ val get_allowed_roles : t -> Entity.role list
 val get_production : t -> production list
 val get_default_production_rate : t -> int
 val get_default_defense : t -> int
+

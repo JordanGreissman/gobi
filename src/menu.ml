@@ -14,12 +14,6 @@ and menu =
   | ProduceEntityMenu of (Hub.t -> t list)
   | NextResearchMenu of (Research.Research.key -> t list)
 
-type menu_arg =
-  | Tile of Tile.t
-  | Hub_roles of Hub.role list
-  | Hub of Hub.t
-  | Research_key of Research.Research.key
-
 let rec get_tile_menu t =
   let describe = {
     text = "describe";
@@ -216,4 +210,7 @@ let get_menu menu tile hub_roles hub research_key =
   | TileMenu f -> match tile with
                   | Some tile -> f tile
                   | None -> failwith "Incorrect arg for menu"
+(*   | BuildHubMenu f -> []
+  | ProduceEntityMenu f -> []
+  | NextResearchMenu f -> [] *)
   | _ -> []

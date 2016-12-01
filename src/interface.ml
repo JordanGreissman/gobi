@@ -75,18 +75,19 @@ let draw_messages ctx w h messages =
     LTerm_draw.draw_string ctx i 1 (List.nth messages (i-1))
   done
 
-let draw_menu ctx w h menu =
+let draw_menu ctx w h menu turn =
   let key_style = { LTerm_style.none with foreground = Some (LTerm_style.blue) } in
   LTerm_draw.clear ctx;
   draw_ascii_frame ctx w h;
+  LTerm_draw.draw_string ctx 1 1 ("Turn: "^(string_of_int turn));
   for y = 1 to (min (List.length menu) h) do
     let item : Menu.t = List.nth menu (y-1) in
     let c = match item.key with
       | Char c -> c
       | _ -> failwith "Invalid key sequence" in
-    LTerm_draw.draw_string ctx y 1 " [";
-    LTerm_draw.draw_char ctx y 3 ~style:key_style c;
-    LTerm_draw.draw_string ctx y 4 (Printf.sprintf "] %s" item.text)
+    LTerm_draw.draw_string ctx (y+1) 1 " [";
+    LTerm_draw.draw_char ctx (y+1) 3 ~style:key_style c;
+    LTerm_draw.draw_string ctx (y+1) 4 (Printf.sprintf "] %s" item.text)
   done
 
 (* NOTE lambda-term coordinates are given y first, then x *)
@@ -101,4 +102,4 @@ let draw s ui matrix =
   let menu_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=0;col2=menu_width} in
   draw_map map_ctx (w-menu_width) (h-message_box_height) menu_width !s;
   draw_messages message_ctx w message_box_height !s.messages;
-  draw_menu menu_ctx menu_width (h-message_box_height) !s.menu
+  draw_menu menu_ctx menu_width (h-message_box_height) !s.menu !s.turn
