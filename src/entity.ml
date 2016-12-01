@@ -123,6 +123,6 @@ let get_cost_to_make e = e.role.cost_to_make
 let get_art e = e.role.art
 
 (* id getter / setter *)
-let get_id e = e.id 
+let get_id e = e.id
 let set_id id e = { e with id = id }
 

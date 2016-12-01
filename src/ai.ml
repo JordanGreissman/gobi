@@ -9,21 +9,30 @@ let select_random_from_list lst =
   List.nth lst x
 
 let attempt_move_entity s civ =
+  let state = !s in
+  let entity = select_random_from_list civ.entities in
+  let entity_tile = Mapp.tile_by_pos (Entity.get_pos entity) state.map in
+  let tiles = Mapp.get_adjacent_tiles state.map entity_tile in
+  let tile = select_random_from_list tiles in
+  let tup = Tile.move_entity tile entity_tile in
+  let map = Mapp.set_tile (fst tup) state.map in
+  let map = Mapp.set_tile (snd tup) map in
+  s := {state with map=map};
+  let entities = List.filter (fun x ->
+                              (Entity.get_id x) <> (Entity.get_id entity))
+                                civ.entities in
+  let entities = entity::entities in
+  {civ with entities=entities}
+
+let attempt_make_technology s civ =
   civ
 
-let attempt_technology_victory s civ =
-  Random.self_init ();
-  let state = !s in
-  let x = Random.int ((state.total_turns - state.turn) + 10) in
-  if x = 0 then {civ with techs = state.tech_tree}
-  else civ
-
+(* TODO generate certain hub based on turn *)
 let attempt_build_hub s civ =
   let state = !s in
   let role = select_random_from_list state.hub_roles in
   let cluster = select_random_from_list civ.clusters in
   let tile = select_random_from_list (Cluster.get_tiles cluster) in
-  (* TODO pick random adjacent tile, see if its already settled *)
   let tiles = Mapp.get_adjacent_tiles state.map tile in
   let tile = select_random_from_list tiles in
   let hub = Hub.create ~role:role
@@ -53,7 +62,7 @@ let rec attempt_turn s civ =
   | 0 | 1 -> attempt_make_entity s civ
   | 2 | 3 -> attempt_build_hub s civ
   | 4 | 5 | 6 | 7 -> attempt_move_entity s civ
-  | 8 -> attempt_technology_victory s civ
+  | 8 -> attempt_make_technology s civ
   | _ -> civ
 
 let attempt_turns civs (s:State.t ref) =
