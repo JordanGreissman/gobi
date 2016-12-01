@@ -22,11 +22,10 @@ let attempt_build_hub s civ =
   let state = !s in
   let role = select_random_from_list state.hub_roles in
   let cluster = select_random_from_list civ.clusters in
-  let tile = Mapp.get_random_tile state.map in
-  (* let tile = select_random_from_list (Cluster.get_tiles cluster) in *)
+  let tile = select_random_from_list (Cluster.get_tiles cluster) in
   (* TODO pick random adjacent tile, see if its already settled *)
-  (* let tiles = THAT THING in *)
-  (* let tile = select_random_from_list tiles in *)
+  let tiles = Mapp.get_adjacent_tiles state.map tile in
+  let tile = select_random_from_list tiles in
   let hub = Hub.create ~role:role
                         ~production_rate:1
                         ~def:(Hub.get_role_default_defense role)
@@ -61,4 +60,4 @@ let attempt_turns civs (s:State.t ref) =
   let ai = List.filter (fun x -> not (Civ.get_player_controlled x)) civs in
   let player = List.filter (fun x -> Civ.get_player_controlled x) civs in
   let ai = List.map (attempt_turn s) ai in
-  {!s with civs = (player@ai)}
+  {!s with civs = (player@ai)};
