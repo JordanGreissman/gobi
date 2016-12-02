@@ -7,16 +7,40 @@ type t = {
   desc : string;
   (** list of entities currently on the map *)
   entities : Entity.t list;
+
   pending_entities : Entity.t list;
   (** list of clusters currently on the map *)
   clusters : Cluster.t list;
+
   pending_hubs : Hub.t list;
+  (** Entities that can be made and used *)
+
+  unlocked_entities : Entity.role list;
+  (** count of resources accrued *)
+  resources : (Resource.t * int) list;
   (** list of techs that have been unlocked *)
   techs : Research.Research.research_list;
   (** whether the civ is player or ai controlled *)
   player_controlled : bool;
+  (** the next id to assign to entities *)
   next_id : int;
 }
+
+(** Applies a function for clusters on every cluster in a civ. Acc should be [].
+  * Returns civ with new cluster list *)
+val cluster_map : (Cluster.t -> Cluster.t) -> t -> Cluster.t list -> t
+
+(** apply map function to each hub in civ, returning some 'a list *)
+val hub_map_poly : (Hub.t -> 'a) -> 'a -> t -> 'a list
+
+(* Returns civ with added resrouces for the turn *)
+val get_resource_for_turn : t -> t
+
+(* Returns new civ with entity role added that's been unlocked *)
+val add_unlocked_entity : Entity.role -> t -> t
+
+(* Change hubs based on research and return a new hub *)
+val apply_research : Research.Unlockable.t -> t -> t
 
 (** Returns civ with an entity list without the passed in entity *)
 val remove_entity : Entity.t -> t -> t

@@ -28,6 +28,8 @@ type production =
   | Resource of Resource.t
   | Entity of Entity.role
 
+val prod_to_resource : production -> Resource.t
+
 (** Create and return a hub.
   * [role] is the hub role (i.e. the type of hub).
   * [production_rate] is the base production rate of the hub (the number of
@@ -115,6 +117,9 @@ val get_role : t -> role
 
 val get_production_rate : t -> int
 
+(* change hub's production rate by an integer *)
+val change_production_rate : int -> t -> t
+
 val get_defense : t -> int
 
 (** change the defense of this hub by a relative amount (positive values increase
@@ -147,4 +152,7 @@ val get_allowed_roles : t -> Entity.role list
 val get_production : t -> production list
 val get_default_production_rate : t -> int
 val get_default_defense : t -> int
+
+(* add production to hub's role, return hub *)
+val addto_role_production : production list -> t -> t
 

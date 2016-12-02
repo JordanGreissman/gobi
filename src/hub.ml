@@ -8,6 +8,11 @@ type production =
   | Resource of resource
   | Entity of entity_role
 
+(* must be a production of type resource *)
+let prod_to_resource p = match p with
+  | Resource p -> p
+  | _ -> failwith "Precondition violated"
+
 type role = {
   (* the name of this role (e.g. "Mill", "Barracks", etc.) *)
   name : string;
@@ -111,6 +116,9 @@ let change_position delta hub =
   let pos' = Coord.add hub.pos delta in
   { hub with pos = pos' }
 
+let change_production_rate delta hub = 
+  { hub with production_rate = get_production_rate hub + delta }
+
 (* [role] getters and setters *)
 
 let get_role_name r = r.name
@@ -130,4 +138,11 @@ let get_allowed_roles hub = hub.role.allowed_roles
 let get_production hub = hub.role.production
 let get_default_production_rate hub = hub.role.default_production_rate
 let get_default_defense hub = hub.role.default_def
+
+let rec addto_role_production new_prod_lst hub = match new_prod_lst with
+  | [] -> hub
+  | prod::lst -> addto_role_production lst { hub with 
+    role = { (get_role hub) with production = 
+      prod::(get_role_production (get_role hub)) 
+    }}
 

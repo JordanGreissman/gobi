@@ -24,6 +24,8 @@ module Unlockable : sig
 	(* returns true if unlockable is unlocked *)
 	val is_unlocked : t -> bool
 
+	val treasure : t -> treasure
+
 	(* returns amount of a particular resource needed *)
 	val resource_needed : t -> int
 

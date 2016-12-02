@@ -29,6 +29,8 @@ module Unlockable = struct
   let resource t =
     t.name
 
+  let treasure t = t.treasure
+
   let describe_unlocked t =
     let unlocked = List.filter (fun x -> x.is_unlocked) t in
     (* let desc = List.map resource unlocked in *)
@@ -78,7 +80,10 @@ module Research = struct
     | Not_found -> None
 
   let unlock key research_list =
-    None (*need to get more info on this*)
+    match get_next_unlockable key research_list with
+    | None -> raise (Exception.Illegal 
+      ("You have already unlocked everything in "^key^"!"))
+    | Some u -> { u with is_unlocked = true }
 
   let get_key_list key research_list =
     List.assoc key research_list

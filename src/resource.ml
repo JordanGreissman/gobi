@@ -25,6 +25,17 @@ let str_to_res str = match String.lowercase_ascii str with
  | "food"  -> Some Food
  | _       -> None
 
+let rec add_resources list1 list2 = 
+ 	let find_res res lst = try snd (List.find 
+ 		(fun x -> match x with res _ -> true | _ -> false) lst) 
+ 	with Not_found -> 0 in
+ 	match list2 with
+ 	| [] -> list1
+ 	| (res, amt)::t -> add_resources ((res, find_res res list1)::list1) t
+
+ let is_resource r = match r with
+ 	| Food | Gold | Iron | Paper -> true | _ -> false
+
 (* (\* comprehensive list of resource amounts for every resource in the game *\) *)
 (* let res_lst = [ *)
 (*   ("Barker's Civ", [ *)
