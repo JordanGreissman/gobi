@@ -259,13 +259,15 @@ let get_next_menu = function
 
 (* TODO I don't think this works for any other menu type,
   but we'll have to figure that out *)
+(* FIX ME *)
 let get_menu menu tile hub_roles hub research_key =
   match menu with
   | NoMenu -> []
   | StaticMenu menu -> menu
-  | TileMenu f -> match tile with
-                  | Some tile -> f tile
-                  | None -> failwith "Incorrect arg for menu"
+  | TileMenu f -> begin match tile with
+                  | Tile -> f tile
+                  | _ -> failwith "Incorrect arg for menu"
+                end
 (*   | BuildHubMenu f -> []
   | ProduceEntityMenu f -> []
   | NextResearchMenu f -> [] *)

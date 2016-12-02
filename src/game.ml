@@ -104,7 +104,8 @@ let init_json json =
   {turns = fst meta; ai = snd meta; entities = entities; hubs = hubs;
     tech_tree = tree; civs = civs}
 
-let init_civ player_controlled hub_roles map civ : civ =
+let init_civ player_controlled hub_roles map unlocked civ : civ =
+
   let tup = Cluster.create
       ~name:(fst civ)
       ~descr:"A soon to be booming metropolis"
@@ -139,8 +140,12 @@ let init_state json : state =
   let json = Basic.from_file json in
   let parsed = init_json json in
   let map = ref (Mapp.generate 42 42) in
+  let unlocked = List.map (fun (k, v) ->
+                              Research.Research.get_unlocked k parsed.tech_tree)
+                              parsed.tech_tree in
+  let unlocked = List.flatten unlocked in
   let civs = List.mapi
-      (fun i x -> init_civ (i=0) parsed.hubs map x)
+      (fun i civ -> init_civ (i=0) parsed.hubs map unlocked civ)
       parsed.civs in
   let coords = get_player_start_coords civs in
 {
@@ -374,21 +379,25 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
       Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0) }
   | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
     { s with is_quit = true }
-  (* ------------------------------------------------------------------------- *)
+  (* ------------------------------------------------------------------------ *)
   (* mouse events as well as any key that is not one of the above must check for
    * a pending command *)
-  (* Is this what you wanted jojo *)
   | LTerm_event.Key { code = c } ->
     let f = function
-      | Some m -> execute s e (Menu.get_cmd m)
+      | Some m -> begin (* FIX ME, THIS IS WHERE THIS SHOULD GO PROBABLY, also look at menu.ml *)
+                  let s' = execute s e (Menu.get_cmd m) in
+                  {s' with menu = Menu.get_menu (s'.next_menu) tile s'.hub_roles hub None}
+                end
       | None -> s in
-    let foo = try Some (List.find (fun (x:Menu.t) -> x.key = c) s.menu) with Not_found -> None in
+    let foo = try Some (List.find (fun (x:Menu.t) -> x.key = c) s.menu)
+              with Not_found -> None in
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     let hub = Tile.get_hub tile in
-    let tile = Some tile in
+    (* let tile = Some tile in *)
     foo |> f
     (* TODO pass in argument (like selected tile?) in order to get next menu *)
-    |> (fun s -> { s with menu = (Menu.get_menu (Menu.get_next_menu foo) tile s.hub_roles hub None) })
+    (* |> (fun s -> { s with menu = (* FIX ME, THIS PROBABLY GOES UP ABOVE *)
+                  (Menu.get_menu (foo.next_menu) tile s.hub_roles hub None) }) *)
   | LTerm_event.Mouse e ->
     (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)
     (* state.ctx.messages <- new_msg'::state.ctx.messages; *)
