@@ -377,6 +377,7 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
   (* ------------------------------------------------------------------------- *)
   (* mouse events as well as any key that is not one of the above must check for
    * a pending command *)
+  (* Is this what you wanted jojo *)
   | LTerm_event.Key { code = c } ->
     let f = function
       | Some m -> execute s e (Menu.get_cmd m)
