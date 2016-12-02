@@ -163,6 +163,66 @@ let rec add_hubs clusters map hubs =
   | [] -> clusters
   | h::t -> add_hubs (Cluster.add_hub clusters map h) map t
 
+  let check_for_win s =
+    let check_conditions s =
+      let civs = State.get_civs s in
+      (* TODO *)
+      let check_points civs =
+        [] in
+      (* TODO *)
+      let check_tech civs =
+        [] in
+
+      let rec get_winners civs =
+        match civs with
+        | [] -> []
+        | (Some (x, y))::t -> (x, y)::(get_winners t)
+        | _ -> failwith "Could not get winners" in
+
+      let tech_win = let civs = check_tech civs in
+                      match List.length civs with
+                      | 0 -> []
+                      | _ -> List.map
+                            (fun x -> Some (x.name, x.player_controlled)) civs in
+      let military_win = if List.length civs = 1 then
+                          (let civ = List.nth civs 0 in
+                          Some (civ.name, civ.player_controlled))
+                          else None in
+      let score_win = if s.turn = s.total_turns then
+                        (let civs = check_points civs in
+                        match List.length civs with
+                        | 0 -> []
+                        | _ -> List.map
+                            (fun x -> Some (x.name, x.player_controlled)) civs)
+                      else [] in
+      match (score_win, military_win, tech_win) with
+      | ([], None, []) -> ([], No_Win)
+      | ((Some (x, y))::t, None, []) -> begin match t with
+                              | [] -> ([(x, y)], Score)
+                              | _ -> (get_winners score_win, Tie)
+                            end
+      | ([], Some (x, y), []) -> ([(x, y)], Score)
+      | ([], None, (Some (x, y))::t) ->  begin match t with
+                              | [] -> ([(x, y)], Tech)
+                              | _ -> (get_winners tech_win, Tie)
+                            end
+      | (a, Some (x, y), []) -> ((x, y)::(get_winners a), Tie)
+      | ([], Some (x, y), b) -> ((x, y)::(get_winners b), Tie)
+      | (a, None, b) -> ((get_winners a)@(get_winners b), Tie)
+      | (a, Some (x, y), b) -> ((x, y)::(get_winners a)@(get_winners b), Tie) in
+
+    let conditions_met = check_conditions s in
+    match conditions_met with
+    | (_, No_Win) -> s
+    | (civs, condition) when condition = Tie -> (* TODO print victory message *)
+                                  {s with is_quit = true}
+    | (civ, condition) -> match condition with
+                                (* TODO print victory message *)
+                                | Military -> {s with is_quit = true}
+                                | Score -> {s with is_quit = true}
+                                | Tech -> {s with is_quit = true}
+                                | _ -> failwith "Error deciding winner" (* or here *)
+
 let tick_pending map civ =
   let ticked = List.map Entity.tick_cost civ.pending_entities in
   let done_entities = List.filter
@@ -185,6 +245,7 @@ let next_turn s =
   let civs = State.get_civs s in
   let s = Ai.attempt_turns civs (ref s) in
   let civs = List.map (tick_pending s.map) (State.get_civs s) in
+  let s = check_for_win s in
   {s with civs = civs; turn = (s.turn + 1)}
 
 (* [execute s e c] returns the next state of the game given the current state
@@ -342,71 +403,10 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
     |> f
   | _ -> s
 
-let check_for_win s =
-  let check_conditions s =
-    let civs = State.get_civs s in
-    (* TODO *)
-    let check_points civs =
-      [List.nth civs 0] in
-    (* TODO *)
-    let check_tech civs =
-      [List.nth civs 0] in
-
-    let rec get_winners civs =
-      match civs with
-      | [] -> []
-      | (Some (x, y))::t -> (x, y)::(get_winners t)
-      | _ -> failwith "Could not get winners" in
-
-    let tech_win = let civs = check_tech civs in
-                    match List.length civs with
-                    | 0 -> []
-                    | _ -> List.map
-                          (fun x -> Some (x.name, x.player_controlled)) civs in
-    let military_win = if List.length civs = 1 then
-                        (let civ = List.nth civs 0 in
-                        Some (civ.name, civ.player_controlled))
-                        else None in
-    let score_win = if s.turn = s.total_turns then
-                      (let civs = check_points civs in
-                      match List.length civs with
-                      | 0 -> []
-                      | _ -> List.map
-                          (fun x -> Some (x.name, x.player_controlled)) civs)
-                    else [] in
-    match (score_win, military_win, tech_win) with
-    | ([], None, []) -> ([], No_Win)
-    | ((Some (x, y))::t, None, []) -> begin match t with
-                            | [] -> ([(x, y)], Score)
-                            | _ -> (get_winners score_win, Tie)
-                          end
-    | ([], Some (x, y), []) -> ([(x, y)], Score)
-    | ([], None, (Some (x, y))::t) -> begin match t with
-                            | [] -> ([(x, y)], Tech)
-                            | _ -> (get_winners tech_win, Tie)
-                          end
-    | (a, Some (x, y), []) -> ((x, y)::(get_winners a), Tie)
-    | ([], Some (x, y), b) -> ((x, y)::(get_winners b), Tie)
-    | (a, None, b) -> ((get_winners a)@(get_winners b), Tie)
-    | (a, Some (x, y), b) -> ((x, y)::(get_winners a)@(get_winners b), Tie) in
-
-  let conditions_met = check_conditions s in
-  match conditions_met with
-  | (_, No_Win) -> s
-  | (civs, condition) -> {s with is_quit = true}
-  | (civ, condition) -> match condition with
-                              (* TODO print victory message *)
-                              | Military -> {s with is_quit = true}
-                              | Score -> {s with is_quit = true}
-                              | Tech -> {s with is_quit = true}
-                              | Tie -> {s with is_quit = true} (* we shouldn't get here *)
-                              | _ -> failwith "Error deciding winner" (* or here *)
-
 let rec player_loop ui state_ref =
   let state = !state_ref in
   LTerm_ui.wait ui >>= fun e ->
   let state' = get_next_state state e in
-  let state' = check_for_win state' in
   if state'.is_quit (* End more gracefully? *)
   then return ()
   else (

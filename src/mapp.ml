@@ -44,8 +44,9 @@ let get_adjacent_tiles map tile =
       let lower_left_tile = tile_by_pos (Coord.create (x-1) y) map in
       let upper_left_tile = tile_by_pos (Coord.create (x-1) (y-1)) map in
       if x mod 2 = 0
-      then [top_tile;upper_right_tile;lower_right_tile]
-      else [upper_left_tile;top_tile;upper_right_tile]
+      then [top_tile;upper_right_tile;upper_left_tile]
+      else [upper_left_tile;top_tile;upper_right_tile;
+            lower_left_tile;lower_right_tile]
     | (x,y) when (x < 41 && x > 0) && (y = 0) ->
       let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
       let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
@@ -73,6 +74,7 @@ let get_adjacent_tiles map tile =
       let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
       let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
       [top_tile;upper_right_tile;lower_right_tile]
+    | _ -> failwith "Should not have gotten here in get_adjacent_tiles"
 
 
 (* map generation *)

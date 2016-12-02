@@ -9,6 +9,7 @@ let select_random_from_list lst =
   List.nth lst x
 
 let attempt_move_entity s civ =
+  if List.length civ.entities = 0 then civ else
   let state = !s in
   let entity = select_random_from_list civ.entities in
   let entity_tile = Mapp.tile_by_pos (Entity.get_pos entity) state.map in
@@ -29,6 +30,7 @@ let attempt_make_technology s civ =
 
 (* TODO generate certain hub based on turn *)
 let attempt_build_hub s civ =
+  if List.length civ.clusters = 0 then civ else
   let state = !s in
   let role = select_random_from_list state.hub_roles in
   let cluster = select_random_from_list civ.clusters in
@@ -47,6 +49,7 @@ let attempt_build_hub s civ =
 
 (* TODO generate certain unit based on turn *)
 let attempt_make_entity s civ =
+  if List.length civ.clusters = 0 then civ else
   let state = !s in
   let role = select_random_from_list state.entity_roles in
   let cluster = select_random_from_list civ.clusters in
