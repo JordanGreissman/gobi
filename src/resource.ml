@@ -25,9 +25,9 @@ let str_to_res str = match String.lowercase_ascii str with
  | "food"  -> Some Food
  | _       -> None
 
-let rec add_resources list1 list2 = 
- 	let find_res res lst = try snd (List.find 
- 		(fun x -> match x with res _ -> true | _ -> false) lst) 
+let rec add_resources list1 list2 =
+ 	let find_res res lst = try snd (List.find
+ 		(fun x -> match x with res -> true | _ -> false) lst)
  	with Not_found -> 0 in
  	match list2 with
  	| [] -> list1

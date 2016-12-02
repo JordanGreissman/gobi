@@ -67,7 +67,7 @@ module Research : sig
 
 	(* unlock and return a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
      * otheriwse, returns none *)
-	val unlock : key -> research_list -> t option
+	val unlock : key -> research_list -> t
 
 	(* returns the list of unlockables based on the key*)
  val get_key_list : key -> research_list ->  value

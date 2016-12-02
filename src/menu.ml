@@ -53,7 +53,7 @@ and get_build_hub_menu roles =
   } in
   [describe]
 
-and get_produce_entity_menu role =
+and get_produce_entity_menu hub =
   let settler = {
     text = "settler";
     key = Char (UChar.of_char 's');
@@ -96,7 +96,7 @@ and get_produce_entity_menu role =
     cmd = Cmd.create Cmd.Produce;
     next_menu = StaticMenu main_menu;
   } in
-  match role.name with
+  match Hub.describe hub with
   | "town_hall" ->
     [settler;worker]
   | "barracks" ->
