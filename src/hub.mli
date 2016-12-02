@@ -28,7 +28,11 @@ type production =
   | Resource of Resource.t
   | Entity of Entity.role
 
+(* turns product into resource type *)
 val prod_to_resource : production -> Resource.t
+
+(* Checks if is a valid resource *)
+val is_resource : production -> bool
 
 (** Create and return a hub.
   * [role] is the hub role (i.e. the type of hub).

@@ -41,7 +41,7 @@ let rec hub_map_poly hub_func fallback civ =
 (* Returns civ with added resrouces for the turn *)
 let rec get_resource_for_turn civ = 
   let resource_lst hub = List.flatten (
-    List.map (fun p -> if Resource.is_resource p then 
+    List.map (fun p -> if Hub.is_resource p then 
       [Hub.prod_to_resource p] else []) 
     (Hub.get_role_production hub) ) in
   let hub_func hub = List.map (fun resource -> 

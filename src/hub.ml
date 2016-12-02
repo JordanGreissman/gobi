@@ -13,6 +13,9 @@ let prod_to_resource p = match p with
   | Resource p -> p
   | _ -> failwith "Precondition violated"
 
+let is_resource r = match r with
+  | Resource _ -> true | _ -> false
+
 type role = {
   (* the name of this role (e.g. "Mill", "Barracks", etc.) *)
   name : string;
