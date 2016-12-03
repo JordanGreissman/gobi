@@ -30,6 +30,7 @@ val place_hub :
 (** [move_entity from to] is a 2-tuple [(from',to')] where [from'] is the updated
   * version of [from] and [to'] is the updated version of [to]. The tiles are
   * updated by moving the entity on [to] to [from].
+  * Raises Illegal if there is no entity on [from].
   *)
 val move_entity : t -> t -> t*t
 

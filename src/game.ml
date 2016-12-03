@@ -282,12 +282,13 @@ let parse_event r e (s:State.t) =
     | Research _ -> "select a research upgrade" in
   match (r,e) with
   | (Tile _,Mouse m) ->
-    let x,y = (LTerm_mouse.col m,LTerm_mouse.row m) in
-    let c = Coord.Screen.create x y in
-    let t = match Coord.offset_from_screen c with
-      | Contained c -> Tile (Some (Mapp.tile_by_pos c s.map))
-      | _ -> raise (Exception.Illegal "Not Contained in parse_event") in
-    t
+    let f = function
+      | Coord.Contained c -> Tile (Some (Mapp.tile_by_pos c s.map))
+      | _ -> Tile (None) in
+    s.screen_top_left
+    |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col m)-20) (LTerm_mouse.row m))
+    |> Coord.offset_from_screen
+    |> f
   | (HubRole _,Key k) ->
     let menu_for_key =
       try Some (List.find (fun (x:menu) -> x.key = k.code) s.menu)
@@ -407,14 +408,44 @@ let rec execute (s:State.t) e c : State.t =
       | None -> dispatch_message s "No entity selected!" Message.Illegal in
     s'
   | Move ->
-    let tile = Mapp.tile_by_pos s.selected_tile s.map in
-    (match Tile.get_entity tile with
-    | Some e ->
-      dispatch_message
-        { s with pending_cmd = Some c }
-        "Select tile to move to"
-        Message.Info
-    | None -> raise (Illegal "No entity selected!"))
+    if are_all_reqs_satisfied (snd c) then
+      (* TODO there's a lot of boilerplate just to extract requirements... *)
+      let too = match List.nth (snd c) 0 with
+        | Tile t -> (match t with
+          | Some x -> x
+          | None   -> raise (BadInvariant (
+              "game",
+              "execute",
+              "All requirements were satisfied for Move but requirement is None")))
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "Move required Tile but got something else")) in
+      let from = match List.nth (snd c) 1 with
+        | Tile t -> (match t with
+          | Some x -> x
+          | None   -> raise (BadInvariant (
+              "game",
+              "execute",
+              "All requirements were satisfied for Move but requirement is None")))
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "Move required Tile but got something else")) in
+      (* TODO: Tile.move_entity doesn't check movement points *)
+      let (from',too') = Tile.move_entity too from in
+      let map' = s.map |> Mapp.set_tile from' |> Mapp.set_tile too' in
+      { s with pending_cmd = None; map = map' }
+    else
+      let tile = Mapp.tile_by_pos s.selected_tile s.map in
+      (match Tile.get_entity tile with
+      | Some e ->
+        let c' = ((fst c),(Tile (Some tile))::(List.tl (snd c))) in
+        dispatch_message
+          { s with pending_cmd = Some c' }
+          "Select tile to move to"
+          Message.Info
+      | None -> raise (Illegal "No entity selected!"))
   | Attack          -> s (* TODO *)
   | PlaceHub        -> s (* TODO *)
   | Clear ->
@@ -430,27 +461,35 @@ let rec execute (s:State.t) e c : State.t =
       | None ->
         dispatch_message s "No entity to clear this forest!" Message.Illegal in
     s'
-  | Produce -> s
-  (* if are_all_reqs_satisfied (snd c) then *)
-  (*   let role = match List.nth (snd c) 1 with *)
-  (*     | EntityRole x -> match x with *)
-  (*       | Some y -> y *)
-  (*       | None -> failwith "lol" *)
-  (*     | _ -> failwith "Whoops" in *)
-  (*   let role = List.nth s.entity_roles 0 in *)
-  (*   let pos = s.selected_tile in *)
-  (*   let civ = State.get_current_civ s in *)
-  (*   let entity = Entity.create role pos civ.next_id in *)
-  (*   let civ = {civ with pending_entities = entity::civ.pending_entities} in *)
-  (*   State.update_civ s.current_civ civ s *)
-  (* else *)
-  (*   let tile = Mapp.tile_by_pos s.selected_tile s.map in *)
-  (*   (\* TODO fix this *\) *)
-  (*   let req_list = satisfy_next_req e s (snd c) in *)
-  (*   let s' = match Tile.get_hub tile with *)
-  (*     | Some x -> { s with pending_cmd=Some ((fst c), req_list); } *)
-  (*     | None   -> dispatch_message s "No hub selected!" Message.Illegal in *)
-  (*   s' *)
+  | Produce ->
+    if are_all_reqs_satisfied (snd c) then
+      let role = match List.nth (snd c) 0 with
+        | EntityRole x -> (match x with
+          | Some y -> y
+          | None -> raise (BadInvariant (
+              "game",
+              "execute",
+              "Produce requirements were satisfied by EntityRole was None")))
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "Produce requirements were satisfied but requirement was not an EntityRole")) in
+      let civ = State.get_current_civ s in
+      let entity = Entity.create role s.selected_tile civ.next_id in
+      let civ = {civ with pending_entities = entity::civ.pending_entities} in
+      let s' = State.update_civ s.current_civ civ s in
+      dispatch_message
+        s'
+        ("One " ^ (Entity.get_role_name role) ^ " is now in production")
+        Message.Info
+    else
+      let tile = Mapp.tile_by_pos s.selected_tile s.map in
+      (* TODO fix this *)
+      let req_list = satisfy_next_req e s (snd c) in
+      let s' = match Tile.get_hub tile with
+        | Some x -> { s with pending_cmd=Some ((fst c), req_list); }
+        | None   -> dispatch_message s "No hub selected!" Message.Illegal in
+      s'
   | AddEntityToHub -> s
   (* TODO: set pending commands to get tiles of e and h*)
   (* let s' = match s.pending_cmd with  *)
@@ -461,16 +500,17 @@ let rec execute (s:State.t) e c : State.t =
   (*     { s with current_civ = Civ.add_entity_to_hub entity hub (State.get_current_civ civ) } *)
   (*   | _ -> failwith "AddEntityToHub's stored data isn't None or two tiles w/ coor" in *)
   (* s' *)
-  | SelectTile      ->
+  | SelectTile | SelectHub | SelectEntity ->
     let (cmd,req_list) = match s.pending_cmd with
       | Some p -> p
-      | None -> failwith "No pending command found when executing Selection" in
+      | None -> raise (BadInvariant (
+          "game",
+          "execute",
+          "No pending command found when executing SelectTile")) in
     let req_list' = satisfy_next_req e s req_list in
     if are_all_reqs_satisfied req_list'
     then execute { s with pending_cmd=Some (cmd,req_list') } e (cmd,req_list')
     else { s with pending_cmd=Some (cmd,req_list') }
-  | SelectHub       -> s (* TODO *)
-  | SelectEntity    -> s (* TODO *)
 
 (* [get_next_state s e] is the next state of the game, given the current state
  * [s] and the input event [e] *)
@@ -525,11 +565,11 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
         let cmd = Cmd.create Cmd.SelectTile in
         execute s (LTerm_event.Mouse e) cmd
       | (Coord.Contained c,None) ->
-        let s' = dispatch_message
-            s
-            (Printf.sprintf "Selected tile is now %s" (Coord.to_string c))
-            Message.Info in
-        { s' with selected_tile = c }
+        (* let s' = dispatch_message *)
+        (*     s *)
+        (*     (Printf.sprintf "Selected tile is now %s" (Coord.to_string c)) *)
+        (*     Message.Info in *)
+        { s with selected_tile = c }
       | (_,_) -> s in
     s.screen_top_left
     |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
