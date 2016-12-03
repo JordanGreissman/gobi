@@ -15,15 +15,16 @@ let attempt_move_entity s civ =
   let entity_tile = Mapp.tile_by_pos (Entity.get_pos entity) state.map in
   let tiles = Mapp.get_adjacent_tiles state.map entity_tile in
   let tile = select_random_from_list tiles in
-  let tup = Tile.move_entity tile entity_tile in
+  let tup = Tile.move_entity entity_tile tile in
   let map' = Mapp.set_tile (fst tup) state.map in
   let map' = Mapp.set_tile (snd tup) map' in
   s := {state with map=map'};
-  let entities = List.filter (fun x ->
+  Civ.replace_entity entity civ
+ (*  let entities = List.filter (fun x ->
                               (Entity.get_id x) <> (Entity.get_id entity))
                                 civ.entities in
   let entities = entity::entities in
-  {civ with entities=entities}
+  {civ with entities=entities} *)
 
 let attempt_make_technology s civ =
   let state = !s in
