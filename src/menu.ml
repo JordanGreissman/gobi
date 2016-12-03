@@ -180,12 +180,6 @@ and hub_menu = [
     next_menu = ProduceEntityMenu get_produce_entity_menu;
   };
   {
-    text = "add entities";
-    key = Char (UChar.of_char 'e');
-    cmd = Cmd.create Cmd.AddEntityToHub;
-    next_menu = NoMenu;
-  };
-  {
     text = "back";
     key = Char (UChar.of_char '<');
     cmd = Cmd.create Cmd.NoCmd;

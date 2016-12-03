@@ -489,16 +489,62 @@ let rec execute (s:State.t) e c : State.t =
         | None   -> raise (Illegal "No hub selected!") in
       let cmd' = ((fst c),((HubRole (Some (Hub.get_role hub)))::(List.tl (snd c)))) in
       { s with pending_cmd = Some cmd' }
-  | AddEntityToHub -> s
-  (* TODO: set pending commands to get tiles of e and h*)
-  (* let s' = match s.pending_cmd with  *)
-  (*   | None -> s *)
-  (*   | Some (_, t1::t2::[]) -> *)
-  (*     let entity = Tile.get_entity (Mapp.tile_by_pos t1 s.map) in *)
-  (*     let hub = Tile.get_hub (Mapp.tile_by_pos t2 s.map) in *)
-  (*     { s with current_civ = Civ.add_entity_to_hub entity hub (State.get_current_civ civ) } *)
-  (*   | _ -> failwith "AddEntityToHub's stored data isn't None or two tiles w/ coor" in *)
-  (* s' *)
+  | AddEntityToHub ->
+    if are_all_reqs_satisfied (snd c) then
+      let entity = match List.nth (snd c) 0 with
+        | Tile x -> begin
+          match x with
+          | Some y -> begin
+            match Tile.get_entity y with
+            | Some z -> z
+            | None   -> raise (BadInvariant (
+                "game",
+                "execute",
+                "AddEntityToHub requirements were satisfied, but there is no entity on this tile!"))
+            end
+          | None -> raise (BadInvariant (
+              "game",
+              "execute",
+              "AddEntityToHub requirements were satisfied by first Tile was None"))
+          end
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "AddEntityToHub requirements were satisfied but requirement was not a Tile")) in
+      let hub = match List.nth (snd c) 1 with
+        | Tile x -> begin
+            match x with
+            | Some y -> begin
+                match Tile.get_hub y with
+                | Some z -> z
+                | None -> raise (BadInvariant (
+                    "game",
+                    "execute",
+                    "AddEntityToHub requirements were satisfied, but there is no entity on this tile!"))
+              end
+            | None -> raise (BadInvariant (
+                "game",
+                "execute",
+                "AddEntityToHub requirements were satisfied by first Tile was None"))
+          end
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "AddEntityToHub requirements were satisfied but requirement was not a Tile")) in
+      let civ' = Civ.add_entity_to_hub entity hub (List.nth s.civs s.current_civ) in
+      let s' = State.update_civ s.current_civ civ' s in
+      dispatch_message s' "Entity added to hub" Message.Info
+    else
+      let t = Mapp.tile_by_pos s.selected_tile s.map in
+      let s' = match Tile.get_entity t with
+      | Some _ ->
+        let cmd' = ((fst c),(Tile (Some t))::(List.tl (snd c))) in
+        dispatch_message
+          { s with pending_cmd = Some cmd' }
+          "Select a hub to add the entity to"
+          Message.Info
+      | None -> raise (Illegal "No entity on this tile!") in
+      s'
   | SelectTile | SelectHub | SelectEntity ->
     let (cmd,req_list) = match s.pending_cmd with
       | Some p -> p
