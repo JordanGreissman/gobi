@@ -28,7 +28,9 @@ let dispatch_message (state:State.t) s k =
 (* Error handling necessary? *)
 let load_json s =
   try Yojson.Basic.from_file s with
-  | _ -> raise (Critical ("game","load_json","File does not exist or is not a JSON"))
+  | _ -> raise (Critical ("game",
+                          "load_json",
+                          "File does not exist or is not a JSON"))
 
 let get_assoc s json =
   json |> Yojson.Basic.Util.member s
@@ -191,16 +193,27 @@ let check_for_win s =
     let civs = State.get_civs s in
     (* TODO *)
     let check_points civs =
-      [] in
+      let points = List.map score civs in
+      let rec fold_points i max lst =
+        match lst with
+        | [] -> [i]
+        | h::t -> if h > max then fold_points (i + 1) h t
+                  else if h = max then (i::(fold_points (i + 1) h t))
+                  else fold_points i max t in
+      let indexes = fold_points 0 0 points in
+      List.map (fun x -> List.nth civs x) indexes
+    in
 
     let check_tech civs =
-      List.filter (fun x -> Research.Research.check_complete x.techs) civs in
+      List.filter (fun x -> Research.Research.check_complete x.techs) civs
+    in
 
     let rec get_winners civs =
       match civs with
       | [] -> []
       | (Some (x, y))::t -> (x, y)::(get_winners t)
-      | _ -> raise (Critical ("game","get_winners","Could not get winners")) in
+      | _ -> raise (Critical ("game","get_winners","Could not get winners"))
+    in
 
     let tech_win = let civs = check_tech civs in
       match List.length civs with
@@ -232,7 +245,8 @@ let check_for_win s =
     | (a, Some (x, y), []) -> ((x, y)::(get_winners a), Tie)
     | ([], Some (x, y), b) -> ((x, y)::(get_winners b), Tie)
     | (a, None, b) -> ((get_winners a)@(get_winners b), Tie)
-    | (a, Some (x, y), b) -> ((x, y)::(get_winners a)@(get_winners b), Tie) in
+    | (a, Some (x, y), b) -> ((x, y)::(get_winners a)@(get_winners b), Tie)
+  in
 
   let conditions_met = check_conditions s in
   match conditions_met with
@@ -275,6 +289,7 @@ let tick_pending s civ =
   let clusters = add_hubs civ.clusters map done_hubs in
   let pending_hubs = List.filter
       (fun x -> not (Hub.is_done x)) ticked in
+  let civ = get_resource_for_turn civ in
   {civ with entities=entities;
             pending_entities=pending_entities;
             clusters=clusters;
@@ -425,9 +440,9 @@ let rec execute (s:State.t) e c : State.t =
         | Tile t -> (match t with
           | Some x -> x
           | None   -> raise (BadInvariant (
-              "game",
-              "execute",
-              "All requirements were satisfied for Move but requirement is None")))
+            "game",
+            "execute",
+            "All requirements satisfied for Move but requirement is None")))
         | _ -> raise (BadInvariant (
             "game",
             "execute",
@@ -436,9 +451,9 @@ let rec execute (s:State.t) e c : State.t =
         | Tile t -> (match t with
           | Some x -> x
           | None   -> raise (BadInvariant (
-              "game",
-              "execute",
-              "All requirements were satisfied for Move but requirement is None")))
+            "game",
+            "execute",
+            "All requirements satisfied for Move but requirement is None")))
         | _ -> raise (BadInvariant (
             "game",
             "execute",
@@ -464,9 +479,9 @@ let rec execute (s:State.t) e c : State.t =
         | Tile t -> (match t with
           | Some x -> x
           | None   -> raise (BadInvariant (
-              "game",
-              "execute",
-              "All requirements were satisfied for PlaceHub but requirement is None")))
+            "game",
+            "execute",
+            "All requirements satisfied for PlaceHub but requirement is None")))
         | _ -> raise (BadInvariant (
             "game",
             "execute",
@@ -475,9 +490,9 @@ let rec execute (s:State.t) e c : State.t =
         | HubRole r -> (match r with
           | Some x -> x
           | None   -> raise (BadInvariant (
-              "game",
-              "execute",
-              "All requirements were satisfied for PlaceHub but requirement is None")))
+            "game",
+            "execute",
+            "All requirements satisfied for PlaceHub but requirement is None")))
         | _ -> raise (BadInvariant (
             "game",
             "execute",
@@ -521,20 +536,20 @@ let rec execute (s:State.t) e c : State.t =
           match x with
           | Some y -> y
           | None -> raise (BadInvariant (
-              "game",
-              "execute",
-              "Produce requirements were satisfied by EntityRole was None")))
-        | _ -> raise (BadInvariant (
             "game",
             "execute",
-            "Produce requirements were satisfied but requirement was not an EntityRole")) in
+            "Produce requirements were satisfied by EntityRole was None")))
+        | _ -> raise (BadInvariant (
+          "game",
+          "execute",
+          "Produce requirements satisfied but requirement was not an EntityRole")) in
       let civ = State.get_current_civ s in
       let entity = Entity.create role_to_produce s.selected_tile civ.next_id in
       let civ = {civ with pending_entities = entity::civ.pending_entities} in
       let s' = State.update_civ s.current_civ civ s in
       dispatch_message
         s
-        ("One " ^ (Entity.get_role_name role_to_produce) ^ " is now in production")
+        ("One "^(Entity.get_role_name role_to_produce)^" is now in production")
         Message.Info
     else
       let tile = Mapp.tile_by_pos s.selected_tile s.map in
