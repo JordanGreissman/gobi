@@ -371,10 +371,6 @@ let rec execute (s:State.t) e c : State.t =
         | Some h -> dispatch_message s (Hub.describe h) Message.Info
         | None -> raise (Illegal "There is no hub on this tile!") in
       s'
-    | "research" -> (
-        (* TODO how to get relevant key *)
-        let desc = Research.Research.describe_tree "Agriculture" s.tech_tree in
-        dispatch_message s desc Message.Info)
     | "entity" ->
       let entity = Tile.get_entity tile in
       let s' = match entity with
@@ -383,7 +379,7 @@ let rec execute (s:State.t) e c : State.t =
       s'
     | _ -> s)
   | Research        -> s (* TODO *)
-  | DisplayResearch -> (* FIX ME *)
+  | DisplayResearch -> (* TEST THIS *)
     let key = (
       match List.nth (snd c) 0 with
       | Research x -> (

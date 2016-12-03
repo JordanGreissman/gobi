@@ -81,6 +81,6 @@ module Research : sig
     been unlocked, otherwise false *)
  val check_complete : research_list -> bool
 
- val describe_tree : key -> research_list -> string
+ (* val describe_tree : key -> research_list -> string *)
 
 end
