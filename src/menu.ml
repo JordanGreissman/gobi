@@ -63,7 +63,7 @@ and get_produce_entity_menu hub =
   let settler = {
     text = "settler";
     key = Char (UChar.of_char 's');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create Produce);
     next_menu = StaticMenu main_menu;
   } in
   let worker = {

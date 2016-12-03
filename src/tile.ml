@@ -40,12 +40,11 @@ let place_hub ~role ~starting_entity ~tile =
   let h = Hub.create role production_rate def pos in
     { tile with hub=(Some h) }
 
-let move_entity to_tile from_tile =
-  if to_tile.entity = None
-  then
-    let current_entity = from_tile.entity in
-    ({to_tile with entity=current_entity}, {from_tile with entity=None})
-  else (to_tile, from_tile)
+let move_entity from_tile to_tile =
+  match from_tile.entity with
+  | Some e ->
+    ({ from_tile with entity = None },{ to_tile with entity = Some e })
+  | None   -> raise (Illegal "No entity to move!")
 
 (* getters and setters *)
 
