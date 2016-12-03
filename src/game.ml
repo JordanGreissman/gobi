@@ -314,19 +314,17 @@ let parse_event r e (s:State.t) =
     HubRole (Some r)
   | (EntityRole _,Key k) ->
     let menu_for_key =
-      try Some (List.find (fun (x:menu) -> x.key = k.code) s.menu)
-      with Not_found -> None in
-    let e = match menu_for_key with
-      | Some m -> (
-          try Entity.find_role m.text s.entity_roles
-          with Illegal _ -> raise (Critical (
-              "game",
-              "parse_event",
-              "Entity role \"" ^ m.text ^ "\" not found")))
-      | None -> raise (Critical (
+      try List.find (fun (x:menu) -> x.key = k.code) s.menu
+      with Not_found -> raise (Critical (
           "game",
           "parse_event",
           "No menu item associated with keypress " ^ (LTerm_key.to_string k))) in
+    let e =
+      try Entity.find_role menu_for_key.text s.entity_roles
+      with Illegal _ -> raise (Critical (
+          "game",
+          "parse_event",
+          "Entity role \"" ^ menu_for_key.text ^ "\" not found")) in
     EntityRole (Some e)
   | (a,_) -> raise (Illegal ("Please " ^ (expected_action a)))
 
@@ -458,9 +456,15 @@ let rec execute (s:State.t) e c : State.t =
         dispatch_message s "No entity to clear this forest!" Message.Illegal in
     s'
   | Produce ->
+    (* TODO Produce requires a Hub role and an Entity role, but here we only use
+     * the entity role, because the entity production menu only displays the entities
+     * that can be produced for the selected hub role, so really we've already
+     * eliminated the possibility that we're producing an entity role that's
+     * illegal for this hub role and we don't have to check it twice *)
     if are_all_reqs_satisfied (snd c) then
-      let role = match List.nth (snd c) 0 with
-        | EntityRole x -> (match x with
+      let role_to_produce = match List.nth (snd c) 1 with
+        | EntityRole x -> (
+          match x with
           | Some y -> y
           | None -> raise (BadInvariant (
               "game",
@@ -471,21 +475,20 @@ let rec execute (s:State.t) e c : State.t =
             "execute",
             "Produce requirements were satisfied but requirement was not an EntityRole")) in
       let civ = State.get_current_civ s in
-      let entity = Entity.create role s.selected_tile civ.next_id in
+      let entity = Entity.create role_to_produce s.selected_tile civ.next_id in
       let civ = {civ with pending_entities = entity::civ.pending_entities} in
       let s' = State.update_civ s.current_civ civ s in
       dispatch_message
-        s'
-        ("One " ^ (Entity.get_role_name role) ^ " is now in production")
+        s
+        ("One " ^ (Entity.get_role_name role_to_produce) ^ " is now in production")
         Message.Info
     else
       let tile = Mapp.tile_by_pos s.selected_tile s.map in
-      (* TODO fix this *)
-      let req_list = satisfy_next_req e s (snd c) in
-      let s' = match Tile.get_hub tile with
-        | Some x -> { s with pending_cmd=Some ((fst c), req_list); }
-        | None   -> dispatch_message s "No hub selected!" Message.Illegal in
-      s'
+      let hub = match Tile.get_hub tile with
+        | Some h -> h
+        | None   -> raise (Illegal "No hub selected!") in
+      let cmd' = ((fst c),((HubRole (Some (Hub.get_role hub)))::(List.tl (snd c)))) in
+      { s with pending_cmd = Some cmd' }
   | AddEntityToHub -> s
   (* TODO: set pending commands to get tiles of e and h*)
   (* let s' = match s.pending_cmd with  *)
@@ -505,7 +508,7 @@ let rec execute (s:State.t) e c : State.t =
           "No pending command found when executing SelectTile")) in
     let req_list' = satisfy_next_req e s req_list in
     if are_all_reqs_satisfied req_list'
-    then execute { s with pending_cmd=Some (cmd,req_list') } e (cmd,req_list')
+    then execute { s with pending_cmd = None } e (cmd,req_list')
     else { s with pending_cmd=Some (cmd,req_list') }
 
 (* [get_next_state s e] is the next state of the game, given the current state
@@ -539,10 +542,10 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
           | StaticMenu m -> m
           | TileMenu f -> f (Mapp.tile_by_pos s'.selected_tile s'.map)
           | BuildHubMenu f -> f s'.hub_roles
-          | ProduceEntityMenu f -> [m]
-          (* TODO: get list of entity roles that the hub on the currently
-           * selected tile can produce *)
-          (* let hub = Tile.get_hub tile in *)
+          | ProduceEntityMenu f -> (
+            match Tile.get_hub (Mapp.tile_by_pos s'.selected_tile s'.map) with
+            | Some h -> f h
+            | None   -> raise (Illegal "No hub selected!"))
           | NextResearchMenu f ->
             (* The text of the menu item serves to identify the tech tree branch
              * the user selected *)
