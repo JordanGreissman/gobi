@@ -71,7 +71,7 @@ let extract_to_role name descr requires cost_to_make attack defense actions =
   create_role name descr cost_to_make unlocked actions default_power
 
 let describe e =
-  "This is a"^e.role.name
+  "This is a "^e.role.name
 
 let describe_role r =
   r.descr
@@ -125,4 +125,3 @@ let get_art e = e.role.art
 (* id getter / setter *)
 let get_id e = e.id
 let set_id id e = { e with id = id }
-
