@@ -1,3 +1,5 @@
+open Exception
+
 module Unlockable = struct
   type treasure =
     | Hub of Hub.role list * int
@@ -59,7 +61,8 @@ module Research = struct
       ) in
     let resource = match Resource.str_to_res res_str with
       | Some r -> r
-      | None   -> failwith "no resource provided" in
+      | None   ->
+        raise (Critical ("research","extract_to_value","no resource provided")) in
     Unlockable.create_unlockable name resource cost treasure
 
   let add_unlockable_key key value research_list =
@@ -71,8 +74,8 @@ module Research = struct
       | key::key_tail, value::value_tail ->
         let key_value_tree = add_unlockable_key key value acc_tree in
         create_tree key_tail value_tail key_value_tree
-      | _ -> failwith "Precondition violation"
-
+      | _ -> raise (BadInvariant ("resource","create_tree","input lists are not the same length"))
+               
   let get_next_unlockable key research_list =
     let value_list = List.assoc key research_list in
     try
@@ -86,6 +89,20 @@ module Research = struct
     | None -> raise (Exception.Illegal 
       ("You have already unlocked everything in "^key^"!"))
     | Some u -> { u with is_unlocked = true }
+
+  let rec replace_unlockable new_u research = 
+    let rec replace_in_list new_u = function
+      | [] -> []
+      | u::t -> if (Unlockable.resource u) = (Unlockable.resource new_u)
+        then new_u::(replace_in_list u t)
+        else u::(replace_in_list u t)
+      in
+    match research with
+      | [] -> []
+      | (key, branch)::t -> 
+        let new_value = (key, research_in_list new_u branch) in
+          new_value::(replace_unlockable new_u t)
+
 
   let get_key_list key research_list =
     List.assoc key research_list

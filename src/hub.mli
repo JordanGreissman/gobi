@@ -4,8 +4,6 @@
   *)
 type role
 
-type coord = Coord.t
-
 (** the type of a hub. This type represents a specific instance of a hub, which
   * has a location, production levels, etc., and should not be conflated with
   * the [role] type, described below.
@@ -20,7 +18,7 @@ type t = {
    * of the caller to check the updated defense value after changing it *)
   def: int;
   (* the position of this hub (in rectangular map coordinates) *)
-  pos: coord;
+  pos: Coord.t;
 }
 
 (** the production type of a hub. Hubs can produce either resources or entities *)

@@ -14,11 +14,11 @@ type t = {
 
   pending_hubs : Hub.t list;
   (** Entities that can be made and used *)
-
+i
   unlocked_entities : Entity.role list;
   (** count of resources accrued *)
   resources : (Resource.t * int) list;
-  (** list of techs that have been unlocked *)
+  (** list of all techs, some of which may be locked *)
   techs : Research.Research.research_list;
   (** whether the civ is player or ai controlled *)
   player_controlled : bool;
@@ -49,8 +49,10 @@ val remove_entity : Entity.t -> t -> t
 val replace_entity : Entity.t -> t -> t
 
 (* Check civ's resources and unlocks if possible. Returns
- * same civ if can't, otherwise changed civ *)
+ * same civ if can't, otherwise changed civ with unlocked tech *)
 val unlock_if_possible : key -> research_list -> t -> t
+
+val add_entity : Entity.role -> Tile.t -> t -> t
 
 (** Add entity to a hub in existing civ, returning the new civ.
   * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub
@@ -59,4 +61,7 @@ val add_entity_to_hub : Entity.t -> Hub.t -> t -> t
 
 (** Returns true if the civ isn't run by AI *)
 val get_player_controlled : t -> bool
+
+(* Returns tech tree, some of which may be locked *)
+val get_tree : t ->  Research.Research.research_list
 

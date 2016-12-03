@@ -12,13 +12,13 @@ and menu =
   | TileMenu of (Tile.t -> t list)
   | BuildHubMenu of (Hub.role list -> t list)
   | ProduceEntityMenu of (Hub.t -> t list)
-  | NextResearchMenu of (Research.Research.key -> t list)
+  | NextResearchMenu of (Research.Research.research_list -> Research.Research.key -> t list)
 
 let rec get_tile_menu t =
   let describe = {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "tile");
     next_menu = StaticMenu main_menu;
   } in
   let clear = {
@@ -45,13 +45,19 @@ let rec get_tile_menu t =
   | (true,_)      -> [describe;clear;back]
 
 and get_build_hub_menu roles =
-  let describe = {
-    text = "describe";
-    key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+  let hubs = List.mapi (fun i hub -> {
+    text = Hub.get_role_name hub;
+    key = Char (UChar.of_char (char_of_int i));
+    cmd = Cmd.create Cmd.PlaceHub;
+    next_menu = NoMenu;
+  }) roles in
+  let back = {
+    text = "back";
+    key = Char (UChar.of_char '<');
+    cmd = Cmd.create Cmd.NoCmd;
     next_menu = StaticMenu main_menu;
   } in
-  [describe]
+  hubs@[back]
 
 and get_produce_entity_menu hub =
   let settler = {
@@ -103,11 +109,23 @@ and get_produce_entity_menu hub =
     (*eventually check if they have it unlocked*)
     [warrior;archer;cavalry;heavy;spearman]
 
-
-
-
-and get_research_menu r =
-  failwith "get_research_menu is unimplemented"
+and get_next_research_menu tech_tree branch_name =
+  let describe = {
+    text = "describe";
+    key = Char (UChar.of_char 'd');
+    cmd = Cmd.create (Cmd.Describe "research");
+    next_menu = StaticMenu main_menu;
+  } in
+  match Research.Research.get_next_unlockable branch_name tech_tree with
+    | Some u ->
+      let next = {
+        text = "begin researching " ^ (Research.Unlockable.resource u);
+        key = Char (UChar.of_char 'r');
+        cmd = Cmd.create Cmd.Research;
+        next_menu = StaticMenu main_menu;
+      } in
+      [describe; next]
+    | None   -> [describe]
 
 and main_menu = [
   {
@@ -115,34 +133,30 @@ and main_menu = [
     key = Char (UChar.of_char 't');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = TileMenu get_tile_menu;
-    (* next_menu = NoMenu; *)
   };
   {
     text = "hub";
     key = Char (UChar.of_char 'h');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = StaticMenu hub_menu;
-    (* next_menu = NoMenu; *)
   };
   {
     text = "entity";
     key = Char (UChar.of_char 'e');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = StaticMenu entity_menu;
-    (* next_menu = NoMenu; *)
   };
   {
     text = "research";
     key = Char (UChar.of_char 'r');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = StaticMenu research_menu;
-    (* next_menu = NoMenu; *)
   };
   {
     text = "next turn";
     key = Char (UChar.of_char 'n');
     cmd = Cmd.create Cmd.NextTurn;
-    next_menu = NoMenu;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "tutorial";
@@ -156,7 +170,7 @@ and hub_menu = [
   {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "hub");
     next_menu = StaticMenu main_menu;
   };
   {
@@ -183,14 +197,14 @@ and entity_menu : t list = [
   {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "entity");
     next_menu = StaticMenu main_menu;
   };
   {
     text = "move";
     key = Char (UChar.of_char 'm');
     cmd = Cmd.create Cmd.Move;
-    next_menu = StaticMenu main_menu;
+    next_menu = NoMenu;
   };
   {
     text = "attack";
@@ -221,27 +235,27 @@ and entity_menu : t list = [
 and research_menu : t list = [
   {
     text = "Agriculture";
-    key = Char (UChar.of_char '1');
+    key = Char (UChar.of_char 'a');
     cmd = Cmd.create Cmd.NoCmd;
-    next_menu = NextResearchMenu get_research_menu;
+    next_menu = NextResearchMenu get_next_research_menu;
   };
   {
     text = "Transportation";
-    key = Char (UChar.of_char '2');
+    key = Char (UChar.of_char 't');
     cmd = Cmd.create Cmd.NoCmd;
-    next_menu = NextResearchMenu get_research_menu;
+    next_menu = NextResearchMenu get_next_research_menu;
   };
   {
     text = "Combat";
-    key = Char (UChar.of_char '3');
+    key = Char (UChar.of_char 'c');
     cmd = Cmd.create Cmd.NoCmd;
-    next_menu = NextResearchMenu get_research_menu;
+    next_menu = NextResearchMenu get_next_research_menu;
   };
   {
     text = "Productivity";
     key = Char (UChar.of_char '4');
     cmd = Cmd.create Cmd.NoCmd;
-    next_menu = NextResearchMenu get_research_menu;
+    next_menu = NextResearchMenu get_next_research_menu;
   };
   {
     text = "back";
@@ -250,23 +264,3 @@ and research_menu : t list = [
     next_menu = StaticMenu main_menu;
   };
 ]
-
-let get_cmd t = t.cmd
-
-let get_next_menu = function
-  | Some t -> t.next_menu
-  | None -> (StaticMenu main_menu)
-
-(* TODO I don't think this works for any other menu type,
-  but we'll have to figure that out *)
-let get_menu menu tile hub_roles hub research_key =
-  match menu with
-  | NoMenu -> []
-  | StaticMenu menu -> menu
-  | TileMenu f -> match tile with
-                  | Some tile -> f tile
-                  | None -> failwith "Incorrect arg for menu"
-(*   | BuildHubMenu f -> []
-  | ProduceEntityMenu f -> []
-  | NextResearchMenu f -> [] *)
-  | _ -> []

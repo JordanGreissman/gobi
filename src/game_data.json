@@ -1,7 +1,7 @@
 {
   "game": {
     "turns": 100,
-    "ai": 3
+    "ai": 4
   },
   "techtree": [
     {

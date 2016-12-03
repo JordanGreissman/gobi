@@ -37,13 +37,13 @@ end
 
 module Research : sig
 
-  type t = Unlockable.t
+	type t = Unlockable.t
 
-  type key = string
+	type key = string
 
-  type value = t list
+	type value = t list
 
-  type research_list = (key * value) list
+	type research_list = (key * value) list
 
   (* Faciliate going from JSON to research tree. Respectively takes
    * the tech name, the resource type string (lower / uppercase of resource)
@@ -53,29 +53,33 @@ module Research : sig
    * the string list of roles made, if any
    * the list of all Entity.role(s) made
    * the list of all Hub.role(s) made
-   *)
-  val extract_to_value : string -> string -> int -> string -> int ->
-  	string list -> Entity.role list -> Hub.role list -> t
+ 		*)
+ 	val extract_to_value : string -> string -> int -> string -> int ->
+ 		string list -> Entity.role list -> Hub.role list -> t
 
-  (* Get list of all possible keys *)
-  val get_keys : string
+ 	(* Get list of all possible keys *)
+ 	val get_keys : string
 
-  (* Creates a tree from a list of keys and values, which must be the same size *)
-  val create_tree : key list -> value list -> research_list -> research_list
+ 	(* Creates a tree from a list of keys and values, which must be the same size *)
+ 	val create_tree : key list -> value list -> research_list -> research_list
 
-  val add_unlockable_key: key -> value -> research_list -> research_list
+ 	val add_unlockable_key: key -> value -> research_list -> research_list
 
- (* gets the next locked unlockable from the [key]*)
-	val get_next_unlockable: key -> research_list -> t option
+ 	(* gets the next locked unlockable from the [key]*)
+ 	val get_next_unlockable: key -> research_list -> t option
 
-	(* unlock and return a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
-     * otheriwse, returns none *)
+	(* unlock and return a potential unlockable based on the next locked unlockable with the 
+	 * key if the type and amount of resources is valid
+	* otheriwse, returns none *)
 	val unlock : key -> research_list -> t
 
+	(* replaces based on name of resource, returns new research list *)
+	val replace_unlockable : t -> research_list -> research_list
+
 	(* returns the list of unlockables based on the key*)
- val get_key_list : key -> research_list ->  value
+	val get_key_list : key -> research_list ->  value
 
 	(* returns a list of every unlocked unlockable *)
- val get_unlocked : key -> research_list -> t list
+	val get_unlocked : key -> research_list -> t list
 
 end

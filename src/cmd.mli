@@ -9,7 +9,7 @@ type cmd =
   (** [Tutorial] starts the tutorial *)
   | Tutorial
   (* TODO: do we need separate describe commands for hubs, entities, tiles, etc? *)
-  | Describe
+  | Describe of string
   (** [Research r] begins the process of researching [r] *)
   | Research
   (** [DisplayResearch t] displays the research that has already been completed
@@ -71,9 +71,9 @@ type cmd =
 (** represents the different requirements that commands can have. These
   * requirements need to be fulfilled before the command can be executed. *)
 type required =
-  | Tile of Coord.t option
-  | HubRole of LTerm_key.t option
-  | EntityRole of LTerm_key.t option
+  | Tile of Tile.t option
+  | HubRole of Hub.role option
+  | EntityRole of Entity.role option
   | Research of Research.Research.key option
 
 (** a command is a cmd type plus a list of its requirements *)
@@ -87,8 +87,8 @@ val create : cmd -> t
   * satisfied. If [e] is not of the correct type tojsatisfy such a requirement,
   * raises Illegal. If all requirements are already satisfied, evaluates to [lst]
   *)
-val satisfy_next_req : LTerm_event.t -> required list -> required list
+(* val satisfy_next_req : LTerm_event.t -> required list -> required list *)
 
 (** [all_all_reqs_satisfied lst] is true if all the requirements in [lst] are
   * satisfied and false otherwise. *)
-val are_all_reqs_satisfied : required list -> bool
+(* val are_all_reqs_satisfied : required list -> bool *)

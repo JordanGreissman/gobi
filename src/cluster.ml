@@ -1,6 +1,4 @@
-open Hub
-open Tile
-open Entity
+open Exception
 
 type tile = Tile.t
 
@@ -80,7 +78,11 @@ let rec add_entity_to_hub entity hub cluster =
             production_rate = Hub.get_production_rate tile_hub + 1 }
           in Tile.set_hub tile (Some new_hub)
         else tile
-      | _ -> failwith "Tile doesn't have hub, precondition violated"; tile
+      | _ ->
+        raise (BadInvariant (
+            "cluster",
+            "add_entity_to_hub",
+            "Tile doesn't have hub, precondition violated"))
     ) in tile_map (tile_func) [] cluster
 
 let get_tiles t = t.tiles
