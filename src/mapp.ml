@@ -12,7 +12,6 @@ let tile_by_pos c map =
     | Failure _ -> List.nth row ((List.length map) - 1)
     | Invalid_argument _ -> List.nth row 0
 
-
 let get_adjacent_tiles map tile =
   let x = Coord.get_x (Tile.get_pos tile) in
   let y = Coord.get_y (Tile.get_pos tile) in
