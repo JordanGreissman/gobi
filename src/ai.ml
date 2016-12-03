@@ -26,7 +26,11 @@ let attempt_move_entity s civ =
   {civ with entities=entities}
 
 let attempt_make_technology s civ =
-  civ
+  let state = !s in
+  let techs = civ.techs in
+  let key = select_random_from_list (List.map (fun (k, v) -> k) techs) in
+  let tree_with_unlocked = Research.Research.unlock key techs in
+  {civ with techs=tree_with_unlocked}
 
 (* TODO generate certain hub based on turn *)
 let attempt_build_hub s civ =

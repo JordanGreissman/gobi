@@ -109,7 +109,10 @@ let init_json json =
   {turns = fst meta; ai = snd meta; entities = entities; hubs = hubs;
    tech_tree = tree; civs = civs}
 
-let init_civ player_controlled entity_roles hub_roles map unlocked civ : civ =
+let init_civ player_controlled parsed map unlocked civ : civ =
+  let entity_roles = parsed.entities in
+  let hub_roles = parsed.hubs in
+  let tech_tree = parsed.tech_tree in
   let starting_tile = Mapp.get_random_tile !map in
   let tiles = Mapp.get_adjacent_tiles !map starting_tile in
   let tile = Random.self_init ();
@@ -134,7 +137,7 @@ let init_civ player_controlled entity_roles hub_roles map unlocked civ : civ =
     unlocked_entities = [];
     resources = [];
     clusters = [fst tup];
-    techs = [];
+    techs = tech_tree;
     player_controlled = player_controlled;
     next_id = 1;
   }
@@ -157,7 +160,7 @@ let init_state json : State.t =
       parsed.tech_tree in
   let unlocked = List.flatten unlocked in
   let civs = List.mapi
-      (fun i civ -> init_civ (i=0) parsed.entities parsed.hubs map unlocked civ)
+      (fun i civ -> init_civ (i=0) parsed map unlocked civ)
       parsed.civs in
   let coords = get_player_start_coords civs in
   {
@@ -188,9 +191,9 @@ let check_for_win s =
     (* TODO *)
     let check_points civs =
       [] in
-    (* TODO *)
+
     let check_tech civs =
-      [] in
+      List.filter (fun x -> Research.Research.check_complete x.techs) civs in
 
     let rec get_winners civs =
       match civs with
@@ -356,7 +359,7 @@ let rec execute (s:State.t) e c : State.t =
   match fst c with
   | NoCmd           -> s
   | NextTurn        -> next_turn s
-  | Tutorial        -> s (* TODO *)
+  | Tutorial        -> s
   | Describe str -> (
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     match str with
@@ -367,7 +370,10 @@ let rec execute (s:State.t) e c : State.t =
         | Some h -> dispatch_message s (Hub.describe h) Message.Info
         | None -> raise (Illegal "There is no hub on this tile!") in
       s'
-    | "research" -> s (* TODO *)
+    | "research" -> (
+        (* TODO how to get relevant key *)
+        let desc = Research.Research.describe_tree "Agriculture" s.tech_tree in
+        dispatch_message s desc Message.Info)
     | "entity" ->
       let entity = Tile.get_entity tile in
       let s' = match entity with
@@ -376,14 +382,19 @@ let rec execute (s:State.t) e c : State.t =
       s'
     | _ -> s)
   | Research        -> s (* TODO *)
-  | DisplayResearch -> s (* begin
-                            let key = snd c in
-                            let civ = State.get_current_civ s in
-                            let research_list = List.assoc key civ.techs in
-                            let desc = Research.Unlockable.describe_unlocked
-                            research_list in
-                            {s with messages = desc::s.messages}
-                            end *)
+  | DisplayResearch -> (* FIX ME *)
+    let key = (
+      match List.nth (snd c) 0 with
+      | Research x -> (
+        match x with
+        | Some key -> key
+        | _ -> raise (Illegal ""))
+      | _ -> raise (Illegal "")) in
+    let civ = State.get_current_civ s in
+    let research_list = List.assoc key civ.techs in
+    let desc = Research.Unlockable.describe_unlocked research_list in
+    let s' = dispatch_message s desc Message.Info in
+    s'
   | Skip ->
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     let entity = Tile.get_entity tile in
@@ -409,7 +420,7 @@ let rec execute (s:State.t) e c : State.t =
   | Clear ->
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     let s' = match Tile.get_entity tile with
-      | Some e -> 
+      | Some e ->
         (* TODO pretty sure Tile.clear already does all this checking and error handling... *)
         if Tile.needs_clearing tile then
           let tile = Tile.set_terrain tile Tile.Flatland in
@@ -530,7 +541,7 @@ let rec player_loop ui state_ref =
   let state = !state_ref in
   LTerm_ui.wait ui >>= fun e ->
   let state' =
-    try get_next_state state e with 
+    try get_next_state state e with
     | Illegal s -> dispatch_message state s Message.Illegal
     | Critical (file,func,err) ->
       failwith (Printf.sprintf "Critical error in %s.ml:%s: %s" file func err)

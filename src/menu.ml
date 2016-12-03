@@ -119,7 +119,7 @@ and get_next_research_menu tech_tree branch_name =
   match Research.Research.get_next_unlockable branch_name tech_tree with
     | Some u ->
       let next = {
-        text = "begin researching " ^ (Research.Unlockable.resource u);
+        text = "research " ^ (Research.Unlockable.name u);
         key = Char (UChar.of_char 'r');
         cmd = Cmd.create Cmd.Research;
         next_menu = StaticMenu main_menu;
@@ -253,12 +253,12 @@ and research_menu : t list = [
   };
   {
     text = "Productivity";
-    key = Char (UChar.of_char '4');
+    key = Char (UChar.of_char 'p');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = NextResearchMenu get_next_research_menu;
   };
   {
-    text = "back";
+    text = "Back";
     key = Char (UChar.of_char '<');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = StaticMenu main_menu;

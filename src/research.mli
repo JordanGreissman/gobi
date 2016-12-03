@@ -30,7 +30,9 @@ module Unlockable : sig
 	val resource_needed : t -> int
 
 	(* returns the name of the resource *)
-	val resource : t -> string
+	val resource : t -> Resource.t
+
+  val name : t -> string
 
   val describe_unlocked : t list -> string
 end
@@ -67,12 +69,18 @@ module Research : sig
 
 	(* unlock and return a potential unlockable based on the next locked unlockable with the key if the type and amount of resources is valid
      * otheriwse, returns none *)
-	val unlock : key -> research_list -> t
+	val unlock : key -> research_list -> research_list
 
 	(* returns the list of unlockables based on the key*)
  val get_key_list : key -> research_list ->  value
 
 	(* returns a list of every unlocked unlockable *)
  val get_unlocked : key -> research_list -> t list
+
+  (* true if for some (k, v) in [research_list], every Unlockable in v has
+    been unlocked, otherwise false *)
+ val check_complete : research_list -> bool
+
+ val describe_tree : key -> research_list -> string
 
 end

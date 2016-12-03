@@ -29,15 +29,20 @@ module Unlockable = struct
     t.cost
 
   let resource t =
+    t.resource
+
+  let name t =
     t.name
 
   let treasure t = t.treasure
 
   let describe_unlocked t =
     let unlocked = List.filter (fun x -> x.is_unlocked) t in
+    print_endline "here";
     (* let desc = List.map resource unlocked in *)
-    let desc = List.fold_right (fun x y -> y^(resource x)) unlocked "" in
-    desc
+    let desc = List.fold_right (fun x y -> y^(name x)) unlocked "" in
+    if desc = "" then "You have not yet unlocked anything in this tree!"
+    else "You have unlocked: "^desc
 end
 
 module Research = struct
@@ -73,7 +78,7 @@ module Research = struct
         let key_value_tree = add_unlockable_key key value acc_tree in
         create_tree key_tail value_tail key_value_tree
       | _ -> raise (BadInvariant ("resource","create_tree","input lists are not the same length"))
-               
+
   let get_next_unlockable key research_list =
     let value_list = List.assoc key research_list in
     try
@@ -84,9 +89,30 @@ module Research = struct
 
   let unlock key research_list =
     match get_next_unlockable key research_list with
-    | None -> raise (Exception.Illegal 
-      ("You have already unlocked everything in "^key^"!"))
-    | Some u -> { u with is_unlocked = true }
+    | None -> research_list (* raise (Exception.Illegal
+      ("You have already unlocked everything in "^key^"!")) *)
+    | Some u -> let unlocked = { u with is_unlocked = true } in
+                let branch = List.assoc key research_list in
+                let foo = List.map (fun x ->
+                  Unlockable.resource x = Unlockable.resource unlocked)
+                  branch in
+                let rec index_of_true i = function
+                  | [] -> -1
+                  | h::t -> if h then i else index_of_true (i+1) t in
+                let index = index_of_true 0 foo in
+                let index =
+                  match index with
+                  | -1 -> raise (Critical ("Research.ml",
+                                  "unlock",
+                                  "Could not find name of unlockable"))
+                  | _ -> index in
+                let lazy_swap = Array.of_list branch in
+                lazy_swap.(index)<-unlocked;
+                let branch = Array.to_list lazy_swap in
+                let lst = List.map (fun (k, v) ->
+                  if (k = key) then (k, branch)
+                  else (k, v)) research_list in
+                lst
 
   let get_key_list key research_list =
     List.assoc key research_list
@@ -94,4 +120,19 @@ module Research = struct
   let get_unlocked key research_list =
     let value_list = List.assoc key research_list in
     List.filter (fun x -> Unlockable.is_unlocked x) value_list
+
+  let check_complete research_list =
+    let check key = ((get_next_unlockable key research_list) = None) in
+    List.fold_right (fun (k, v) a -> check k || a) research_list false
+
+  let describe_tree key research_list =
+    let branch = (
+      try List.assoc key research_list with
+      | _ -> raise (Critical ("Research.ml",
+                                    "unlock",
+                                    "Not a valid key for research"))) in
+    let desc = List.fold_right
+      (fun x y -> (Unlockable.name x)^", "^y) branch "" in
+    let desc = key^" branch: "^desc in
+    String.sub desc 0 ((String.length desc) - 2)
 end
