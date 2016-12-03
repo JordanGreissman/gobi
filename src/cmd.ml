@@ -4,7 +4,7 @@ type cmd =
   | NoCmd
   | NextTurn
   | Tutorial
-  | Describe
+  | Describe of string
   | Research
   | DisplayResearch
   | Skip
@@ -32,7 +32,7 @@ let create = function
   | NoCmd           -> (NoCmd          ,[])
   | NextTurn        -> (NextTurn       ,[])
   | Tutorial        -> (Tutorial       ,[])
-  | Describe        -> (Describe       ,[])
+  | Describe s      -> (Describe s     ,[])
   | Research        -> (Research       ,[Research (None)])
   | DisplayResearch -> (DisplayResearch,[Research (None)])
   | Skip            -> (Skip           ,[])

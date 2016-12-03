@@ -18,7 +18,7 @@ let rec get_tile_menu t =
   let describe = {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "tile");
     next_menu = StaticMenu main_menu;
   } in
   let clear = {
@@ -45,13 +45,19 @@ let rec get_tile_menu t =
   | (true,_)      -> [describe;clear;back]
 
 and get_build_hub_menu roles =
-  let describe = {
-    text = "describe";
-    key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+  let hubs = List.mapi (fun i hub -> {
+    text = Hub.get_role_name hub;
+    key = Char (UChar.of_char (char_of_int i));
+    cmd = Cmd.create Cmd.PlaceHub;
+    next_menu = NoMenu;
+  }) roles in
+  let back = {
+    text = "back";
+    key = Char (UChar.of_char '<');
+    cmd = Cmd.create Cmd.NoCmd;
     next_menu = StaticMenu main_menu;
   } in
-  [describe]
+  hubs@[back]
 
 and get_produce_entity_menu hub =
   let settler = {
@@ -107,7 +113,7 @@ and get_next_research_menu tech_tree branch_name =
   let describe = {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "research");
     next_menu = StaticMenu main_menu;
   } in
   match Research.Research.get_next_unlockable branch_name tech_tree with
@@ -150,7 +156,7 @@ and main_menu = [
     text = "next turn";
     key = Char (UChar.of_char 'n');
     cmd = Cmd.create Cmd.NextTurn;
-    next_menu = NoMenu;
+    next_menu = StaticMenu main_menu;
   };
   {
     text = "tutorial";
@@ -164,7 +170,7 @@ and hub_menu = [
   {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "hub");
     next_menu = StaticMenu main_menu;
   };
   {
@@ -191,14 +197,14 @@ and entity_menu : t list = [
   {
     text = "describe";
     key = Char (UChar.of_char 'd');
-    cmd = Cmd.create Cmd.Describe;
+    cmd = Cmd.create (Cmd.Describe "entity");
     next_menu = StaticMenu main_menu;
   };
   {
     text = "move";
     key = Char (UChar.of_char 'm');
     cmd = Cmd.create Cmd.Move;
-    next_menu = StaticMenu main_menu;
+    next_menu = NoMenu;
   };
   {
     text = "attack";
@@ -229,19 +235,19 @@ and entity_menu : t list = [
 and research_menu : t list = [
   {
     text = "Agriculture";
-    key = Char (UChar.of_char '1');
+    key = Char (UChar.of_char 'a');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = NextResearchMenu get_next_research_menu;
   };
   {
     text = "Transportation";
-    key = Char (UChar.of_char '2');
+    key = Char (UChar.of_char 't');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = NextResearchMenu get_next_research_menu;
   };
   {
     text = "Combat";
-    key = Char (UChar.of_char '3');
+    key = Char (UChar.of_char 'c');
     cmd = Cmd.create Cmd.NoCmd;
     next_menu = NextResearchMenu get_next_research_menu;
   };

@@ -97,7 +97,7 @@ let rec find_role role_str role_list =
 let describe hub =
   hub.role.name
 
-let describe_role r = r.descr
+let describe_role r = "This is a"^r.descr
 
 let tick_cost t =
   {t with role = {t.role with cost_to_make = t.role.cost_to_make - 1}}
@@ -119,7 +119,7 @@ let change_position delta hub =
   let pos' = Coord.add hub.pos delta in
   { hub with pos = pos' }
 
-let change_production_rate delta hub = 
+let change_production_rate delta hub =
   { hub with production_rate = get_production_rate hub + delta }
 
 (* [role] getters and setters *)
@@ -144,8 +144,8 @@ let get_default_defense hub = hub.role.default_def
 
 let rec addto_role_production new_prod_lst hub = match new_prod_lst with
   | [] -> hub
-  | prod::lst -> addto_role_production lst { hub with 
-    role = { (get_role hub) with production = 
-      prod::(get_role_production (get_role hub)) 
+  | prod::lst -> addto_role_production lst { hub with
+    role = { (get_role hub) with production =
+      prod::(get_role_production (get_role hub))
     }}
 

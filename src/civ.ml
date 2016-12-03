@@ -18,13 +18,13 @@ type t = {
 let rec cluster_map clust_func civ acc = match civ.clusters with
   | [] -> { civ with clusters = acc }
   | cluster::lst ->
-    cluster_map clust_func { civ with clusters = lst } 
-      (acc@[clust_func cluster]) 
-      
+    cluster_map clust_func { civ with clusters = lst }
+      (acc@[clust_func cluster])
+
 (*
-(** Applies a function to every hub in a civ. Acc should be []. 
+(** Applies a function to every hub in a civ. Acc should be [].
   * Returns a civ with a new hub list *)
-let rec hub_map hub_func civ acc = 
+let rec hub_map hub_func civ acc =
   let tile_func tile = match tile.hub with
       | Some hub -> { tile with hub = hub_func hub }
       | None -> tile in
@@ -32,37 +32,37 @@ let rec hub_map hub_func civ acc =
 *)
 
 (** apply map function to each hub in civ, returning some 'a list *)
-let rec hub_map_poly hub_func fallback civ = 
+let rec hub_map_poly hub_func fallback civ =
   let tile_func t = match Tile.get_hub t with
     | Some hub -> hub_func hub | None -> fallback in
   let clust_func c = List.map tile_func (Cluster.get_tiles c) in
   List.flatten (List.map clust_func civ.clusters)
 
 (* Returns civ with added resrouces for the turn *)
-let rec get_resource_for_turn civ = 
+let rec get_resource_for_turn civ =
   let resource_lst hub = List.flatten (
-    List.map (fun p -> if Hub.is_resource p then 
-      [Hub.prod_to_resource p] else []) 
+    List.map (fun p -> if Hub.is_resource p then
+      [Hub.prod_to_resource p] else [])
     (Hub.get_role_production hub) ) in
-  let hub_func hub = List.map (fun resource -> 
-    (resource, Hub.get_production_rate hub)) 
+  let hub_func hub = List.map (fun resource ->
+    (resource, Hub.get_production_rate hub))
     (resource_lst (Hub.get_role hub)) in
   let new_resources = List.flatten (hub_map_poly hub_func [] civ) in
-  { civ with resources = 
+  { civ with resources =
     Resource.add_resources civ.resources new_resources }
 
 (* Returns new civ with entity role added that's been unlocked *)
-let add_unlocked_entity new_role civ = 
+let add_unlocked_entity new_role civ =
   { civ with unlocked_entities = new_role::civ.unlocked_entities }
 
 let rec apply_research u civ = match Research.Unlockable.treasure u with
-  | Hub (role, amt) -> 
+  | Hub (role, amt) ->
     let tile_func tile = match Tile.get_hub tile with
-      | Some hub -> Tile.set_hub tile 
+      | Some hub -> Tile.set_hub tile
         (Some (Hub.change_production_rate amt hub))
       | _ -> tile in
     cluster_map (Cluster.tile_map (tile_func) []) civ []
-  | Production (role, prod_lst) -> 
+  | Production (role, prod_lst) ->
     let tile_func tile = match Tile.get_hub tile with
       | Some hub -> if (Hub.get_role hub) = role then
         Tile.set_hub tile (Some (Hub.addto_role_production prod_lst hub))
@@ -82,6 +82,13 @@ let replace_entity new_entity civ =
   let to_be_removed = List.find (fun e -> (Entity.get_id e) = id) civ.entities in
   let new_e_list = new_entity::(remove_entity to_be_removed civ).entities in
     { civ with entities = new_e_list }
+
+let add_entity entity_role tile civ =
+  let id = civ.next_id in
+  (* TODO make sure it's unlocked *)
+  let entity = Entity.create entity_role (Tile.get_pos tile) id in
+  {civ with pending_entities=entity::civ.pending_entities;
+            next_id=civ.next_id+1}
 
 (** Add entity to a hub in existing civ, returning the new civ.
   * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub

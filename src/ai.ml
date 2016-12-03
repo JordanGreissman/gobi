@@ -16,9 +16,9 @@ let attempt_move_entity s civ =
   let tiles = Mapp.get_adjacent_tiles state.map entity_tile in
   let tile = select_random_from_list tiles in
   let tup = Tile.move_entity tile entity_tile in
-  let map = Mapp.set_tile (fst tup) state.map in
-  let map = Mapp.set_tile (snd tup) map in
-  s := {state with map=map};
+  let map' = Mapp.set_tile (fst tup) state.map in
+  let map' = Mapp.set_tile (snd tup) map' in
+  s := {state with map=map'};
   let entities = List.filter (fun x ->
                               (Entity.get_id x) <> (Entity.get_id entity))
                                 civ.entities in
@@ -42,9 +42,9 @@ let attempt_build_hub s civ =
                         ~def:(Hub.get_role_default_defense role)
                         ~pos:(Tile.get_pos tile) in
   let new_tile = Tile.place_hub role None tile in
-  let map = Mapp.set_tile new_tile state.map in
-  let clusters = Cluster.add_hub civ.clusters state.map hub in
-  s := {state with map=map};
+  let map' = Mapp.set_tile new_tile state.map in
+  let clusters = Cluster.add_hub civ.clusters map' hub in
+  s := {state with map=map'};
   {civ with clusters=clusters}
 
 (* TODO generate certain unit based on turn *)
@@ -56,6 +56,8 @@ let attempt_make_entity s civ =
   let tile = select_random_from_list (Cluster.get_tiles cluster) in
   let id = civ.next_id in
   let entity = Entity.create role (Tile.get_pos tile) id in
+  let map' = Mapp.set_tile (Tile.set_entity tile (Some entity)) state.map in
+  s := {state with map=map'};
   {civ with entities=entity::civ.entities}
 
 let rec attempt_turn s civ =

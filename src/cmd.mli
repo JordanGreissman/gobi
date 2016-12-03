@@ -9,7 +9,7 @@ type cmd =
   (** [Tutorial] starts the tutorial *)
   | Tutorial
   (* TODO: do we need separate describe commands for hubs, entities, tiles, etc? *)
-  | Describe
+  | Describe of string
   (** [Research r] begins the process of researching [r] *)
   | Research
   (** [DisplayResearch t] displays the research that has already been completed
