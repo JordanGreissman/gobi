@@ -13,3 +13,5 @@ val generate : int -> int -> t
 val set_tile : Tile.t -> t -> t
 
 val get_random_tile : t -> Tile.t
+
+val get_nearest_available_tile : Tile.t -> t -> Tile.t

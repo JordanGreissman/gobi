@@ -2,6 +2,7 @@ open Yojson
 open Lwt
 open CamomileLibrary
 open Civ
+open State
 open Exception
 open Cmd
 open LTerm_event
@@ -245,16 +246,32 @@ let check_for_win s =
     | Tech -> {s with is_quit = true}
     | _ -> raise (Critical ("game","check_for_win","Error deciding winner"))(* or here *)
 
-let tick_pending map civ =
+let place_entity_on_map s entity =
+  let state = !s in
+  let tile = Mapp.tile_by_pos (Entity.get_pos entity) state.map in
+  let tile = Mapp.get_nearest_available_tile tile state.map in
+  let entity = Entity.set_pos (Tile.get_pos tile) entity in
+  let map' = Mapp.set_tile (Tile.set_entity tile (Some entity)) state.map in
+  s := {state with map=map'}; entity
+
+let place_hub_on_map s hub =
+  let state = !s in
+  let tile = Mapp.tile_by_pos (Hub.get_position hub) state.map in
+  let map' = Mapp.set_tile (Tile.set_hub tile (Some hub)) state.map in
+  s := {state with map=map'}; hub
+
+let tick_pending s civ =
+  let map = s.map in
   let ticked = List.map Entity.tick_cost civ.pending_entities in
   let done_entities = List.filter
       Entity.is_done ticked in
+  let done_entities = List.map (place_entity_on_map (ref s)) done_entities in
   let entities = done_entities@civ.entities in
   let pending_entities = List.filter
       (fun x -> not (Entity.is_done x)) ticked in
   let ticked = List.map Hub.tick_cost civ.pending_hubs in
-  let done_hubs = List.filter
-      Hub.is_done civ.pending_hubs in
+  let done_hubs = List.map (place_hub_on_map (ref s))
+    (List.filter Hub.is_done civ.pending_hubs) in
   let clusters = add_hubs civ.clusters map done_hubs in
   let pending_hubs = List.filter
       (fun x -> not (Hub.is_done x)) ticked in
@@ -266,7 +283,7 @@ let tick_pending map civ =
 let next_turn s =
   let civs = State.get_civs s in
   let s = Ai.attempt_turns civs (ref s) in
-  let civs = List.map (tick_pending s.map) (State.get_civs s) in
+  let civs = List.map (tick_pending s) (State.get_civs s) in
   let s = check_for_win s in
   {s with civs = civs; turn = (s.turn + 1)}
 
