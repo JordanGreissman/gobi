@@ -18,6 +18,7 @@ let attempt_move_entity s civ =
   let tup = Tile.move_entity entity_tile tile in
   let map' = Mapp.set_tile (fst tup) state.map in
   let map' = Mapp.set_tile (snd tup) map' in
+  let entity = Entity.set_pos (Tile.get_pos (snd tup)) entity in
   s := {state with map=map'};
   Civ.replace_entity entity civ
  (*  let entities = List.filter (fun x ->

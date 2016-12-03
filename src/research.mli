@@ -91,6 +91,7 @@ module Research : sig
  (* fraction of a branch unlocked *)
  val frac_unlocked : (key * value) -> float
 
- val describe_tree : key -> research_list -> string
+ (* val describe_tree : key -> research_list -> string *)
+
 
 end

@@ -40,9 +40,9 @@ module Unlockable = struct
     let unlocked = List.filter (fun x -> x.is_unlocked) t in
     print_endline "here";
     (* let desc = List.map resource unlocked in *)
-    let desc = List.fold_right (fun x y -> y^(name x)) unlocked "" in
+    let desc = List.fold_right (fun x y -> (name x)^", "^y) unlocked "" in
     if desc = "" then "You have not yet unlocked anything in this tree!"
-    else "You have unlocked: "^desc
+    else "You have unlocked: "^(String.sub desc 0 ((String.length desc) - 2))
 end
 
 module Research = struct
@@ -149,8 +149,8 @@ module Research = struct
                 then (1.0 /. total) +. (frac_unlocked ("", t))
                 else (frac_unlocked ("", t))
 
-
-  let describe_tree key research_list =
+(*   let describe_tree key research_list =
+>>>>>>> 89f4691b6c133e903bb64a21f99ad63bd2ff95d3
     let branch = (
       try List.assoc key research_list with
       | _ -> raise (Critical ("Research.ml",
@@ -159,5 +159,5 @@ module Research = struct
     let desc = List.fold_right
       (fun x y -> (Unlockable.name x)^", "^y) branch "" in
     let desc = key^" branch: "^desc in
-    String.sub desc 0 ((String.length desc) - 2)
+    String.sub desc 0 ((String.length desc) - 2) *)
 end
