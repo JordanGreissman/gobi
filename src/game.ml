@@ -113,7 +113,7 @@ let init_civ player_controlled entity_roles hub_roles map unlocked civ : civ =
   let starting_tile = Mapp.get_random_tile !map in
   let tiles = Mapp.get_adjacent_tiles !map starting_tile in
   let tile = Random.self_init ();
-              List.nth (tiles) (Random.int (List.length tiles)) in
+    List.nth (tiles) (Random.int (List.length tiles)) in
   let tup = Cluster.create
       ~name:(fst civ)
       ~descr:"A soon to be booming metropolis"
@@ -123,7 +123,7 @@ let init_civ player_controlled entity_roles hub_roles map unlocked civ : civ =
   let role = Entity.find_role "worker" entity_roles in
   let worker = Entity.create role (Tile.get_pos tile) 0 in
   let map' = Mapp.set_tile (Tile.set_entity tile (Some worker))
-              (snd tup) in
+      (snd tup) in
   map := map';
   {
     name = fst civ;
@@ -314,11 +314,11 @@ let parse_event r e (s:State.t) =
       with Not_found -> None in
     let e = match menu_for_key with
       | Some m -> (
-        try Entity.find_role m.text s.entity_roles
-        with Illegal _ -> raise (Critical (
-            "game",
-            "parse_event",
-            "Entity role \"" ^ m.text ^ "\" not found")))
+          try Entity.find_role m.text s.entity_roles
+          with Illegal _ -> raise (Critical (
+              "game",
+              "parse_event",
+              "Entity role \"" ^ m.text ^ "\" not found")))
       | None -> raise (Critical (
           "game",
           "parse_event",
@@ -357,42 +357,33 @@ let rec execute (s:State.t) e c : State.t =
   | NoCmd           -> s
   | NextTurn        -> next_turn s
   | Tutorial        -> s (* TODO *)
-  | Describe str    -> begin
-      let tile = Mapp.tile_by_pos s.selected_tile s.map in
-      match str with
-      | "tile" ->     let desc = Tile.describe tile in
-                        {s with messages = desc::s.messages}
-      | "hub" ->      begin
-                        let hub = Tile.get_hub tile in
-                          match hub with
-                          | Some h ->
-                            let desc = Hub.describe h in
-                              {s with messages = desc::s.messages}
-                          | None ->
-                            let desc = "There is no hub on this tile!" in
-                              {s with messages = desc::s.messages}
-                  end
-      | "research" -> s (* TODO *)
-      | "entity" ->   begin
-                        let entity = Tile.get_entity tile in
-                        match entity with
-                        | Some e ->
-                          let desc = Entity.describe e in
-                            {s with messages = desc::s.messages}
-                        | None ->
-                          let desc = "There is no entity on this tile!" in
-                            {s with messages = desc::s.messages}
-                    end
-      end
+  | Describe str -> (
+    let tile = Mapp.tile_by_pos s.selected_tile s.map in
+    match str with
+    | "tile" -> dispatch_message s (Tile.describe tile) Message.Info
+    | "hub" ->
+      let hub = Tile.get_hub tile in
+      let s' = match hub with
+        | Some h -> dispatch_message s (Hub.describe h) Message.Info
+        | None -> raise (Illegal "There is no hub on this tile!") in
+      s'
+    | "research" -> s (* TODO *)
+    | "entity" ->
+      let entity = Tile.get_entity tile in
+      let s' = match entity with
+        | Some e -> dispatch_message s (Entity.describe e) Message.Info
+        | None -> raise (Illegal "There is no entity on this tile!") in
+      s'
+    | _ -> s)
   | Research        -> s (* TODO *)
   | DisplayResearch -> s (* begin
-       let key = snd c in
-       let civ = State.get_current_civ s in
-       let research_list = List.assoc key civ.techs in
-       let desc = Research.Unlockable.describe_unlocked
-                research_list in
-       {s with messages = desc::s.messages}
-     end *)
+                            let key = snd c in
+                            let civ = State.get_current_civ s in
+                            let research_list = List.assoc key civ.techs in
+                            let desc = Research.Unlockable.describe_unlocked
+                            research_list in
+                            {s with messages = desc::s.messages}
+                            end *)
   | Skip ->
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     let entity = Tile.get_entity tile in
@@ -404,14 +395,15 @@ let rec execute (s:State.t) e c : State.t =
         State.update_civ s.current_civ new_civ s
       | None -> dispatch_message s "No entity selected!" Message.Illegal in
     s'
-  | Move            -> begin
-      let tile = Mapp.tile_by_pos s.selected_tile s.map in
-      let entity = Tile.get_entity tile in
-      if entity <> None then
-        {s with pending_cmd=Some c;
-                        messages = "Select a tile to move to!"::s.messages}
-      else {s with messages = "No entity selected!"::s.messages}
-    end
+  | Move ->
+    let tile = Mapp.tile_by_pos s.selected_tile s.map in
+    (match Tile.get_entity tile with
+    | Some e ->
+      dispatch_message
+        { s with pending_cmd = Some c }
+        "Select tile to move to"
+        Message.Info
+    | None -> raise (Illegal "No entity selected!"))
   | Attack          -> s (* TODO *)
   | PlaceHub        -> s (* TODO *)
   | Clear ->
@@ -428,26 +420,26 @@ let rec execute (s:State.t) e c : State.t =
         dispatch_message s "No entity to clear this forest!" Message.Illegal in
     s'
   | Produce -> s
-    (* if are_all_reqs_satisfied (snd c) then *)
-    (*   let role = match List.nth (snd c) 1 with *)
-    (*     | EntityRole x -> match x with *)
-    (*       | Some y -> y *)
-    (*       | None -> failwith "lol" *)
-    (*     | _ -> failwith "Whoops" in *)
-    (*   let role = List.nth s.entity_roles 0 in *)
-    (*   let pos = s.selected_tile in *)
-    (*   let civ = State.get_current_civ s in *)
-    (*   let entity = Entity.create role pos civ.next_id in *)
-    (*   let civ = {civ with pending_entities = entity::civ.pending_entities} in *)
-    (*   State.update_civ s.current_civ civ s *)
-    (* else *)
-    (*   let tile = Mapp.tile_by_pos s.selected_tile s.map in *)
-    (*   (\* TODO fix this *\) *)
-    (*   let req_list = satisfy_next_req e s (snd c) in *)
-    (*   let s' = match Tile.get_hub tile with *)
-    (*     | Some x -> { s with pending_cmd=Some ((fst c), req_list); } *)
-    (*     | None   -> dispatch_message s "No hub selected!" Message.Illegal in *)
-    (*   s' *)
+  (* if are_all_reqs_satisfied (snd c) then *)
+  (*   let role = match List.nth (snd c) 1 with *)
+  (*     | EntityRole x -> match x with *)
+  (*       | Some y -> y *)
+  (*       | None -> failwith "lol" *)
+  (*     | _ -> failwith "Whoops" in *)
+  (*   let role = List.nth s.entity_roles 0 in *)
+  (*   let pos = s.selected_tile in *)
+  (*   let civ = State.get_current_civ s in *)
+  (*   let entity = Entity.create role pos civ.next_id in *)
+  (*   let civ = {civ with pending_entities = entity::civ.pending_entities} in *)
+  (*   State.update_civ s.current_civ civ s *)
+  (* else *)
+  (*   let tile = Mapp.tile_by_pos s.selected_tile s.map in *)
+  (*   (\* TODO fix this *\) *)
+  (*   let req_list = satisfy_next_req e s (snd c) in *)
+  (*   let s' = match Tile.get_hub tile with *)
+  (*     | Some x -> { s with pending_cmd=Some ((fst c), req_list); } *)
+  (*     | None   -> dispatch_message s "No hub selected!" Message.Illegal in *)
+  (*   s' *)
   | AddEntityToHub -> s
   (* TODO: set pending commands to get tiles of e and h*)
   (* let s' = match s.pending_cmd with  *)
@@ -523,9 +515,9 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
         execute s (LTerm_event.Mouse e) cmd
       | (Coord.Contained c,None) ->
         let s' = dispatch_message
-          s
-          (Printf.sprintf "Selected tile is now %s" (Coord.to_string c))
-          Message.Info in
+            s
+            (Printf.sprintf "Selected tile is now %s" (Coord.to_string c))
+            Message.Info in
         { s' with selected_tile = c }
       | (_,_) -> s in
     s.screen_top_left
