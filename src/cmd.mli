@@ -8,7 +8,7 @@ type cmd =
   | NextTurn
   (** [Tutorial] starts the tutorial *)
   | Tutorial
-  (* TODO: do we need separate describe commands for hubs, entities, tiles, etc? *)
+  (* [Describe str] describes the currently selected [str], if there is one *)
   | Describe of string
   (** [Research r] begins the process of researching [r] *)
   | Research

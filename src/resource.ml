@@ -25,14 +25,22 @@ let str_to_res str = match String.lowercase_ascii str with
  | "food"  -> Some Food
  | _       -> None
 
-let find_res res lst = try snd (List.find
- 		(fun x -> match x with (amt, x) when amt = res -> x | _ -> raise (Illegal "can't find resource")) lst)
- 	with Not_found -> raise (Illegal "can't find resource")) in
+let res_to_str res = match res with
+	| Iron -> "iron" | Gold -> "gold"
+	| Paper -> "paper" | Food -> "food"
+	| _ -> ""
+
+let find_res res lst = 
+	let find tup = match tup with
+		| (kind, amt) when ((Some kind) = (str_to_res res)) -> true
+		| _ -> false in
+	try List.find find lst with 
+		| Not_found -> raise (Exception.Illegal "can't find resource")
 
 let change_resource key amt lst = 
-	let res = find_res key lst in
-	let new_res = (fst res, snd res + amt) in
-	let list_without = List.filter (fun (res, amt) -> not (res = res)) lst in
+	let (res, the_amt) = find_res key lst in
+	let new_res = (res, the_amt + amt) in
+	let list_without = List.filter (fun (the_res, amt) -> not (the_res = res)) lst in
 		new_res::list_without
 
 let rec add_resources list1 list2 =

@@ -14,6 +14,12 @@ type t = {
    next_id : int;
 }
 
+(** Getters *)
+let get_player_controlled civ = civ.player_controlled
+let get_tree civ = civ.techs
+let get_resources civ = civ.resources
+let get_entities civ = civ.entities
+
 (** Applies a function for clusters on every cluster in a civ. Acc should be [].
   * Returns civ with new cluster list *)
 let rec cluster_map clust_func civ acc = match civ.clusters with
@@ -38,6 +44,31 @@ let rec hub_map_poly hub_func fallback civ =
     | Some hub -> hub_func hub | None -> fallback in
   let clust_func c = List.map tile_func (Cluster.get_tiles c) in
   List.flatten (List.map clust_func civ.clusters)
+
+let score civ = 
+
+  let food_amt = try snd (Resource.find_res "food" (get_resources civ)) with
+    | Illegal _ -> 0 in
+  let entity_amt = List.length (get_entities civ) in
+  let food_entity_bool = food_amt >= entity_amt in
+  
+  let rec sum_list lst = match lst with
+    | [] -> 0 | h::t -> h + (sum_list t) in
+  let total_prod_rate = sum_list (hub_map_poly Hub.get_production_rate 0 civ) in
+
+  let rec sum_tuple_list lst = match lst with 
+    | [] -> 0 | (k, v)::t -> v + (sum_tuple_list t) in
+  let no_food_func (r, v) = match r with | Resource.Food -> false | _ -> true in
+  let no_food_list = List.filter no_food_func (get_resources civ) in
+  let total_res = sum_tuple_list no_food_list in
+
+  let rec sum_float_list lst = match lst with
+    | [] -> 0.0 | h::t -> h +. (sum_float_list t) in
+  let res_frac = sum_float_list 
+    (List.map (fun b -> Research.Research.frac_unlocked b) (get_tree civ)) in
+
+  let food_score = if food_entity_bool then 500 else 0 in
+    food_score + total_prod_rate + total_res + int_of_float (res_frac *. 100.0)
 
 (* Returns civ with added resrouces for the turn *)
 let rec get_resource_for_turn civ =
@@ -104,26 +135,17 @@ let add_entity_to_hub entity hub civ =
 
 (* resource decreased approproately too *)
 let unlock_if_possible key tree civ = 
-  let next_unlockable = Research.get_next_unlockable key tree in
-  let unlock_cost = match next_unlockable with
-    | Some u -> (Unlockable.resource u, Unlockable.resource_needed u)
-    | None -> raise Illegal "no more to unlock" in
+  let next_unlockable = match Research.Research.get_next_unlockable key tree with
+    | Some u -> u | None -> raise (Illegal "no more to unlock") in
+  let unlock_cost = (Research.Unlockable.resource next_unlockable, 
+    Research.Unlockable.resource_needed next_unlockable) in
   try 
-    let unlock_have = Resource.find_Res (fst unlock_cost) civ.resources in
+    let unlock_have = Resource.find_res (Resource.res_to_str (fst unlock_cost)) civ.resources in
     if (snd unlock_cost) <= (snd unlock_have) then
-      let unlocked = Research.unlock next_unlockable tree in
-      let new_tree = Research.replace_unlockable unlocked tree in
-      { civ with techs        = new_tree;
-                 resources    = (Resource.change_resource 
-                  (snd unlock_cost) (fst unlock_cost) civ.resources)
+      (* let new_tree = Research.Research.replace_unlockable unlocked tree in *)
+      { civ with techs        = (Research.Research.unlock key tree);
+                 resources    = Resource.change_resource 
+                  (Resource.res_to_str (fst unlock_cost)) (snd unlock_cost) civ.resources
         }
     else civ
-  with | Illegal _ -> "dont have it"
-
-
-  if { civ with }
-
-(** Returns true if the civ isn't run by AI *)
-let get_player_controlled civ = civ.player_controlled
-
-let get_tree civ = civ.techs
+  with | Illegal _ -> raise (Illegal "You can't unlock this!")

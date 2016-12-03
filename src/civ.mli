@@ -14,7 +14,7 @@ type t = {
 
   pending_hubs : Hub.t list;
   (** Entities that can be made and used *)
-i
+
   unlocked_entities : Entity.role list;
   (** count of resources accrued *)
   resources : (Resource.t * int) list;
@@ -29,6 +29,9 @@ i
 (** Applies a function for clusters on every cluster in a civ. Acc should be [].
   * Returns civ with new cluster list *)
 val cluster_map : (Cluster.t -> Cluster.t) -> t -> Cluster.t list -> t
+
+(* An arbitrary score for the civ based on it's contents *)
+val score: t -> int
 
 (** apply map function to each hub in civ, returning some 'a list *)
 val hub_map_poly : (Hub.t -> 'a) -> 'a -> t -> 'a list
@@ -50,7 +53,7 @@ val replace_entity : Entity.t -> t -> t
 
 (* Check civ's resources and unlocks if possible. Returns
  * same civ if can't, otherwise changed civ with unlocked tech *)
-val unlock_if_possible : key -> research_list -> t -> t
+val unlock_if_possible : string -> Research.Research.research_list -> t -> t
 
 val add_entity : Entity.role -> Tile.t -> t -> t
 
@@ -64,4 +67,7 @@ val get_player_controlled : t -> bool
 
 (* Returns tech tree, some of which may be locked *)
 val get_tree : t ->  Research.Research.research_list
+
+(* Gets resources of civ *)
+val get_resources : t -> (Resource.t * int) list
 

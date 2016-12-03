@@ -1,5 +1,8 @@
 type t = Food | Gold | Iron | Paper
 
+(* convert resource to string form, empty string if none *)
+val res_to_str : t -> string
+
 (* Returns corresponding variant for lower or uppercase string of same name *)
 val str_to_res : string -> t option
 
@@ -8,7 +11,7 @@ val find_res : string -> (t * int) list -> (t * int)
 
 (* changes a specifc resource (String input) by the amount, an int. 
  * Input includes (resource * int) list, returns the same *)
-val change_resource : string -> int -> (t * int) list
+val change_resource : string -> int -> (t * int) list -> (t * int) list
 
 (* Combines tuple lists, with the precontion of no repeated resources *)
 val add_resources : (t * int) list -> (t * int) list -> (t * int) list
