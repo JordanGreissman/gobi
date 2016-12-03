@@ -51,6 +51,8 @@ module Research = struct
   type value = t list
   type research_list = (key * value) list
 
+  let get_keys = ["Agriculture"; "Transportation"; "Combat"; "Productivity"]
+
   let extract_to_value name res_str cost u_hub u_amt u_entity
   entity_role_list hub_role_list =
     let hub_list = Hub.find_role u_hub hub_role_list in
@@ -114,6 +116,20 @@ module Research = struct
                   else (k, v)) research_list in
                 lst
 
+  let rec replace_unlockable new_u research = 
+    let rec replace_in_list new_u = function
+      | [] -> []
+      | u::t -> if (Unlockable.resource u) = (Unlockable.resource new_u)
+        then new_u::(replace_in_list u t)
+        else u::(replace_in_list u t)
+      in
+    match research with
+      | [] -> []
+      | (key, branch)::t -> 
+        let new_value = (key, replace_in_list new_u branch) in
+          new_value::(replace_unlockable new_u t)
+
+
   let get_key_list key research_list =
     List.assoc key research_list
 
@@ -125,7 +141,16 @@ module Research = struct
     let check key = ((get_next_unlockable key research_list) = None) in
     List.fold_right (fun (k, v) a -> check k || a) research_list false
 
+  let rec frac_unlocked branch = 
+    let total = float_of_int (List.length (snd branch)) in
+    match snd branch with
+      | [] -> 0.0
+      | u::t -> if Unlockable.is_unlocked u 
+                then (1.0 /. total) +. (frac_unlocked ("", t))
+                else (frac_unlocked ("", t))
+
 (*   let describe_tree key research_list =
+>>>>>>> 89f4691b6c133e903bb64a21f99ad63bd2ff95d3
     let branch = (
       try List.assoc key research_list with
       | _ -> raise (Critical ("Research.ml",
