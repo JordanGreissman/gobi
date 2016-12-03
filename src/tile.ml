@@ -1,3 +1,5 @@
+open Exception
+
 type coordinate = Coord.t
 type entity = Entity.t
 type entity_role = Entity.role
@@ -54,9 +56,8 @@ let is_settled t = not(t.hub = None)
 let unsettle t = {t with hub=None}
 
 let clear t = match t.terrain with
-  | Flatland | Mountain | Desert -> failwith "Cannot clear this terrain type"
+  | Flatland | Mountain | Desert -> raise (Illegal "Cannot clear this terrain type")
   | Forest -> { t with terrain = Flatland }
-
 
 let get_hub t = t.hub
 let set_hub t hub =
@@ -136,15 +137,20 @@ let get_art_char c t =
     let g x = match x with Some _ -> true | None -> false in
     let l = t.pos |> Coord.screen_from_offset |> List.mapi f |> List.filter g in
     match List.length l with
-    | 0 -> failwith
-             (Printf.sprintf
-                "Coordinate %s not contained in tile %s"
-                (Coord.Screen.to_string c)
-                (Coord.to_string t.pos))
+    | 0 -> raise (BadInvariant (
+        "tile",
+        "get_art_char",
+        (Printf.sprintf
+          "Coordinate %s not contained in tile %s"
+          (Coord.Screen.to_string c)
+          (Coord.to_string t.pos))))
     | 1 -> (match List.hd l with
         | Some x -> x
-        | None -> failwith "?????")
-    | _ -> failwith "Duplicate coordinate found" in
+        | None -> raise (BadInvariant ("tile","get_art_char","Expected Some but got None")))
+    | _ -> raise (BadInvariant (
+        "tile",
+        "get_art_char",
+        "Duplicate coordinate found")) in
   let e () = match t.entity with
     | Some e -> (
       let cell = List.nth (List.nth (Entity.get_art e) ax) ay in

@@ -1,3 +1,5 @@
+open Exception
+
 type entity = Entity.t
 type entity_role = Entity.role
 type resource = Resource.t
@@ -9,9 +11,9 @@ type production =
   | Entity of entity_role
 
 (* must be a production of type resource *)
-let prod_to_resource p = match p with
+let prod_to_resource = function
   | Resource p -> p
-  | _ -> failwith "Precondition violated"
+  | _ -> raise (BadInvariant ("hub","prod_to_resource","Expected a resource"))
 
 let is_resource r = match r with
   | Resource _ -> true | _ -> false

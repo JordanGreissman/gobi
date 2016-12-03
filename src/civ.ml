@@ -1,3 +1,4 @@
+open Exception
 
 type t = {
    name : string;
@@ -69,7 +70,7 @@ let rec apply_research u civ = match Research.Unlockable.treasure u with
         else tile
       | None -> tile in
       cluster_map (Cluster.tile_map (tile_func) []) civ []
-  | _ -> failwith "Not a valid unlockable type"; civ
+  | _ -> raise (BadInvariant ("civ","apply_research","Expected a valid Unlockable"))
 
 (** Returns civ with an entity list without the passed in entity *)
 let remove_entity entity civ =

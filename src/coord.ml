@@ -1,3 +1,5 @@
+open Exception
+
 (* Internally, there are 3 different coordinate types used for different purposes.
  * Specifically, cube coordinates lead to the simplest algorithms on hexagonal
  * grids. For descriptions and a comparison of the 3 different systems, please
@@ -100,7 +102,7 @@ let offset_from_screen ((x,y) : Screen.t) : offset_from_screen_t =
         if y = 3 then Border ((x/18*2+1,y/6),None,None)
         else if y = 255 then Border ((x/18*2,41),None,None)
         else Border ((x/18*2+1,y/6-1),Some (x/18*2+1,y/6),None)
-      | _ -> failwith "Illegal value mod 18")
+      | n -> raise (BadInvariant ("coord","offset_from_screen","Illegal value mod 18: " ^ (string_of_int n))))
   | 1 | 5 -> (
     let x = x-2 in
     if x < 0 || x > 378 then None
@@ -120,7 +122,7 @@ let offset_from_screen ((x,y) : Screen.t) : offset_from_screen_t =
         else Border ((x/18*2,y/6),Some (x/18*2+1,y/6),None)
       | n when n < 8 -> if y = 253 then None else Contained (x/18*2,y/6)
       | n when n > 8 -> if y = 1 then None else Contained (x/18*2+1,(y-3)/6)
-      | _ -> failwith "Illegal value mod 18")
+      | n -> raise (BadInvariant ("coord","offset_from_screen","Illegal value mod 18: " ^ (string_of_int n))))
   | 2 | 4 -> (
     let x = x-1 in
     if x < 0 || x > 378 then None
@@ -140,6 +142,6 @@ let offset_from_screen ((x,y) : Screen.t) : offset_from_screen_t =
         else Border ((x/18*2,y/6),Some (x/18*2+1,y/6),None)
       | n when n < 10 -> if y = 254 then None else Contained (x/18*2,y/6)
       | n when n > 10 -> if y = 2 then None else Contained (x/18*2+1,(y-3)/6)
-      | _ -> failwith "Illegal value mod 18")
-  | _ -> failwith "Illegal value mod 6"
+      | n -> raise (BadInvariant ("coord","offset_from_screen","Illegal value mod 18: " ^ (string_of_int n))))
+  | n -> raise (BadInvariant ("coord","offset_from_screen","Illegal value mod 6: " ^ (string_of_int n)))
 

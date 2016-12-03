@@ -1,4 +1,5 @@
 open LTerm_style
+open Exception
 
 type cell = {
   char : char;
@@ -30,7 +31,10 @@ let load name =
     let colors = String.trim colors in
     let combined =
       try List.combine (explode chars) (explode colors)
-      with Invalid_argument _ -> failwith "Malformatted ascii art file" in
+      with Invalid_argument _ -> raise (Critical (
+          "art",
+          "load",
+          "Malformatted ascii art file")) in
     combined |> List.map (fun (ch,cl) ->
         if ch = 'N' then None else Some {char=ch;color=match cl with
         | 'K' -> black

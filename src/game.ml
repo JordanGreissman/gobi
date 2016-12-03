@@ -20,10 +20,14 @@ type parsed_json = {
 
 type win_state = Military | Tech | Score | Tie | No_Win
 
+let dispatch_message (state:State.t) s k =
+  let m = Message.create s k in
+  { state with messages = m::state.messages }
+
 (* Error handling necessary? *)
 let load_json s =
   try Yojson.Basic.from_file s with
-  | _ -> raise (Exception.CriticalError "File does not exist or is not a JSON")
+  | _ -> raise (Critical ("game","load_json","File does not exist or is not a JSON"))
 
 let get_assoc s json =
   json |> Yojson.Basic.Util.member s
@@ -192,7 +196,7 @@ let check_for_win s =
       match civs with
       | [] -> []
       | (Some (x, y))::t -> (x, y)::(get_winners t)
-      | _ -> failwith "Could not get winners" in
+      | _ -> raise (Critical ("game","get_winners","Could not get winners")) in
 
     let tech_win = let civs = check_tech civs in
       match List.length civs with
@@ -236,7 +240,7 @@ let check_for_win s =
     | Military -> {s with is_quit = true}
     | Score -> {s with is_quit = true}
     | Tech -> {s with is_quit = true}
-    | _ -> failwith "Error deciding winner" (* or here *)
+    | _ -> raise (Critical ("game","check_for_win","Error deciding winner"))(* or here *)
 
 let tick_pending map civ =
   let ticked = List.map Entity.tick_cost civ.pending_entities in
@@ -266,23 +270,13 @@ let next_turn s =
 (* given an unsatisfied requirement [r], an input event [e], and the game state
  * [s], return a satisfied version of [r] where the parameter comes from parsing
  * [e] using [s].
- *)
+*)
 let parse_event r e (s:State.t) =
-  let get_req_name = function
-    | Tile _       -> "Tile"
-    | HubRole _    -> "HubRole"
-    | EntityRole _ -> "EntityRole"
-    | Research _   -> "Research" in
-  let get_expected_event = function
-    | Tile _        -> "MouseEvent"
-    | HubRole _     -> "KeyEvent"
-    | EntityRole _  -> "KeyEvent"
-    | Research _    -> "none" in
-  let get_event_name = function
-    | Resize _   -> "ResizeEvent"
-    | Key _      -> "KeyEvent"
-    | Sequence _ -> "SequenceEvent"
-    | Mouse _    -> "MouseEvent" in
+  let expected_action = function
+    | Tile _ -> "select a tile"
+    | HubRole _ -> "select a hub type to build"
+    | EntityRole _ -> "select an entity type to produce"
+    | Research _ -> "select a research upgrade" in
   match (r,e) with
   | (Tile _,Mouse m) ->
     let x,y = (LTerm_mouse.col m,LTerm_mouse.row m) in
@@ -299,11 +293,20 @@ let parse_event r e (s:State.t) =
       | Some (m:Menu.t) ->
         let role_lst = Hub.find_role m.text s.hub_roles in
         let r = match List.length role_lst with
-          | 0 -> failwith "No role found"
+          | 0 -> raise (BadInvariant (
+              "game",
+              "parse_event",
+              "No hub role is associated with the menu item with text: "^m.text))
           | 1 -> List.hd role_lst
-          | n -> failwith "Duplicate rolls exist!" in
+          | n -> raise (Critical (
+              "game",
+              "parse_event",
+              "Duplicate rolls \"" ^ m.text ^ "\"exist!" )) in
         r
-      | None -> failwith "No key associated with this keypress!" in
+      | None -> raise (Critical (
+          "game",
+          "parse_event",
+          "No menu item associated with keypress " ^ (LTerm_key.to_string k))) in
     HubRole (Some r)
   | (EntityRole _,Key k) ->
     let menu_for_key =
@@ -312,14 +315,16 @@ let parse_event r e (s:State.t) =
     let e = match menu_for_key with
       | Some m -> (
         try Entity.find_role m.text s.entity_roles
-        with Illegal _ -> failwith "No entity found!")
-      | None -> failwith "No key associated with this keypress!" in
+        with Illegal _ -> raise (Critical (
+            "game",
+            "parse_event",
+            "Entity role \"" ^ m.text ^ "\" not found")))
+      | None -> raise (Critical (
+          "game",
+          "parse_event",
+          "No menu item associated with keypress " ^ (LTerm_key.to_string k))) in
     EntityRole (Some e)
-  | (_,_) -> raise (Exception.Illegal (Printf.sprintf
-                    "Requirement %s expected input event %s put got %s instead"
-                    (get_req_name r)
-                    (get_expected_event r)
-                    (get_event_name e)))
+  | (a,_) -> raise (Illegal ("Please " ^ (expected_action a)))
 
 let is_some = function
   | Some x -> true
@@ -333,7 +338,10 @@ let is_satisfied r =
   | Research x   -> is_some x
 
 let rec satisfy_next_req e s = function
-  | []   -> failwith "All requirements already satisfied!"
+  | []   -> raise (BadInvariant (
+      "game",
+      "satisfy_next_req",
+      "All requirements already satisfied!"))
   | h::t ->
     if is_satisfied h
     then h::(satisfy_next_req e s t)
@@ -385,21 +393,17 @@ let rec execute (s:State.t) e c : State.t =
                 research_list in
        {s with messages = desc::s.messages}
      end *)
-  | Skip            -> begin
-      let tile = Mapp.tile_by_pos s.selected_tile s.map in
-      let entity = Tile.get_entity tile in
-      match entity with
-      | Some e -> begin
-          let entity =
-            Entity.set_actions 0 e in
-          let civ = State.get_current_civ s in
-          let new_civ = Civ.replace_entity entity civ in
-          State.update_civ s.current_civ new_civ s
-        end
-      | None -> {s
-                 with messages =
-                        "No entity selected!"::s.messages}
-    end
+  | Skip ->
+    let tile = Mapp.tile_by_pos s.selected_tile s.map in
+    let entity = Tile.get_entity tile in
+    let s' = match entity with
+      | Some e ->
+        let entity = Entity.set_actions 0 e in
+        let civ = State.get_current_civ s in
+        let new_civ = Civ.replace_entity entity civ in
+        State.update_civ s.current_civ new_civ s
+      | None -> dispatch_message s "No entity selected!" Message.Illegal in
+    s'
   | Move            -> begin
       let tile = Mapp.tile_by_pos s.selected_tile s.map in
       let entity = Tile.get_entity tile in
@@ -410,56 +414,50 @@ let rec execute (s:State.t) e c : State.t =
     end
   | Attack          -> s (* TODO *)
   | PlaceHub        -> s (* TODO *)
-  | Clear           -> begin
-      let tile = Mapp.tile_by_pos s.selected_tile s.map in
-      let entity = Tile.get_entity tile in
-      if entity <> None then
+  | Clear ->
+    let tile = Mapp.tile_by_pos s.selected_tile s.map in
+    let s' = match Tile.get_entity tile with
+      | Some e -> 
+        (* TODO pretty sure Tile.clear already does all this checking and error handling... *)
         if Tile.needs_clearing tile then
           let tile = Tile.set_terrain tile Tile.Flatland in
           let map = Mapp.set_tile tile s.map in
           {s with map = map}
-        else {s with messages =
-                       "No forest to be cleared!"::s.messages}
-      else {s with messages =
-                     "No entity to clear this forest!"::s.messages}
-    end
-  | Produce         -> begin
-      if are_all_reqs_satisfied (snd c) then
-        (* This needs to be commented out until we fixe
-                                        Cmd.required type *)
-        (*                               let role = List.nth (snd c) 1 in
-                                         let role = match role with
-                                                | EntityRole x -> begin match x with
-                                                                | Some y -> y
-                                                                | None -> failwith "lol"
-                                                                end
-                                                | _ -> failwith "Whoops" in *)
-        let role = List.nth s.entity_roles 0 in
-        let pos = s.selected_tile in
-        let civ = State.get_current_civ s in
-        let entity = Entity.create role pos civ.next_id in
-        let civ = {civ with pending_entities =
-                              entity::civ.pending_entities} in
-        State.update_civ s.current_civ civ s
-      else
-        let tile = Mapp.tile_by_pos
-            s.selected_tile s.map in
-        (* TODO fix this *)
-        let req_list = satisfy_next_req e s (snd c) in
-        let hub = Tile.get_hub tile in
-        match hub with
-        | Some x -> { s with pending_cmd=Some ((fst c), req_list); }
-        | None   -> { s with messages = "No hub selected!"::s.messages }
-    end
-  | AddEntityToHub  ->  s
-  (* TODO: set pending commands to get tiles of e and hmatch s.pending_cmd with
-     | None -> s
-     | Some (_, t1::t2::[]) ->
-     let entity = Tile.get_entity (Mapp.tile_by_pos t1 s.map) in
-     let hub = Tile.get_hub (Mapp.tile_by_pos t2 s.map) in
-     { s with current_civ = Civ.add_entity_to_hub entity hub (State.get_current_civ civ) }
-     | _ -> failwith "AddEntityToHub's stored data isn't None or two tiles w/ coor"
-  *)
+        else dispatch_message s "No forest to be cleared!" Message.Illegal
+      | None ->
+        dispatch_message s "No entity to clear this forest!" Message.Illegal in
+    s'
+  | Produce -> s
+    (* if are_all_reqs_satisfied (snd c) then *)
+    (*   let role = match List.nth (snd c) 1 with *)
+    (*     | EntityRole x -> match x with *)
+    (*       | Some y -> y *)
+    (*       | None -> failwith "lol" *)
+    (*     | _ -> failwith "Whoops" in *)
+    (*   let role = List.nth s.entity_roles 0 in *)
+    (*   let pos = s.selected_tile in *)
+    (*   let civ = State.get_current_civ s in *)
+    (*   let entity = Entity.create role pos civ.next_id in *)
+    (*   let civ = {civ with pending_entities = entity::civ.pending_entities} in *)
+    (*   State.update_civ s.current_civ civ s *)
+    (* else *)
+    (*   let tile = Mapp.tile_by_pos s.selected_tile s.map in *)
+    (*   (\* TODO fix this *\) *)
+    (*   let req_list = satisfy_next_req e s (snd c) in *)
+    (*   let s' = match Tile.get_hub tile with *)
+    (*     | Some x -> { s with pending_cmd=Some ((fst c), req_list); } *)
+    (*     | None   -> dispatch_message s "No hub selected!" Message.Illegal in *)
+    (*   s' *)
+  | AddEntityToHub -> s
+  (* TODO: set pending commands to get tiles of e and h*)
+  (* let s' = match s.pending_cmd with  *)
+  (*   | None -> s *)
+  (*   | Some (_, t1::t2::[]) -> *)
+  (*     let entity = Tile.get_entity (Mapp.tile_by_pos t1 s.map) in *)
+  (*     let hub = Tile.get_hub (Mapp.tile_by_pos t2 s.map) in *)
+  (*     { s with current_civ = Civ.add_entity_to_hub entity hub (State.get_current_civ civ) } *)
+  (*   | _ -> failwith "AddEntityToHub's stored data isn't None or two tiles w/ coor" in *)
+  (* s' *)
   | SelectTile      ->
     let (cmd,req_list) = match s.pending_cmd with
       | Some p -> p
@@ -503,9 +501,9 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
           | TileMenu f -> f (Mapp.tile_by_pos s'.selected_tile s'.map)
           | BuildHubMenu f -> f s'.hub_roles
           | ProduceEntityMenu f -> [m]
-            (* TODO: get list of entity roles that the hub on the currently
-             * selected tile can produce *)
-            (* let hub = Tile.get_hub tile in *)
+          (* TODO: get list of entity roles that the hub on the currently
+           * selected tile can produce *)
+          (* let hub = Tile.get_hub tile in *)
           | NextResearchMenu f ->
             (* The text of the menu item serves to identify the tech tree branch
              * the user selected *)
@@ -524,8 +522,11 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
         let cmd = Cmd.create Cmd.SelectTile in
         execute s (LTerm_event.Mouse e) cmd
       | (Coord.Contained c,None) ->
-        let new_msg = Printf.sprintf "Selected tile is now %s" (Coord.to_string c) in
-        { s with messages = new_msg::s.messages; selected_tile = c }
+        let s' = dispatch_message
+          s
+          (Printf.sprintf "Selected tile is now %s" (Coord.to_string c))
+          Message.Info in
+        { s' with selected_tile = c }
       | (_,_) -> s in
     s.screen_top_left
     |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
@@ -536,7 +537,13 @@ let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
 let rec player_loop ui state_ref =
   let state = !state_ref in
   LTerm_ui.wait ui >>= fun e ->
-  let state' = get_next_state state e in
+  let state' =
+    try get_next_state state e with 
+    | Illegal s -> dispatch_message state s Message.Illegal
+    | Critical (file,func,err) ->
+      failwith (Printf.sprintf "Critical error in %s.ml:%s: %s" file func err)
+    | BadInvariant (file,func,err) ->
+      failwith (Printf.sprintf "Invariant violation in %s.ml:%s: %s" file func err) in
   if state'.is_quit (* End more gracefully? *)
   then return ()
   else (

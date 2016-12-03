@@ -1,3 +1,3 @@
 exception Illegal of string
-
-exception CriticalError of string
+exception Critical of string * string * string
+exception BadInvariant of string * string * string

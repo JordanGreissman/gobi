@@ -19,7 +19,7 @@ type t = {
   selected_tile : Coord.t;
   (** a list of messages (strings) to draw in the message pane. More recent
     * messages first, with the most recent message having index 0 *)
-  messages : string list;
+  messages : Message.t list;
   (** the menu that is currently being displayed along the left side of the
     * screen. *)
   menu : Menu.t list;

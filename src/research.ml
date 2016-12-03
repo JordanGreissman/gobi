@@ -1,3 +1,5 @@
+open Exception
+
 module Unlockable = struct
   type treasure =
     | Hub of Hub.role list * int
@@ -57,7 +59,8 @@ module Research = struct
       ) in
     let resource = match Resource.str_to_res res_str with
       | Some r -> r
-      | None   -> failwith "no resource provided" in
+      | None   ->
+        raise (Critical ("research","extract_to_value","no resource provided")) in
     Unlockable.create_unlockable name resource cost treasure
 
   let add_unlockable_key key value research_list =
@@ -69,8 +72,8 @@ module Research = struct
       | key::key_tail, value::value_tail ->
         let key_value_tree = add_unlockable_key key value acc_tree in
         create_tree key_tail value_tail key_value_tree
-      | _ -> failwith "Precondition violation"
-
+      | _ -> raise (BadInvariant ("resource","create_tree","input lists are not the same length"))
+               
   let get_next_unlockable key research_list =
     let value_list = List.assoc key research_list in
     try

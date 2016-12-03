@@ -1,4 +1,5 @@
 open CamomileLibrary
+open Exception
 
 type state = State.t
 
@@ -72,7 +73,16 @@ let draw_messages ctx w h messages =
   draw_ascii_frame ctx w h;
   (* draw the messages *)
   for i = 1 to min (h-2) (List.length messages) do
-    LTerm_draw.draw_string ctx i 1 (List.nth messages (i-1))
+    let m = (List.nth messages (i-1)) in
+    let style = match Message.get_kind m with
+      | Message.Info -> LTerm_style.none
+      | Message.ImportantInfo ->
+        { LTerm_style.none with foreground = Some (LTerm_style.blue) }
+      | Message.Illegal ->
+        { LTerm_style.none with foreground = Some (LTerm_style.red) }
+      | Message.Win -> 
+        { LTerm_style.none with foreground = Some (LTerm_style.yellow) } in
+    LTerm_draw.draw_string ctx i 1 ~style:style (Message.get_text m)
   done
 
 let draw_menu ctx w h menu turn =
@@ -84,7 +94,11 @@ let draw_menu ctx w h menu turn =
     let item : Menu.t = List.nth menu (y-1) in
     let c = match item.key with
       | Char c -> c
-      | _ -> failwith "Invalid key sequence" in
+      | e -> raise (Critical (
+          "interface",
+          "draw_menu",
+          "Unexpected key input: " ^
+          (LTerm_key.to_string {control=false;meta=false;shift=false;code=e}))) in
     LTerm_draw.draw_string ctx (y+1) 1 " [";
     LTerm_draw.draw_char ctx (y+1) 3 ~style:key_style c;
     LTerm_draw.draw_string ctx (y+1) 4 (Printf.sprintf "] %s" item.text)
