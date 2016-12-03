@@ -441,7 +441,44 @@ let rec execute (s:State.t) e c : State.t =
           Message.Info
       | None -> raise (Illegal "No entity selected!"))
   | Attack          -> s (* TODO *)
-  | PlaceHub        -> s (* TODO *)
+  | PlaceHub        ->
+    if are_all_reqs_satisfied (snd c) then
+      let tile = match List.nth (snd c) 0 with
+        | Tile t -> (match t with
+          | Some x -> x
+          | None   -> raise (BadInvariant (
+              "game",
+              "execute",
+              "All requirements were satisfied for PlaceHub but requirement is None")))
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "PlaceHub required Tile but got something else")) in
+      let role = match List.nth (snd c) 1 with
+        | HubRole r -> (match r with
+          | Some x -> x
+          | None   -> raise (BadInvariant (
+              "game",
+              "execute",
+              "All requirements were satisfied for PlaceHub but requirement is None")))
+        | _ -> raise (BadInvariant (
+            "game",
+            "execute",
+            "PlaceHub required HubRole but got something else")) in
+      let starting_entity = None in (* TODO *)
+      let t' = Tile.place_hub role starting_entity tile in
+      let map' = Mapp.set_tile t' s.map in
+      dispatch_message
+        { s with map = map' }
+        ((Hub.get_role_name role) ^ " now under construction")
+        Message.Info
+    else
+      let t = Mapp.tile_by_pos s.selected_tile s.map in
+      let cmd' = ((fst c),(Tile (Some t))::(List.tl (snd c))) in
+      dispatch_message
+        { s with pending_cmd = Some cmd' }
+        "Select hub role to place"
+        Message.Info
   | Clear ->
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     let s' = match Tile.get_entity tile with

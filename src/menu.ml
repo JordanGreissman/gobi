@@ -46,11 +46,12 @@ let rec get_tile_menu t =
   | (true,_)      -> [describe;clear;back]
 
 and get_build_hub_menu roles =
+  let alpha = "abcdefghijklmnopqrstuvwxyz" in
   let hubs = List.mapi (fun i hub -> {
     text = Hub.get_role_name hub;
-    key = Char (UChar.of_char (char_of_int i));
-    cmd = Cmd.create Cmd.PlaceHub;
-    next_menu = NoMenu;
+    key = Char (UChar.of_char alpha.[i]);
+    cmd = Cmd.create Cmd.SelectHub;
+    next_menu = StaticMenu main_menu;
   }) roles in
   let back = {
     text = "back";
