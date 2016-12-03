@@ -48,6 +48,10 @@ val remove_entity : Entity.t -> t -> t
 (** Replace entity with id of new_entity with new_entity *)
 val replace_entity : Entity.t -> t -> t
 
+(* Check civ's resources and unlocks if possible. Returns
+ * same civ if can't, otherwise changed civ *)
+val unlock_if_possible : key -> research_list -> t -> t
+
 (** Add entity to a hub in existing civ, returning the new civ.
   * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub
   * doesn't exist in clusters. *)

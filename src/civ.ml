@@ -94,5 +94,25 @@ let add_entity_to_hub entity hub civ =
       remove_entity entity new_civ
   else raise (Exception.Illegal "This entity has the wrong role for the hub"); civ
 
+(* resource decreased approproately too *)
+let unlock_if_possible key tree civ = 
+  let next_unlockable = Research.get_next_unlockable key tree in
+  let unlock_cost = match next_unlockable with
+    | Some u -> (Unlockable.resource u, Unlockable.resource_needed u)
+    | None -> raise Illegal "no more to unlock" in
+  try 
+    let unlock_have = Resource.find_Res fst unlock_cost civ.resources in
+    if (snd unlock_cost) <= (snd unlock_have) then
+      { civ with techs        = (next_unlockable)::civ.techs;
+                 resources    = (Resource.change_resource 
+                  (snd unlock_cost) (fst unlock_cost) civ.resources)
+        }
+    else civ
+  with | Illegal _ -> "dont have it"
+
+
+  if { civ with }
+
+
 (** Returns true if the civ isn't run by AI *)
 let get_player_controlled civ = civ.player_controlled

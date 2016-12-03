@@ -26,7 +26,10 @@ let attempt_move_entity s civ =
   {civ with entities=entities}
 
 let attempt_make_technology s civ =
-  civ
+  let res_str = select_random_from_list Research.get_keys in
+  unlock_if_possible res_str s civ
+  tree should be a partial tree with locked / unlocked
+
 
 (* TODO generate certain hub based on turn *)
 let attempt_build_hub s civ =

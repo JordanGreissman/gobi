@@ -57,6 +57,9 @@ module Research : sig
   val extract_to_value : string -> string -> int -> string -> int ->
   	string list -> Entity.role list -> Hub.role list -> t
 
+  (* Get list of all possible keys *)
+  val get_keys : string
+
   (* Creates a tree from a list of keys and values, which must be the same size *)
   val create_tree : key list -> value list -> research_list -> research_list
 

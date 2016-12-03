@@ -25,6 +25,16 @@ let str_to_res str = match String.lowercase_ascii str with
  | "food"  -> Some Food
  | _       -> None
 
+let find_res res lst = try snd (List.find
+ 		(fun x -> match x with (amt, x) when amt = res -> x | _ -> raise (Illegal "can't find resource")) lst)
+ 	with Not_found -> raise (Illegal "can't find resource")) in
+
+let change_resource key amt lst = 
+	let res = find_res key lst in
+	let new_res = (fst res, snd res + amt) in
+	let list_without = List.filter (fun (res, amt) -> not (res = res)) lst in
+		new_res::list_without
+
 let rec add_resources list1 list2 =
  	let find_res res lst = try snd (List.find
  		(fun x -> match x with (amt, x) when amt = res -> true | _ -> false) lst)

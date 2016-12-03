@@ -44,6 +44,8 @@ module Research = struct
   type value = t list
   type research_list = (key * value) list
 
+  let get_keys = ["Agriculture", "Transportation", "Combat", "Productivity"]
+
   let extract_to_value name res_str cost u_hub u_amt u_entity
   entity_role_list hub_role_list =
     let hub_list = Hub.find_role u_hub hub_role_list in
