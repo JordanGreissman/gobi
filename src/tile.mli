@@ -34,6 +34,8 @@ val place_hub :
   *)
 val move_entity : t -> t -> t*t
 
+val distance_between_tiles: t -> t -> float
+
 (** [get_art_char c t] is the art cell for the absolute screen coordinate [c],
   * which is contained within tile [t]. This is the art cell for the entity on
   * [t]; or if there is no entity, the hub on [t]; or if there is also no hub,
@@ -56,6 +58,8 @@ val set_hub : t -> Hub.t option -> t
 
 val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
+
+val get_known_entity: t -> Entity.t
 
 val get_pos : t -> Coord.t
 

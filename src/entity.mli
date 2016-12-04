@@ -85,6 +85,10 @@ val unlock_role : role -> role
 val get_role_default_power : role -> int*int
 
 val set_actions : int -> t -> t
+
+val get_actions_used: t -> int
+val set_actions_used: t -> int -> t
+
 (* convenience functions *)
 val get_actions : t -> int
 val get_name : t -> string

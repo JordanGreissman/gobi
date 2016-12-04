@@ -436,7 +436,7 @@ let rec execute (s:State.t) e c : State.t =
   | Move ->
     if are_all_reqs_satisfied (snd c) then
       (* TODO there's a lot of boilerplate just to extract requirements... *)
-      let too = match List.nth (snd c) 0 with
+      let from = match List.nth (snd c) 0 with
         | Tile t -> (match t with
           | Some x -> x
           | None   -> raise (BadInvariant (
@@ -447,7 +447,7 @@ let rec execute (s:State.t) e c : State.t =
             "game",
             "execute",
             "Move required Tile but got something else")) in
-      let from = match List.nth (snd c) 1 with
+      let too = match List.nth (snd c) 1 with
         | Tile t -> (match t with
           | Some x -> x
           | None   -> raise (BadInvariant (
@@ -458,10 +458,22 @@ let rec execute (s:State.t) e c : State.t =
             "game",
             "execute",
             "Move required Tile but got something else")) in
-      (* TODO: Tile.move_entity doesn't check movement points *)
-      let (from',too') = Tile.move_entity too from in
-      let map' = s.map |> Mapp.set_tile from' |> Mapp.set_tile too' in
-      { s with pending_cmd = None; map = map' }
+      let distance_between_tiles = Tile.distance_between_tiles from too in
+      let entity_on_tile = Tile.get_known_entity from in
+      let entity_actions_allowed = Entity.get_actions entity_on_tile in
+      let entity_actions_used = Entity.get_actions_used entity_on_tile in
+      if distance_between_tiles <= (float_of_int (entity_actions_allowed - entity_actions_used))
+      then
+        let (from',too') = Tile.move_entity from too in
+        let map' = s.map |> Mapp.set_tile from' |> Mapp.set_tile too' in
+        let current_civ = State.get_current_civ s in
+        let updated_entity = Entity.set_actions_used entity_on_tile ((int_of_float distance_between_tiles) + entity_actions_used) in
+        let updated_civ = Civ.replace_entity updated_entity current_civ in
+        let state_with_civs_updated = State.update_civ s.current_civ updated_civ s in
+        { state_with_civs_updated with pending_cmd = None; map = map'; }
+      else raise (Illegal (string_of_int ((int_of_float distance_between_tiles) + entity_actions_used)))
+
+
     else
       let tile = Mapp.tile_by_pos s.selected_tile s.map in
       (match Tile.get_entity tile with
