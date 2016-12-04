@@ -447,10 +447,7 @@ let rec execute (s:State.t) e c : State.t =
     let key = match List.nth reqs 0 with
       | Research k -> begin
           match k with
-          | Some k -> 
-            let new_civ = Civ.unlock_if_possible k Civ.get_tree 
-              State.get_current_civ s in
-            { s with current_civ = new_civ }
+          | Some k -> k
           | None   -> raise (BadInvariant (
               "game",
               "execute",
@@ -460,7 +457,9 @@ let rec execute (s:State.t) e c : State.t =
           "game",
           "execute",
           "Research expected Research requirement but got something else")) in
-    s
+    let civ = State.get_current_civ s in
+    let new_civ = Civ.unlock_if_possible key (Civ.get_tree civ) civ in
+    State.update_civ s.current_civ new_civ s
   | DisplayResearch -> (* TEST THIS *)
     let key = (
       match List.nth (snd c) 0 with
