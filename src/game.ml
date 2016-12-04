@@ -138,7 +138,7 @@ let init_civ player_controlled parsed map unlocked civ : civ =
     pending_entities = [];
     pending_hubs = [];
     unlocked_entities = [];
-    resources = [(Food, 0); (Gold, 0); (Iron, 0); (Paper, 0)];
+    resources = [(Food, 1); (Gold, 1); (Iron, 1); (Paper, 1)];
     clusters = [fst tup];
     techs = tech_tree;
     player_controlled = player_controlled;
@@ -462,17 +462,21 @@ let rec execute (s:State.t) e c : State.t =
       let entity_on_tile = Tile.get_known_entity from in
       let entity_actions_allowed = Entity.get_actions entity_on_tile in
       let entity_actions_used = Entity.get_actions_used entity_on_tile in
-      if distance_between_tiles <= (float_of_int (entity_actions_allowed - entity_actions_used))
+      let moves_used =
+        entity_actions_used + (int_of_float distance_between_tiles) in
+      let moves_used = if Tile.get_terrain too = Forest
+                          then moves_used + 1
+                        else moves_used in
+      if moves_used <= entity_actions_allowed
       then
         let (from',too') = Tile.move_entity from too in
-        let map' = s.map |> Mapp.set_tile from' |> Mapp.set_tile too' in
         let current_civ = State.get_current_civ s in
-        let updated_entity = Entity.set_actions_used entity_on_tile ((int_of_float distance_between_tiles) + entity_actions_used) in
+        let updated_entity = Entity.set_actions_used entity_on_tile moves_used in
         let updated_civ = Civ.replace_entity updated_entity current_civ in
         let state_with_civs_updated = State.update_civ s.current_civ updated_civ s in
+        let map' = s.map |> Mapp.set_tile from' |> Mapp.set_tile (Tile.set_entity too' (Some updated_entity)) in
         { state_with_civs_updated with pending_cmd = None; map = map'; }
-      else raise (Illegal (string_of_int ((int_of_float distance_between_tiles) + entity_actions_used)))
-
+      else raise (Illegal ("This entity has no moves left!"))
 
     else
       let tile = Mapp.tile_by_pos s.selected_tile s.map in

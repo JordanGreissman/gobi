@@ -20,12 +20,12 @@ let attempt_move_entity s civ =
   let map' = Mapp.set_tile (snd tup) map' in
   let entity = Entity.set_pos (Tile.get_pos (snd tup)) entity in
   s := {state with map=map'};
-  Civ.replace_entity entity civ
- (*  let entities = List.filter (fun x ->
+  (* Civ.replace_entity entity civ *)
+  let entities = List.filter (fun x ->
                               (Entity.get_id x) <> (Entity.get_id entity))
                                 civ.entities in
   let entities = entity::entities in
-  {civ with entities=entities} *)
+  {civ with entities=entities}
 
 let attempt_make_technology s civ =
   let state = !s in
