@@ -174,7 +174,7 @@ let init_state json : State.t =
     entity_roles = parsed.entities;
     tech_tree = parsed.tech_tree;
     map = !map;
-    screen_top_left = snd coords;
+    screen_top_left = Coord.Screen.add (Coord.Screen.create (-30) (-15)) (snd coords);
     selected_tile = fst coords;
     messages = [];
     is_quit = false;
@@ -300,7 +300,33 @@ let next_turn s =
   let s = Ai.attempt_turns civs (ref s) in
   let civs = List.map (tick_pending s) (State.get_civs s) in
   let s = check_for_win s in
-  {s with civs = civs; turn = (s.turn + 1)}
+  (* reset the action count of every entity *)
+  (* update the civ list *)
+  (* TODO: we do not need to keep track of this state twice *)
+  let civs = List.map
+    (fun (civ:Civ.t) ->
+      let entities = List.map
+        (fun e -> Entity.set_actions_used e 0)
+        civ.entities in
+      { civ with entities = entities })
+    civs in
+  (* update the map *)
+  let entities = s.civs |> List.map (fun (c:Civ.t) -> c.entities) |> List.flatten in
+  let map = ref s.map in
+  List.iter
+    (fun e ->
+      let pos = Entity.get_pos e in
+      let tile = Mapp.tile_by_pos pos !map in
+      let entity = match Tile.get_entity tile with
+        | Some e -> e
+        | None -> raise (BadInvariant (
+                          "game",
+                          "next_turn",
+                          "Expected an entity on this tile but there was none")) in
+      let tile' = Tile.set_entity tile (Some (Entity.set_actions_used entity 0)) in
+      map := Mapp.set_tile tile' !map)
+    entities;
+  { s with civs = civs; turn = (s.turn + 1); map = !map }
 
 (* given an unsatisfied requirement [r], an input event [e], and the game state
  * [s], return a satisfied version of [r] where the parameter comes from parsing
@@ -493,17 +519,19 @@ let rec execute (s:State.t) e c : State.t =
       let moves_used = if Tile.get_terrain too = Forest
                           then moves_used + 1
                         else moves_used in
-      if moves_used <= entity_actions_allowed
+      if moves_used <= entity_actions_allowed && not (Tile.has_movement_obstruction too)
       then
         let (from',too') = Tile.move_entity from too in
         let current_civ = State.get_current_civ s in
         let updated_entity = Entity.set_actions_used entity_on_tile moves_used in
+        let updated_entity = Entity.set_pos (Tile.get_pos too') updated_entity in
         let updated_civ = Civ.replace_entity updated_entity current_civ in
         let state_with_civs_updated = State.update_civ s.current_civ updated_civ s in
         let map' = s.map |> Mapp.set_tile from' |> Mapp.set_tile (Tile.set_entity too' (Some updated_entity)) in
         { state_with_civs_updated with pending_cmd = None; map = map'; }
-      else raise (Illegal ("This entity has no moves left!"))
-
+      else if moves_used > entity_actions_allowed then
+        raise (Illegal ("This entity does not have enough remaining actions!"))
+      else raise (Illegal ("You cannot move to this tile!"))
     else
       let tile = Mapp.tile_by_pos s.selected_tile s.map in
       (match Tile.get_entity tile with
@@ -821,7 +849,7 @@ let rec player_loop ui state_ref =
   LTerm_ui.wait ui >>= fun e ->
   let state' =
     try get_next_state state e with
-    | Illegal s -> dispatch_message state s Message.Illegal
+    | Illegal s -> dispatch_message { state with pending_cmd = None } s Message.Illegal
     | Critical (file,func,err) ->
       failwith (Printf.sprintf "Critical error in %s.ml:%s: %s" file func err)
     | BadInvariant (file,func,err) ->
