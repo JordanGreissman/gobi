@@ -76,15 +76,13 @@ let set_hub t hub =
   then t
   else {t with hub=hub}
 
+
 let get_entity t = t.entity
 let set_entity t entity = { t with entity=entity }
 
 let get_known_entity t = match t.entity with
   | Some e -> e
   | _ -> raise (Illegal "get_known_entity issue")
-let get_known_hub t = match t.hub with
-  | Some e -> e
-  | _ -> raise (Illegal "get_known_hub issue")
 
 
 let get_pos t = t.pos
@@ -100,7 +98,7 @@ let describe_terrain = function
 let describe t =
   match t.entity, t.hub with
   | None, None ->
-    (describe_terrain t.terrain)^Coord.to_string t.pos
+    (describe_terrain t.terrain)
   | Some x, None ->
     (describe_terrain t.terrain)^". "^
       "It currently has a "^(Entity.describe x)^" on it."

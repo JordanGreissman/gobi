@@ -544,8 +544,11 @@ let rec execute (s:State.t) e c : State.t =
         let updated_defender_tile = Tile.set_entity defender_tile None in
         let map' = s.map |> Mapp.set_tile updated_defender_tile in
         {s with map=map';}
-      else
-        let map' = s.map |> Mapp.set_tile defender_tile in
+      else (*SUBTRACT ATTACKER ATTACK FROM HUB DEFENSE*)
+        let attacker_attack = Entity.get_attack (Tile.get_known_entity attacker_tile) in
+        let updated_hub = Hub.change_defense attacker_attack hub in
+        let updated_defender_tile = Tile.set_hub defender_tile (Some updated_hub) in
+        let map' = s.map |> Mapp.set_tile updated_defender_tile in
         {s with map=map';}
     | (None, None) -> raise (Illegal "You cannot attack this tile")
 

@@ -60,7 +60,6 @@ val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
 val set_entity : t -> Entity.t option -> t
 
 val get_known_entity: t -> Entity.t
-val get_known_entity: t -> Hub.t
 
 val get_pos : t -> Coord.t
 
