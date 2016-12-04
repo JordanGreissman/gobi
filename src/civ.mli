@@ -39,6 +39,9 @@ val hub_map_poly : (Hub.t -> 'a) -> 'a -> t -> 'a list
 (* Returns civ with added resrouces for the turn *)
 val get_resource_for_turn : t -> t
 
+(* Returns true if the hub can be bought with resources *)
+val check_hub_cost : Hub.t -> t -> bool
+
 (* Returns new civ with entity role added that's been unlocked *)
 val add_unlocked_entity : Entity.role -> t -> t
 
