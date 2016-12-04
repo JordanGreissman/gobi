@@ -12,8 +12,8 @@ let _ = Random.self_init () in
 Random.int 100
 
 let attack_hub attack_tile hub_tile =
-  let entity_attack = Entity.get_attack (Tile.get_entity attack_tile) in
-  let hub_defense = Hub.get_defense (Tile.get_hub hub_tile) in
+  let entity_attack = Entity.get_attack (Tile.get_known_entity attack_tile) in
+  let hub_defense = Hub.get_defense (Tile.get_known_hub hub_tile) in
   let computed_weights = compute_weights entity_attack hub_defense in
   let random_number = get_random_number in
   if computed_weights > random_number

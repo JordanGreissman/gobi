@@ -484,7 +484,78 @@ let rec execute (s:State.t) e c : State.t =
           "Select tile to move to"
           Message.Info
       | None -> raise (Illegal "No entity selected!"))
-  | Attack          -> s (* TODO *)
+  | Attack          ->
+  if are_all_reqs_satisfied (snd c) then
+    (* TODO there's a lot of boilerplate just to extract requirements... *)
+    let attacker_tile = match List.nth (snd c) 0 with
+      | Tile t -> (match t with
+        | Some x -> x
+        | None   -> raise (BadInvariant (
+          "game",
+          "execute",
+          "All requirements satisfied for Attack but requirement is None")))
+      | _ -> raise (BadInvariant (
+          "game",
+          "execute",
+          "Attack required Tile but got something else")) in
+    let defender_tile = match List.nth (snd c) 1 with
+      | Tile t -> (match t with
+        | Some x -> x
+        | None   -> raise (BadInvariant (
+          "game",
+          "execute",
+          "All requirements satisfied for Attack but requirement is None")))
+      | _ -> raise (BadInvariant (
+          "game",
+          "execute",
+          "Attack required Tile but got something else")) in
+    let adjacent_tiles = Mapp.get_adjacent_tiles s.map attacker_tile in
+    let is_adjacent_tile = List.mem defender_tile adjacent_tiles in
+    let entity_on_tile = Tile.get_entity defender_tile in
+    let hub_on_tile = Tile.get_hub defender_tile in
+    match (entity_on_tile,hub_on_tile) with
+    | (Some entity, Some hub) -> raise (Illegal "umm there shouldnt be a hub and an entity")
+    | (Some entity, None) ->
+      let combat_result = Combat.attack_entity attacker_tile defender_tile in
+      if combat_result
+      then
+        let updated_defender_tile = Tile.set_entity defender_tile None in
+        let current_civ = State.get_current_civ s in
+        let updated_civ = Civ.remove_entity entity current_civ in
+        let updated_civs_state = State.update_civ s.current_civ updated_civ s in
+        let map' = s.map |> Mapp.set_tile updated_defender_tile in
+        {updated_civs_state with map=map';}
+      else
+        let updated_attacker_tile = Tile.set_entity attacker_tile None in
+        let current_civ = State.get_current_civ s in
+        let updated_civ = Civ.remove_entity entity current_civ in
+        let updated_civs_state = State.update_civ s.current_civ updated_civ s in
+        let map' = s.map |> Mapp.set_tile updated_attacker_tile in
+        {updated_civs_state with map=map';}
+
+    | (None, Some hub) ->
+      let combat_result = Combat.attack_hub attacker_tile defender_tile in
+      if combat_result
+      then
+        let updated_defender_tile = Tile.set_entity defender_tile None in
+        let map' = s.map |> Mapp.set_tile updated_defender_tile in
+        {s with map=map';}
+      else
+        let map' = s.map |> Mapp.set_tile defender_tile in
+        {s with map=map';}
+    | (None, None) -> raise (Illegal "You cannot attack this tile")
+
+  else
+    let tile = Mapp.tile_by_pos s.selected_tile s.map in
+    (match Tile.get_entity tile with
+     | Some e ->
+       let c' = ((fst c),(Tile (Some tile))::(List.tl (snd c))) in
+       dispatch_message
+         { s with pending_cmd = Some c' }
+         "Select an Entity to attack"
+         Message.Info
+     | None -> raise (Illegal "No entity selected!"))
+
   | PlaceHub        ->
     if are_all_reqs_satisfied (snd c) then
       let tile = match List.nth (snd c) 0 with

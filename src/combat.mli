@@ -48,7 +48,7 @@ val get_random_number : int
  *    TownHall.defense < 0, attack wins and hub is destroyed
  *
  *    Returns true *)
-val attack_hub : tile -> tile -> bool
+val attack_hub : Tile.t -> Tile.t -> bool
 
 (** [attack_entity] returns true if the attacking unit wins
  * and false otherwise
@@ -65,4 +65,4 @@ val attack_hub : tile -> tile -> bool
  *    29 < 35, defense wins and attack is destroyed
  *
  *    Returns false *)
-val attack_entity : tile -> tile -> bool
+val attack_entity : Tile.t -> Tile.t -> bool

@@ -80,6 +80,10 @@ let set_entity t entity = { t with entity=entity }
 let get_known_entity t = match t.entity with
   | Some e -> e
   | _ -> raise (Illegal "get_known_entity issue")
+let get_known_hub t = match t.hub with
+  | Some e -> e
+  | _ -> raise (Illegal "get_known_hub issue")
+
 
 let get_pos t = t.pos
 
