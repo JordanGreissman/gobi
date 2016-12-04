@@ -97,29 +97,60 @@ let draw_resources ctx w h resources =
         (Resource.res_to_str resource)^":  "^(string_of_int amount));
   done
 
-let draw_menu ctx w h menu turn civs =
-  let player = List.nth civs 0 in
-  let resources = Civ.get_resources player in
-  let key_style = { LTerm_style.none with foreground = Some (LTerm_style.blue) } in
+let draw_menu ctx w h menu turn =
+  (* chops the text of each menu item up into as many pieces are necessary to
+   * fit inside the text_width of the menu. Returns a string list, where
+   * each string is padded to the full width of the menu. The first string in
+   * each list is padded with the string "| [ ] " in preparation for drawing
+   * a key binding (this is done as a separate step).
+   *)
+  let text_width = w - (String.length "| [k] |") in
+  let chop s =
+    let rec f s lst =
+      let pad = if lst = [] then " [ ] " else "     " in
+      if (String.length s) > text_width then
+        let s1 = String.sub s 0 text_width in
+        (* print_endline s1; *)
+        let s2 = String.sub s (text_width) ((String.length s) - text_width) in
+        (* print_endline s2; *)
+        f s2 ((pad^s1)::lst)
+      else (pad^s)::lst in
+    List.rev (f s []) in
+  (* given a list of heights of menu items, returns a list of y coordinates
+   * where each menu item should be drawn *)
+  let get_y heights =
+    let rec f y ys = function
+      | []   -> ys
+      | h::t ->
+        let y' = y+h in
+        f y' (y::ys) t in
+    heights |> f 1 [] |> List.rev in
+  (* chop up each menu item *)
+  let chopped_menu = List.map (fun (m:Menu.t) -> chop m.text) menu in
+  (* get the chopped heights (# of lines) of each chopped menu item *)
+  let lengths = List.map List.length chopped_menu in
+  (* find the y-coord at which each one starts based on the heights *)
+  let ys = get_y lengths in
+  let ym = List.combine ys chopped_menu in
+  (* draw boring stuff *)
   LTerm_draw.clear ctx;
   draw_ascii_frame ctx w h;
   LTerm_draw.draw_string ctx 1 1 ("Turn: "^(string_of_int turn));
-  LTerm_draw.draw_string ctx 10 1 "Menu:";
-
-  draw_resources ctx w h resources;
-  for y = 1 to (min (List.length menu) h) do
-    let item : Menu.t = List.nth menu (y-1) in
-    let c = match item.key with
-      | Char c -> c
-      | e -> raise (Critical (
-          "interface",
-          "draw_menu",
-          "Unexpected key input: " ^
-          (LTerm_key.to_string {control=false;meta=false;shift=false;code=e}))) in
-    LTerm_draw.draw_string ctx (y+11) 1 " [";
-    LTerm_draw.draw_char ctx (y+11) 3 ~style:key_style c;
-    LTerm_draw.draw_string ctx (y+11) 4 (Printf.sprintf "] %s" item.text)
-  done
+  (* draw the strings without key bindings *)
+  List.iter (fun (y,strs) ->
+      List.iteri (fun i s ->
+          LTerm_draw.draw_string ctx (y+i+1) 1 s) strs) ym;
+  (* draw the key bindings as a separate step *)
+  let key_style = { LTerm_style.none with foreground = Some (LTerm_style.blue) } in
+  let keys = List.map (fun (m:Menu.t) -> m.key) menu in
+  List.combine ys keys |> List.iter (fun (y,k) -> match k with
+    | LTerm_key.Char c ->
+      LTerm_draw.draw_char ctx (y+1) 3 ~style:key_style c;
+    | e -> raise (Critical (
+        "interface",
+        "draw_menu",
+        "Unexpected key input: " ^
+        (LTerm_key.to_string {control=false;meta=false;shift=false;code=e}))))
 
 (* NOTE lambda-term coordinates are given y first, then x *)
 let draw s ui matrix =
@@ -133,4 +164,4 @@ let draw s ui matrix =
   let menu_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=0;col2=menu_width} in
   draw_map map_ctx (w-menu_width) (h-message_box_height) menu_width !s;
   draw_messages message_ctx w message_box_height !s.messages;
-  draw_menu menu_ctx menu_width (h-message_box_height) !s.menu !s.turn !s.civs
+  draw_menu menu_ctx menu_width (h-message_box_height) !s.menu !s.turn
