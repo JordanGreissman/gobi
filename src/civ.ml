@@ -141,7 +141,7 @@ let add_entity_to_hub entity hub civ =
 (* resource decreased approproately too *)
 let unlock_if_possible key tree civ =
   let next_unlockable = match Research.Research.get_next_unlockable key tree with
-    | Some u -> u | None -> raise (Illegal "no more to unlock") in
+    | Some u -> u | None -> raise (Illegal "You've unlocked everything in this field!") in
   let unlock_cost = (Research.Unlockable.resource next_unlockable,
     Research.Unlockable.resource_needed next_unlockable) in
   try
@@ -152,7 +152,7 @@ let unlock_if_possible key tree civ =
                  resources    = Resource.change_resource
                   (Resource.res_to_str (fst unlock_cost)) (snd unlock_cost) civ.resources
         }
-    else civ
+    else raise (Illegal "You don't have enough resources!")
   with | Illegal _ -> raise (Illegal "You can't unlock this!")
 
 let check_hub_cost hub civ =
