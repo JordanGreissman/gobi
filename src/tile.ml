@@ -42,8 +42,10 @@ let place_hub ~role ~starting_entity ~tile =
 
 let move_entity from_tile to_tile =
   match from_tile.entity with
-  | Some e ->
-    ({ from_tile with entity = None },{ to_tile with entity = Some e })
+  | Some e -> (
+    match to_tile.terrain with
+    | Mountain -> raise (Illegal "Cannot move here")
+    | _ -> { from_tile with entity = None },{ to_tile with entity = Some e })
   | None   -> raise (Illegal "No entity to move!")
 
 let distance_between_tiles t1 t2 =

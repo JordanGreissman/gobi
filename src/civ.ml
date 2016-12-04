@@ -45,18 +45,18 @@ let rec hub_map_poly hub_func fallback civ =
   let clust_func c = List.map tile_func (Cluster.get_tiles c) in
   List.flatten (List.map clust_func civ.clusters)
 
-let score civ = 
+let score civ =
 
   let food_amt = try snd (Resource.find_res "food" (get_resources civ)) with
     | Illegal _ -> 0 in
   let entity_amt = List.length (get_entities civ) in
   let food_entity_bool = food_amt >= entity_amt in
-  
+
   let rec sum_list lst = match lst with
     | [] -> 0 | h::t -> h + (sum_list t) in
   let total_prod_rate = sum_list (hub_map_poly Hub.get_production_rate 0 civ) in
 
-  let rec sum_tuple_list lst = match lst with 
+  let rec sum_tuple_list lst = match lst with
     | [] -> 0 | (k, v)::t -> v + (sum_tuple_list t) in
   let no_food_func (r, v) = match r with | Resource.Food -> false | _ -> true in
   let no_food_list = List.filter no_food_func (get_resources civ) in
@@ -64,7 +64,7 @@ let score civ =
 
   let rec sum_float_list lst = match lst with
     | [] -> 0.0 | h::t -> h +. (sum_float_list t) in
-  let res_frac = sum_float_list 
+  let res_frac = sum_float_list
     (List.map (fun b -> Research.Research.frac_unlocked b) (get_tree civ)) in
 
   let food_score = if food_entity_bool then 500 else 0 in
@@ -110,10 +110,15 @@ let remove_entity entity civ =
 
 (** Replace entity with id of new_entity with new_entity *)
 let replace_entity new_entity civ =
-  let id = Entity.get_id new_entity in
+  let entities = List.filter (fun x ->
+                              (Entity.get_id x) <> (Entity.get_id new_entity))
+                                civ.entities in
+  let entities = new_entity::entities in
+  {civ with entities=entities}
+  (* let id = Entity.get_id new_entity in
   let to_be_removed = List.find (fun e -> (Entity.get_id e) = id) civ.entities in
   let new_e_list = new_entity::(remove_entity to_be_removed civ).entities in
-    { civ with entities = new_e_list }
+    { civ with entities = new_e_list } *)
 
 let add_entity entity_role tile civ =
   let id = civ.next_id in
@@ -134,17 +139,17 @@ let add_entity_to_hub entity hub civ =
   else raise (Exception.Illegal "This entity has the wrong role for the hub"); civ
 
 (* resource decreased approproately too *)
-let unlock_if_possible key tree civ = 
+let unlock_if_possible key tree civ =
   let next_unlockable = match Research.Research.get_next_unlockable key tree with
     | Some u -> u | None -> raise (Illegal "no more to unlock") in
-  let unlock_cost = (Research.Unlockable.resource next_unlockable, 
+  let unlock_cost = (Research.Unlockable.resource next_unlockable,
     Research.Unlockable.resource_needed next_unlockable) in
-  try 
+  try
     let unlock_have = Resource.find_res (Resource.res_to_str (fst unlock_cost)) civ.resources in
     if (snd unlock_cost) <= (snd unlock_have) then
       (* let new_tree = Research.Research.replace_unlockable unlocked tree in *)
       { civ with techs        = (Research.Research.unlock key tree);
-                 resources    = Resource.change_resource 
+                 resources    = Resource.change_resource
                   (Resource.res_to_str (fst unlock_cost)) (snd unlock_cost) civ.resources
         }
     else civ

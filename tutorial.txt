@@ -1,0 +1,15 @@
+Welcome to Gooby! Use the menus to move your entities, build new hubs, and research new technologies!
+
+Use the arrow keys to move around the map and type 'q' to quit or 'n' to go to the next turn.
+
+In the tile menu, you can describe to get more information about the tile and build a new hub if you have the correct entity on that tile and the right resources!
+
+In the hub menu, you can describe to get more information about the hub and produce a new entity if you have the right resources!
+
+In the entity menu, you can describe to get more information about the entity, move if your entity still has enough actions, attack another civilizations hubs and entities, add your entity to a hub to increase its production, or skip the entity's turn.
+
+In the research menu, you can see what technologies you have unlocked and research more technologies if you have the resources.
+
+Win by destroying the other civilizations, researching an entire research branch, or have the largest civ at the end of the game!
+
+Press any key to close the tutorial!

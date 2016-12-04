@@ -80,16 +80,33 @@ let draw_messages ctx w h messages =
         { LTerm_style.none with foreground = Some (LTerm_style.blue) }
       | Message.Illegal ->
         { LTerm_style.none with foreground = Some (LTerm_style.red) }
-      | Message.Win -> 
+      | Message.Win ->
         { LTerm_style.none with foreground = Some (LTerm_style.yellow) } in
     LTerm_draw.draw_string ctx i 1 ~style:style (Message.get_text m)
   done
 
-let draw_menu ctx w h menu turn =
+let draw_resources ctx w h resources =
+  let key_style = { LTerm_style.none with foreground = Some (LTerm_style.blue) } in
+  LTerm_draw.draw_string ctx 3 1 "Resources:";
+  for y = 0 to 3 do
+    let (resource, amount) = List.nth resources y in
+    LTerm_draw.draw_string ctx (y + 5) 2 (
+      if y = 3 then
+        (Resource.res_to_str resource)^": "^(string_of_int amount)
+      else
+        (Resource.res_to_str resource)^":  "^(string_of_int amount));
+  done
+
+let draw_menu ctx w h menu turn civs =
+  let player = List.nth civs 0 in
+  let resources = Civ.get_resources player in
   let key_style = { LTerm_style.none with foreground = Some (LTerm_style.blue) } in
   LTerm_draw.clear ctx;
   draw_ascii_frame ctx w h;
   LTerm_draw.draw_string ctx 1 1 ("Turn: "^(string_of_int turn));
+  LTerm_draw.draw_string ctx 10 1 "Menu:";
+
+  draw_resources ctx w h resources;
   for y = 1 to (min (List.length menu) h) do
     let item : Menu.t = List.nth menu (y-1) in
     let c = match item.key with
@@ -99,9 +116,9 @@ let draw_menu ctx w h menu turn =
           "draw_menu",
           "Unexpected key input: " ^
           (LTerm_key.to_string {control=false;meta=false;shift=false;code=e}))) in
-    LTerm_draw.draw_string ctx (y+1) 1 " [";
-    LTerm_draw.draw_char ctx (y+1) 3 ~style:key_style c;
-    LTerm_draw.draw_string ctx (y+1) 4 (Printf.sprintf "] %s" item.text)
+    LTerm_draw.draw_string ctx (y+11) 1 " [";
+    LTerm_draw.draw_char ctx (y+11) 3 ~style:key_style c;
+    LTerm_draw.draw_string ctx (y+11) 4 (Printf.sprintf "] %s" item.text)
   done
 
 (* NOTE lambda-term coordinates are given y first, then x *)
@@ -116,4 +133,4 @@ let draw s ui matrix =
   let menu_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=0;col2=menu_width} in
   draw_map map_ctx (w-menu_width) (h-message_box_height) menu_width !s;
   draw_messages message_ctx w message_box_height !s.messages;
-  draw_menu menu_ctx menu_width (h-message_box_height) !s.menu !s.turn
+  draw_menu menu_ctx menu_width (h-message_box_height) !s.menu !s.turn !s.civs
