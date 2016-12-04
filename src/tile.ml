@@ -46,6 +46,16 @@ let move_entity from_tile to_tile =
     ({ from_tile with entity = None },{ to_tile with entity = Some e })
   | None   -> raise (Illegal "No entity to move!")
 
+let distance_between_tiles t1 t2 =
+  let current_tile_x = Coord.get_x (t1.pos) in
+  let current_tile_y = Coord.get_y (t1.pos) in
+  let expected_tile_x = Coord.get_x (t2.pos) in
+  let expected_tile_y = Coord.get_y (t2.pos) in
+  let float_sum_x = float_of_int(current_tile_x - expected_tile_x) in
+  let float_sum_y = float_of_int(current_tile_y - expected_tile_y) in
+  sqrt ((float_sum_x ** 2.)+.(float_sum_y ** 2.))
+
+
 (* getters and setters *)
 
 let get_terrain t = t.terrain
@@ -67,6 +77,10 @@ let set_hub t hub =
 let get_entity t = t.entity
 let set_entity t entity = { t with entity=entity }
 
+let get_known_entity t = match t.entity with
+  | Some e -> e
+  | _ -> raise (Illegal "get_known_entity issue")
+
 let get_pos t = t.pos
 
 (* terrain property queries *)
@@ -80,7 +94,7 @@ let describe_terrain = function
 let describe t =
   match t.entity, t.hub with
   | None, None ->
-    (describe_terrain t.terrain)^"."
+    (describe_terrain t.terrain)^Coord.to_string t.pos
   | Some x, None ->
     (describe_terrain t.terrain)^". "^
       "It currently has a "^(Entity.describe x)^" on it."

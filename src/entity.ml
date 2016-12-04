@@ -32,6 +32,8 @@ type t = {
   pos: coordinate;
   (* unique id for each entity*)
   id: int;
+  (*keeps count of how many actions they used*)
+  actions_used: int;
 }
 
 let rec find_role role_str role_list =
@@ -48,10 +50,11 @@ let create ~role ?atk ?def ~pos ~id =
     | Some d -> d
     | None -> snd role.default_power in
   {
-    role  = role;
-    power = (attack,defense);
-    pos   = pos;
-    id    = id;
+    role         = role;
+    power        = (attack,defense);
+    pos          = pos;
+    id           = id;
+    actions_used = 0;
   }
 
 let create_role ~name ~descr ~cost_to_make ~unlocked ~actions
@@ -83,6 +86,9 @@ let is_done t =
   t.role.cost_to_make = 0
 
 (* [t] getters and setters *)
+let get_actions_used entity = entity.actions_used
+
+let set_actions_used entity x = {entity with actions_used = x}
 
 let get_role entity = entity.role
 
