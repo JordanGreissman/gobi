@@ -74,7 +74,11 @@ let extract_to_role name descr requires cost_to_make attack defense actions =
   create_role name descr cost_to_make unlocked actions default_power
 
 let describe e =
-  "This is a "^e.role.name
+  Printf.sprintf
+    "This is a %s which has used %d/%d moves"
+    e.role.name
+    e.actions_used
+    e.role.actions
 
 let describe_role r =
   r.descr
