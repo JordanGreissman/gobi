@@ -11,3 +11,5 @@ In the entity menu, you can describe to get more information about the entity, m
 In the research menu, you can see what technologies you have unlocked and research more technologies if you have the resources.
 
 Win by destroying the other civilizations, researching an entire research branch, or have the largest civ at the end of the game!
+
+Press any key to close the tutorial!
