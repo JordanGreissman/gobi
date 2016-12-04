@@ -1,4 +1,5 @@
 open CamomileLibrary
+open Exception
 
 type t = {
   text: string;
@@ -45,11 +46,12 @@ let rec get_tile_menu t =
   | (true,_)      -> [describe;clear;back]
 
 and get_build_hub_menu roles =
+  let alpha = "abcdefghijklmnopqrstuvwxyz" in
   let hubs = List.mapi (fun i hub -> {
     text = Hub.get_role_name hub;
-    key = Char (UChar.of_char (char_of_int i));
-    cmd = Cmd.create Cmd.PlaceHub;
-    next_menu = NoMenu;
+    key = Char (UChar.of_char alpha.[i]);
+    cmd = Cmd.create Cmd.SelectHub;
+    next_menu = StaticMenu main_menu;
   }) roles in
   let back = {
     text = "back";
@@ -63,51 +65,50 @@ and get_produce_entity_menu hub =
   let settler = {
     text = "settler";
     key = Char (UChar.of_char 's');
-    cmd = Cmd.(create Produce);
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
   let worker = {
     text = "worker";
     key = Char (UChar.of_char 'w');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
   let warrior = {
     text = "warrior";
     key = Char (UChar.of_char 'r');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
   let archer = {
     text = "archer";
     key = Char (UChar.of_char 'a');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
   let cavalry = {
     text = "cavalry";
     key = Char (UChar.of_char 'c');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
   let heavy = {
     text = "heavy";
     key = Char (UChar.of_char 'h');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
   let spearman = {
     text = "spearman";
     key = Char (UChar.of_char 'n');
-    cmd = Cmd.create Cmd.Produce;
+    cmd = Cmd.(create SelectEntity);
     next_menu = StaticMenu main_menu;
   } in
-  match Hub.describe hub with
-  | "town_hall" ->
-    [settler;worker]
-  | "barracks" ->
-    (*eventually check if they have it unlocked*)
-    [warrior;archer;cavalry;heavy;spearman]
+  match Hub.get_role_name (Hub.get_role hub) with
+  | "town_hall" -> [settler;worker]
+    (* TODO: eventually check if they have it unlocked *)
+  | "barracks" -> [warrior;archer;cavalry;heavy;spearman]
+  | _ -> raise (Illegal "This hub cannot produce units!")
 
 and get_next_research_menu tech_tree branch_name =
   let describe = {
@@ -178,12 +179,6 @@ and hub_menu = [
     key = Char (UChar.of_char 'p');
     cmd = Cmd.create Cmd.Produce;
     next_menu = ProduceEntityMenu get_produce_entity_menu;
-  };
-  {
-    text = "add entities";
-    key = Char (UChar.of_char 'e');
-    cmd = Cmd.create Cmd.AddEntityToHub;
-    next_menu = NoMenu;
   };
   {
     text = "back";

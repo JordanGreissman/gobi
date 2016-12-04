@@ -1,3 +1,5 @@
+open Exception
+
 type tile = Tile.t
 
 type t = tile list list
@@ -72,6 +74,7 @@ let get_adjacent_tiles map tile =
       let upper_right_tile = tile_by_pos (Coord.create (x+1) (y-1)) map in
       let lower_right_tile = tile_by_pos (Coord.create (x+1) y) map in
       [top_tile;upper_right_tile;lower_right_tile]
+    | _ -> raise (Critical ("Mapp.ml", "get_adjacent_tiles", "Idk"))
 
 
 (* map generation *)
@@ -114,3 +117,24 @@ let rec get_random_tile map =
   if Tile.has_building_restriction tile
   then get_random_tile map
   else tile
+
+let rec get_nearest_available_tile tile map =
+  if Tile.get_entity tile = None then tile else
+  let rec check_surrounding tiles =
+    match tiles with
+    | [] -> None
+    | h::t -> (
+      let entity = Tile.get_entity h in
+      match entity with
+      | Some x -> Some h
+      | None -> check_surrounding t
+    ) in
+  let tiles = get_adjacent_tiles map tile in
+  let nearest = check_surrounding tiles in
+  match nearest with
+  | None -> (match tiles with
+            | [] -> raise (Critical ("Mapp.ml",
+                                    "get_nearest_available_tile",
+                                    "No tiles found"))
+            | h::t -> get_nearest_available_tile h map)
+  | Some tile -> tile

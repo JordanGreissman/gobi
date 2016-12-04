@@ -26,3 +26,5 @@ let update_civ i civ s =
 
 let get_civs s =
   s.civs
+
+let get_tree s = s.tech_tree

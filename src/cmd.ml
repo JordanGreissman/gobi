@@ -40,7 +40,7 @@ let create = function
   | Attack          -> (Attack         ,[Tile (None); Tile (None)])
   | PlaceHub        -> (PlaceHub       ,[Tile (None); HubRole (None)])
   | Clear           -> (Clear          ,[Tile (None)])
-  | Produce         -> (Produce        ,[Tile (None); EntityRole (None)])
+  | Produce         -> (Produce        ,[HubRole (None); EntityRole (None)])
   | AddEntityToHub  -> (AddEntityToHub ,[Tile (None); Tile (None)])
   | SelectTile      -> (SelectTile     ,[])
   | SelectHub       -> (SelectHub      ,[])
