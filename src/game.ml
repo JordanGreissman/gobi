@@ -358,6 +358,14 @@ let parse_event r e (s:State.t) =
           "parse_event",
           "Entity role \"" ^ menu_for_key.text ^ "\" not found")) in
     EntityRole (Some e)
+  | (Research _, Key k) ->
+    let research_key =
+      try List.find (fun (x:menu) -> x.key = k.code) s.menu
+      with Not_found -> raise (Critical (
+        "game",
+          "parse_event",
+          "No menu item associated with keypress " ^ (LTerm_key.to_string k))) in
+    Research (Some research_key)
   | (a,_) -> raise (Illegal ("Please " ^ (expected_action a)))
 
 let is_some = function
