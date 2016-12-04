@@ -359,13 +359,13 @@ let parse_event r e (s:State.t) =
           "Entity role \"" ^ menu_for_key.text ^ "\" not found")) in
     EntityRole (Some e)
   | (Research _, Key k) ->
-    let research_key =
+    let menu_for_key =
       try List.find (fun (x:menu) -> x.key = k.code) s.menu
       with Not_found -> raise (Critical (
-        "game",
+          "game",
           "parse_event",
           "No menu item associated with keypress " ^ (LTerm_key.to_string k))) in
-    Research (Some research_key)
+    Research (Some menu_for_key.text)
   | (a,_) -> raise (Illegal ("Please " ^ (expected_action a)))
 
 let is_some = function
@@ -416,7 +416,22 @@ let rec execute (s:State.t) e c : State.t =
         | None -> raise (Illegal "There is no entity on this tile!") in
       s'
     | _ -> s)
-  | Research        -> s (* TODO *)
+  | Research ->
+    let reqs = satisfy_next_req e s (snd c) in
+    let key = match List.nth reqs 0 with
+      | Research k -> begin
+          match k with
+          | Some k -> k
+          | None   -> raise (BadInvariant (
+              "game",
+              "execute",
+              "All requirements satisfied for Research but requirement is None"))
+        end
+      | _ -> raise (BadInvariant (
+          "game",
+          "execute",
+          "Research expected Research requirement but got something else")) in
+    s
   | DisplayResearch -> (* TEST THIS *)
     let key = (
       match List.nth (snd c) 0 with

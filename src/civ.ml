@@ -154,3 +154,6 @@ let unlock_if_possible key tree civ =
         }
     else civ
   with | Illegal _ -> raise (Illegal "You can't unlock this!")
+
+let check_hub_cost hub civ =
+  failwith "Civ.check_hub_cost is unimplemented"
