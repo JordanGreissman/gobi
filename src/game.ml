@@ -498,10 +498,19 @@ let rec execute (s:State.t) e c : State.t =
             "execute",
             "PlaceHub required HubRole but got something else")) in
       let starting_entity = None in (* TODO *)
-      let t' = Tile.place_hub role starting_entity tile in
-      let map' = Mapp.set_tile t' s.map in
+      let civ = get_current_civ s in
+      let hub = Hub.create ~role:role
+                            ~production_rate:1
+                            ~def:(Hub.get_role_default_defense role)
+                            ~pos:(Tile.get_pos tile) in
+      let clusters = Cluster.add_hub civ.clusters s.map hub in
+      (* TODO: We never use place_hub *)
+      (* let t' = Tile.place_hub role starting_entity tile in
+      let map' = Mapp.set_tile t' s.map in *)
+      let civ = {civ with clusters=clusters} in
+      let s = update_civ s.current_civ civ s in
       dispatch_message
-        { s with map = map' }
+        s
         ((Hub.get_role_name role) ^ " now under construction")
         Message.Info
     else
