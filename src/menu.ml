@@ -120,7 +120,7 @@ and get_next_research_menu tech_tree branch_name =
   match Research.Research.get_next_unlockable branch_name tech_tree with
     | Some u ->
       let next = {
-        text = "research " ^ (Research.Unlockable.name u);
+        text = "Reseach "^branch_name;
         key = Char (UChar.of_char 'r');
         cmd = Cmd.create Cmd.Research;
         next_menu = StaticMenu main_menu;
