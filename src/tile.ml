@@ -22,14 +22,6 @@ let create ~terrain ~pos = {
   hub     = None;
 }
 
-(** Create a hub and place it on this tile, also returning a potentially
-  * different civ. For descriptions of the named parameters, see hub.mli.
-  * IMPORTANT: if entity not None you must call Civ.remove_entity starting_entity
-  * civ after.
-  * [starting_entity] is an entity that will automatically be consumed by the
-  *   new hub when it is finished being built, if such an entity exists.
-  *   Typically this is the first entity to start construction of the hub.
-  *)
 let place_hub ~role ~starting_entity ~tile =
   let d = Hub.get_role_default_production_rate role in
   let production_rate = match starting_entity with
@@ -56,9 +48,6 @@ let distance_between_tiles t1 t2 =
   let float_sum_x = float_of_int(current_tile_x - expected_tile_x) in
   let float_sum_y = float_of_int(current_tile_y - expected_tile_y) in
   sqrt ((float_sum_x ** 2.)+.(float_sum_y ** 2.))
-
-
-(* getters and setters *)
 
 let get_terrain t = t.terrain
 let set_terrain t terrain = {t with terrain=terrain}
@@ -89,8 +78,6 @@ let get_known_entity t = match t.entity with
 
 
 let get_pos t = t.pos
-
-(* terrain property queries *)
 
 let describe_terrain = function
   | Flatland -> "This is a flatland tile"

@@ -1,4 +1,3 @@
-(* TODO: the module type will be the *last* argument to module functions *)
 (** the type of a tile *)
 type t
 
@@ -6,11 +5,12 @@ type t
 type terrain = Flatland | Mountain | Forest | Desert
 
 (** Create and return a tile.
-  * [terrain] is the terrain type for the tile.
-  *)
+  * [terrain] is the terrain type for the tile. *)
 val create : terrain:terrain -> pos:Coord.t -> t
 
+(** Returns a description of the tile *)
 val describe : t -> string
+
 val describe_terrain : terrain -> string
 
 (** Create a hub and place it on this tile, also returning a potentially
@@ -32,8 +32,9 @@ val place_hub :
   * updated by moving the entity on [to] to [from].
   * Raises Illegal if there is no entity on [from].
   *)
-val move_entity : t -> t -> t*t
+val move_entity : t -> t -> t * t
 
+(** Returns the distance (float) between two tiles *)
 val distance_between_tiles: t -> t -> float
 
 (** [get_art_char c t] is the art cell for the absolute screen coordinate [c],
@@ -43,37 +44,56 @@ val distance_between_tiles: t -> t -> float
   *)
 val get_art_char : Coord.Screen.t -> t -> Art.cell option
 
-(* getters and setters *)
-
+(** Returns the terrain type of the tile *)
 val get_terrain : t -> terrain
+
+(** Changes the terrain type of the tile, returning the new tile *)
 val set_terrain : t -> terrain -> t
 
+(** Returns true if the tile has been settled *)
 val is_settled : t -> bool
+
+(** Returns a tile that is unsettled *)
 val unsettle : t -> t
+
+(** Returns true if the entity on a tile is a worker *)
 val is_entity_worker: t -> bool
 
+(** Changes a forest to a flatland tile, otherwise raises Illegal *)
 val clear : t -> t
 
+(** Returns Some hub on a tile, otherwise None *)
 val get_hub : t -> Hub.t option
+
+(** Changes a potential hub on a tile, returning the tile with the possible hub *)
 val set_hub : t -> Hub.t option -> t
 
-val get_entity : t -> Entity.t option (* only one entity is allowed per tile *)
+(** Returns Some entity on a tile if any, otherwise None *
+  * Note: only one entity is allowed per tile *)
+val get_entity : t -> Entity.t option
+
+(** Changes a potential entity on a tile, returning the tile with an 
+  * entity (if any) *)
 val set_entity : t -> Entity.t option -> t
 
+(** Returns an entity that is guaranteed to be there, otherwise Illegal *)
 val get_known_entity: t -> Entity.t
 
+(** Returns the coordinates of the tile *)
 val get_pos : t -> Coord.t
 
-(* terrain property queries *)
-
-(** whether units are allowed on this tile *)
+(** Returns true if entities / hubs are allowed on this tile *)
 val has_movement_obstruction : t -> bool
-(** the number of turns it takes unit to traverse this tile
+
+(** Returns the number of turns it takes an entity to traverse this tile
   *  for tiles where [movementObstruction = true], [costToMove = -1] *)
 val cost_to_move : t -> int
-(** whether this tile needs to be cleared before it can be settled *)
+
+(** Returns true if tile needs to be cleared before it can be settled *)
 val needs_clearing : t -> bool
-(** whether hubs are allowed on this tile *)
+
+(** Returns true if hubs can be built on tile *)
 val has_building_restriction : t -> bool
-(** whether food hubs are allowed on this tile (e.g. farms) *)
+
+(** Returns true if farms can be built on this tile *)
 val has_food_restriction : t -> bool

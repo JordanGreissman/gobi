@@ -31,10 +31,15 @@ type t = {
   current_civ : int;
 }
 
+(** Returns the current civilization of a valid state *)
 val get_current_civ : t -> Civ.t
 
+(** Add a civ to an index in a valid state *)
 val update_civ : int -> Civ.t -> t -> t
 
+(** Returns the list of civs in a valid state *)
 val get_civs : t -> Civ.t list
 
+(** Returns the tech_tree, list of a key and list of unlockables, in a
+  * valid state *)
 val get_tree : t -> Research.Research.research_list
