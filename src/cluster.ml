@@ -15,7 +15,6 @@ type t = {
   tiles: tile list;
 }
 
-(** creates a new cluster with a name on a settled tile *)
 let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
 
   let town_hall_hub = List.hd (Hub.find_role "town_hall" hub_role_list) in
@@ -28,12 +27,9 @@ let create ~name ~descr ~town_hall_tile ~hub_role_list ~map =
     tiles = [town_hall];
   }, map)
 
-(* Returns the cluster's town hall *)
 let get_town_hall cluster =
   cluster.town_hall
 
-(* Adds a hub to a cluster, finding the nearest one based on hub coord.,
- * returning the cluster with the new tile w/ hub on it *)
 let add_hub cluster_list map hub =
 
   let hub_pos = Hub.get_position hub in
@@ -61,14 +57,11 @@ let add_hub cluster_list map hub =
     List.filter (fun x -> x.name <> new_cluster_name) cluster_list in
   new_cluster::unchanged_clusters
 
-(** Applies a function for tiles on every tile in a cluster. Acc should be [].
-  * Returns cluster with new tile list *)
 let rec tile_map tile_func acc cluster = match cluster.tiles with
   | [] -> { cluster with tiles = acc }
   | tile::lst ->
     tile_map tile_func (acc@[tile_func tile]) { cluster with tiles = lst}
 
-(* Returns cluster with an updated tile list with entity added to hub *)
 let rec add_entity_to_hub entity hub cluster =
   let tile_func tile = (
     match Tile.get_hub tile with

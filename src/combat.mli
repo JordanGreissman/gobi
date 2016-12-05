@@ -29,7 +29,7 @@
 val compute_weights : int -> int -> int
 
 
-
+(** Generate random number between 0 and 100, exclusive *)
 val get_random_number : int
 
 (** [attack_hub] returns true if the attacking unit
@@ -51,7 +51,8 @@ val get_random_number : int
 val attack_hub : Tile.t -> Tile.t -> bool
 
 (** [attack_entity] returns true if the attacking unit wins
- * and false otherwise
+ * and false otherwise. Returns Illegal if there is no hub
+ * on the tiles. 
  *
  * Example:
  *    Soldier {Attack: 5, Defense: 3}
