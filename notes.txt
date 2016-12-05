@@ -1,20 +1,3 @@
-questions for OH:
-  - how to implement java-like interfaces with ocaml modules
-
-    In student.mli:
-        type t
-        val print_stats t -> unit
-    In teacher.mli:
-        type t
-        val print_stats t -> unit
-    In stats.ml:
-        type statable =
-          | Student of Student.t
-          | Teacher of Teacher.t
-        print_stats = function
-          | Student t -> Student.print_stats t
-          | Teacher t -> Teacher.print_stats t
-
 Hubs produce resources
 Clusters consume resources in order to sustain the population of the cluster
 The production output of each cluster has to satisfy the needs of that cluster

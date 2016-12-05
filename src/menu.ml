@@ -165,6 +165,12 @@ and main_menu = [
     cmd = Cmd.create Cmd.Tutorial;
     next_menu = NoMenu;
   };
+  {
+    text = "quit";
+    key = Char (UChar.of_char 'q');
+    cmd = Cmd.(create NoCmd);
+    next_menu = NoMenu;
+  }
 ]
 
 and hub_menu = [

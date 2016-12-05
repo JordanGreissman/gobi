@@ -28,6 +28,8 @@ type t = {
   pending_cmd : Cmd.t option;
   (** whether the player has quit the game *)
   is_quit : bool;
+  (** whether the player is viewing the tutorial *)
+  is_tutorial : bool;
   current_civ : int;
 }
 

@@ -12,6 +12,7 @@ type t = {
   menu : Menu.t list;
   pending_cmd : Cmd.t option;
   is_quit : bool;
+  is_tutorial : bool;
   current_civ : int;
 }
 

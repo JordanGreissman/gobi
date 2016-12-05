@@ -178,6 +178,7 @@ let init_state json : State.t =
     selected_tile = fst coords;
     messages = [];
     is_quit = false;
+    is_tutorial = false;
     menu = Menu.main_menu;
     pending_cmd = None;
     current_civ = 0;
@@ -431,7 +432,7 @@ let rec execute (s:State.t) e c : State.t =
   match fst c with
   | NoCmd           -> s
   | NextTurn        -> next_turn s
-  | Tutorial        -> s
+  | Tutorial        -> { s with is_tutorial = true }
   | Describe str -> (
     let tile = Mapp.tile_by_pos s.selected_tile s.map in
     match str with
@@ -657,18 +658,13 @@ let rec execute (s:State.t) e c : State.t =
                             ~def:(Hub.get_role_default_defense role)
                             ~pos:(Tile.get_pos tile) in
       let clusters = Cluster.add_hub civ.clusters s.map hub in
-      (* TODO: We never use place_hub *)
-      (* let t' = Tile.place_hub role starting_entity tile in
-         let map' = Mapp.set_tile t' s.map in *)
-      let worker_entity = Tile.get_known_entity tile in
-      let updated_tile = Tile.set_entity tile None in
-      let updated_map = Mapp.set_tile updated_tile s.map in
-      let updated_civ = Civ.remove_entity worker_entity civ in
-      let civ = {updated_civ with clusters=clusters} in
+      let t' = Tile.place_hub role starting_entity tile in
+      let map' = Mapp.set_tile t' s.map in
+      let civ = {civ with clusters=clusters} in
       let s = update_civ s.current_civ civ s in
-      let updated_state = {s with map=updated_map} in
+      let updated_state = { s with map = map' } in
       dispatch_message
-        updated_state
+        { s with map = map' }
         ((Hub.get_role_name role) ^ " now under construction")
         Message.Info
     else
@@ -798,20 +794,21 @@ let rec execute (s:State.t) e c : State.t =
 let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
   (* ------------------------------------------------------------------------- *)
   (* these keys are not affected by the pending command status *)
-  | LTerm_event.Key { code = LTerm_key.Up } ->
+  | LTerm_event.Key { code = Up } ->
     { s with screen_top_left =
                Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1)) }
-  | LTerm_event.Key { code = LTerm_key.Down } ->
+  | LTerm_event.Key { code = Down } ->
     { s with screen_top_left =
                Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1) }
-  | LTerm_event.Key { code = LTerm_key.Left } ->
+  | LTerm_event.Key { code = Left } ->
     { s with screen_top_left =
                Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0) }
-  | LTerm_event.Key { code = LTerm_key.Right } ->
+  | LTerm_event.Key { code = Right } ->
     { s with screen_top_left =
                Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0) }
   | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
     { s with is_quit = true }
+  | LTerm_event.Key { code = Escape } -> { s with is_tutorial = false }
   (* ------------------------------------------------------------------------ *)
   (* mouse events as well as any key that is not one of the above must check for
    * a pending command *)

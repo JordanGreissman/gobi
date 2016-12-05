@@ -53,6 +53,54 @@ let draw_map ctx w h x_offset (s:State.t) =
     done
   done
 
+let draw_tutorial ctx w h =
+  let tutorial = [
+    "Gobi is a turn-based strategy game based on Sid Meier's Civilization V.";
+    "Your task is to build a civilization that will stand the test of time. Grow";
+    "your citiies, build your armies, and destroy the other civilizations to win";
+    "the game!";
+    "";
+    "Resources fuel your growing civilization. They enable you to conduct research,";
+    "build hubs, produce entities, and allow your civilization to grow. There are";
+    "four resources in Gobi: food, gold, iron, and paper. They are produced from";
+    "different hubs and each one is required for a variety of purposes. Discovering";
+    "which hubs produce which resources and which resources are required for various";
+    "purposes is part of the learning curve of the game and will be left up to you.";
+    "";
+    "Entities in Gobi are mobile units. Their primary uses are constructing new";
+    "hubs, attacking and defending, and increasing the production of hubs. There";
+    "are several types of entities in the game (hereafter called 'roles'). Giving";
+    "and order to an entity constitutes an 'action'. Each role has a different";
+    "number of allowed actions per turn, after which they will not be able to do";
+    "more until the next turn. Each role has different strengths, weaknesses, and";
+    "abilities. Discovering these is also part of the fun of learning the game.";
+    "";
+    "Hubs are buildings which produce resources and entities. Each hub has a ";
+    "different cost to build and produces different things. The rate at which a";
+    "hub produces things can be increased by dedicating entities to 'working' in";
+    "that hub. When this happens, the entity is consumed by the hub (you cannot";
+    "get it back later) and the production rate of the hub is permanently increased.";
+    "";
+    "There are three ways to win the game:";
+    "    1) Complete an entire research branch";
+    "    2) Destroy every competing civilization";
+    "    3) Have the largest standing civilization when the turn limit is reached";
+    "";
+    "Use the arrow keys to pan around the map and the mouse to select tiles. The";
+    "menu on the left-hand side of the screen enables you to give commands to the";
+    "game. Keybindings are given in blue.";
+    "";
+    "Press ESC (escape) to exit this tutorial. Good luck!";
+  ] in
+  let y = ref 1 in
+  LTerm_draw.clear ctx;
+  LTerm_draw.draw_string ctx 0 ((w-24)/2) "Welcome to Gobi (Gooby)!";
+  List.iter
+    (fun s ->
+       LTerm_draw.draw_string ctx !y 0 s;
+       incr y)
+    tutorial
+
 let draw_ascii_frame ctx w h =
   for i = 1 to (w-1) do
     LTerm_draw.draw_char ctx 0     i (UChar.of_char '-');
@@ -154,7 +202,7 @@ let draw_menu ctx w h menu turn =
 
 
 (* NOTE lambda-term coordinates are given y first, then x *)
-let draw s ui matrix =
+let draw (s:State.t ref) ui matrix =
   let message_box_height = 10 in
   let menu_width = 20 in
   let size = LTerm_ui.size ui in
@@ -163,6 +211,8 @@ let draw s ui matrix =
   let map_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=menu_width;col2=w} in
   let message_ctx = LTerm_draw.sub ctx {row1=(h-message_box_height);row2=h;col1=0;col2=w} in
   let menu_ctx = LTerm_draw.sub ctx {row1=0;row2=(h-message_box_height);col1=0;col2=menu_width} in
-  draw_map map_ctx (w-menu_width) (h-message_box_height) menu_width !s;
+  if !s.is_tutorial
+  then draw_tutorial map_ctx (w-menu_width) (h-message_box_height)
+  else draw_map map_ctx (w-menu_width) (h-message_box_height) menu_width !s;
   draw_messages message_ctx w message_box_height !s.messages;
   draw_menu menu_ctx menu_width (h-message_box_height) !s.menu !s.turn
