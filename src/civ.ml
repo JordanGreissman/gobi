@@ -14,31 +14,17 @@ type t = {
    next_id : int;
 }
 
-(** Getters *)
 let get_player_controlled civ = civ.player_controlled
 let get_tree civ = civ.techs
 let get_resources civ = civ.resources
 let get_entities civ = civ.entities
 
-(** Applies a function for clusters on every cluster in a civ. Acc should be [].
-  * Returns civ with new cluster list *)
 let rec cluster_map clust_func civ acc = match civ.clusters with
   | [] -> { civ with clusters = acc }
   | cluster::lst ->
     cluster_map clust_func { civ with clusters = lst }
       (acc@[clust_func cluster])
 
-(*
-(** Applies a function to every hub in a civ. Acc should be [].
-  * Returns a civ with a new hub list *)
-let rec hub_map hub_func civ acc =
-  let tile_func tile = match tile.hub with
-      | Some hub -> { tile with hub = hub_func hub }
-      | None -> tile in
-  cluster_map (Cluster.tile_map tile_func []) civ acc
-*)
-
-(** apply map function to each hub in civ, returning some 'a list *)
 let rec hub_map_poly hub_func fallback civ =
   let tile_func t = match Tile.get_hub t with
     | Some hub -> hub_func hub | None -> fallback in
@@ -70,7 +56,6 @@ let score civ =
   let food_score = if food_entity_bool then 500 else 0 in
     food_score + total_prod_rate + total_res + int_of_float (res_frac *. 100.0)
 
-(* Returns civ with added resrouces for the turn *)
 let rec get_resource_for_turn civ =
   let resource_lst hub = List.flatten (
     List.map (fun p -> if Hub.is_resource p then
@@ -83,7 +68,6 @@ let rec get_resource_for_turn civ =
   { civ with resources =
     Resource.add_resources civ.resources new_resources }
 
-(* Returns new civ with entity role added that's been unlocked *)
 let add_unlocked_entity new_role civ =
   { civ with unlocked_entities = new_role::civ.unlocked_entities }
 
@@ -103,12 +87,10 @@ let rec apply_research u civ = match Research.Unlockable.treasure u with
       cluster_map (Cluster.tile_map (tile_func) []) civ []
   | _ -> raise (BadInvariant ("civ","apply_research","Expected a valid Unlockable"))
 
-(** Returns civ with an entity list without the passed in entity *)
 let remove_entity entity civ =
   let new_e_list = List.filter (fun e -> not (e = entity)) civ.entities in
     { civ with entities = new_e_list }
 
-(** Replace entity with id of new_entity with new_entity *)
 let replace_entity new_entity civ =
   let entities = List.filter (fun x ->
                               (Entity.get_id x) <> (Entity.get_id new_entity))
@@ -127,9 +109,6 @@ let add_entity entity_role tile civ =
   {civ with pending_entities=entity::civ.pending_entities;
             next_id=civ.next_id+1}
 
-(** Add entity to a hub in existing civ, returning the new civ.
-  * Raise Illegal if entity role isn't allowed in the hub. Does nothing if hub
-  * doesn't exist in clusters. *)
 let add_entity_to_hub entity hub civ =
   if List.mem (Entity.get_role entity) (Hub.get_allowed_roles hub) then
     let parsed_clusters = List.map
@@ -138,7 +117,6 @@ let add_entity_to_hub entity hub civ =
       remove_entity entity new_civ
   else raise (Exception.Illegal "This entity has the wrong role for the hub"); civ
 
-(* resource decreased approproately too *)
 let unlock_if_possible key tree civ =
   let next_unlockable = match Research.Research.get_next_unlockable key tree with
     | Some u -> u | None -> raise (Illegal "You've unlocked everything in this field!") in
@@ -155,5 +133,6 @@ let unlock_if_possible key tree civ =
     else raise (Illegal "You don't have enough resources!")
   with | Illegal _ -> raise (Illegal "You can't unlock this!")
 
+(* delete? *)
 let check_hub_cost hub civ =
   failwith "Civ.check_hub_cost is unimplemented"
