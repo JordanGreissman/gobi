@@ -629,6 +629,9 @@ let rec execute (s:State.t) e c : State.t =
             "game",
             "execute",
             "PlaceHub required Tile but got something else")) in
+      if Tile.is_settled tile then raise (Illegal "You cannot place a hub on a pre-existing hub")
+      else if not (Tile.is_entity_worker tile) then raise (Illegal "You can only build a hub with a worker")
+      else
       let role = match List.nth (snd c) 1 with
         | HubRole r -> (match r with
           | Some x -> x
@@ -649,11 +652,16 @@ let rec execute (s:State.t) e c : State.t =
       let clusters = Cluster.add_hub civ.clusters s.map hub in
       (* TODO: We never use place_hub *)
       (* let t' = Tile.place_hub role starting_entity tile in
-      let map' = Mapp.set_tile t' s.map in *)
-      let civ = {civ with clusters=clusters} in
+         let map' = Mapp.set_tile t' s.map in *)
+      let worker_entity = Tile.get_known_entity tile in
+      let updated_tile = Tile.set_entity tile None in
+      let updated_map = Mapp.set_tile updated_tile s.map in
+      let updated_civ = Civ.remove_entity worker_entity civ in
+      let civ = {updated_civ with clusters=clusters} in
       let s = update_civ s.current_civ civ s in
+      let updated_state = {s with map=updated_map} in
       dispatch_message
-        s
+        updated_state
         ((Hub.get_role_name role) ^ " now under construction")
         Message.Info
     else

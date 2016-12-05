@@ -65,6 +65,9 @@ let set_terrain t terrain = {t with terrain=terrain}
 
 let is_settled t = not(t.hub = None)
 let unsettle t = {t with hub=None}
+let is_entity_worker t = match t.entity with
+  | Some x when (Entity.get_role_name (Entity.get_role x) = "worker") -> true
+  | _ -> false
 
 let clear t = match t.terrain with
   | Flatland | Mountain | Desert -> raise (Illegal "Cannot clear this terrain type")

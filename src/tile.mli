@@ -50,6 +50,7 @@ val set_terrain : t -> terrain -> t
 
 val is_settled : t -> bool
 val unsettle : t -> t
+val is_entity_worker: t -> bool
 
 val clear : t -> t
 
