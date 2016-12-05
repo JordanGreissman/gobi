@@ -152,6 +152,7 @@ let draw_menu ctx w h menu turn =
         "Unexpected key input: " ^
         (LTerm_key.to_string {control=false;meta=false;shift=false;code=e}))))
 
+
 (* NOTE lambda-term coordinates are given y first, then x *)
 let draw s ui matrix =
   let message_box_height = 10 in

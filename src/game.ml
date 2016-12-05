@@ -181,7 +181,6 @@ let init_state json : State.t =
     menu = Menu.main_menu;
     pending_cmd = None;
     current_civ = 0;
-    is_victory = false;
   }
 
 let rec add_hubs clusters map hubs =
@@ -253,20 +252,16 @@ let check_for_win s =
   match conditions_met with
   | (_, No_Win) -> s
   | (civs, condition) when condition = Tie -> (
-      let s = {s with is_victory = true} in
       dispatch_message s ("Tie game!") Info)
   | ([(_, player)], condition) -> (
     let msg = if player then "You win " else "You lose " in
     match condition with
     (* TODO print victory message *)
     | Military -> (
-      let s = {s with is_victory = true} in
       dispatch_message s (msg^"by a military victory") Info)
     | Score -> (
-      let s = {s with is_victory = true} in
       dispatch_message s (msg^"by a score victory") Info)
     | Tech -> (
-      let s = {s with is_victory = true} in
       dispatch_message s (msg^"by a technology victory") Info)
     | _ -> raise (Critical ("game","check_for_win","Error deciding winner")))(* or here *)
 
@@ -874,12 +869,7 @@ let rec player_loop ui state_ref =
     | BadInvariant (file,func,err) ->
       failwith (Printf.sprintf "Invariant violation in %s.ml:%s: %s" file func err) in
   if state'.is_quit (* End more gracefully? *)
-  then
-    (print_endline "here"; return ())
-  else if state'.is_victory
-  then
-    (print_endline (Message.get_text (List.nth (state'.messages) 0));
-    return ())
+  then return ()
   else (
     state_ref := state';
     LTerm_ui.draw ui;
