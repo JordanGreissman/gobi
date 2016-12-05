@@ -29,6 +29,7 @@ type t = {
   (** whether the player has quit the game *)
   is_quit : bool;
   current_civ : int;
+  is_victory : bool;
 }
 
 (** Returns the current civilization of a valid state *)

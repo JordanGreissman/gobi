@@ -13,6 +13,7 @@ type t = {
   pending_cmd : Cmd.t option;
   is_quit : bool;
   current_civ : int;
+  is_victory : bool;
 }
 
 let get_current_civ s =

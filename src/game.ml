@@ -181,6 +181,7 @@ let init_state json : State.t =
     menu = Menu.main_menu;
     pending_cmd = None;
     current_civ = 0;
+    is_victory = false;
   }
 
 let rec add_hubs clusters map hubs =
@@ -251,14 +252,23 @@ let check_for_win s =
   let conditions_met = check_conditions s in
   match conditions_met with
   | (_, No_Win) -> s
-  | (civs, condition) when condition = Tie -> (* TODO print victory message *)
-    {s with is_quit = true}
-  | (civ, condition) -> match condition with
+  | (civs, condition) when condition = Tie -> (
+      let s = {s with is_victory = true} in
+      dispatch_message s ("Tie game!") Info)
+  | ([(_, player)], condition) -> (
+    let msg = if player then "You win " else "You lose " in
+    match condition with
     (* TODO print victory message *)
-    | Military -> {s with is_quit = true}
-    | Score -> {s with is_quit = true}
-    | Tech -> {s with is_quit = true}
-    | _ -> raise (Critical ("game","check_for_win","Error deciding winner"))(* or here *)
+    | Military -> (
+      let s = {s with is_victory = true} in
+      dispatch_message s (msg^"by a military victory") Info)
+    | Score -> (
+      let s = {s with is_victory = true} in
+      dispatch_message s (msg^"by a score victory") Info)
+    | Tech -> (
+      let s = {s with is_victory = true} in
+      dispatch_message s (msg^"by a technology victory") Info)
+    | _ -> raise (Critical ("game","check_for_win","Error deciding winner")))(* or here *)
 
 let place_entity_on_map s entity =
   let state = !s in
@@ -297,7 +307,9 @@ let tick_pending s civ =
 
 let next_turn s =
   let civs = State.get_civs s in
-  let s = Ai.attempt_turns civs (ref s) in
+  let s = (try
+    Ai.attempt_turns civs (ref s)
+    with _ -> s) in
   let civs = List.map (tick_pending s) (State.get_civs s) in
   let s = check_for_win s in
   (* reset the action count of every entity *)
@@ -311,7 +323,7 @@ let next_turn s =
       { civ with entities = entities })
     civs in
   (* update the map *)
-  let entities = s.civs |> List.map (fun (c:Civ.t) -> c.entities) |> List.flatten in
+  let entities = civs |> List.map (fun (c:Civ.t) -> c.entities) |> List.flatten in
   let map = ref s.map in
   List.iter
     (fun e ->
@@ -708,7 +720,7 @@ let rec execute (s:State.t) e c : State.t =
       let civ = {civ with pending_entities = entity::civ.pending_entities} in
       let s' = State.update_civ s.current_civ civ s in
       dispatch_message
-        s
+        s'
         ("One "^(Entity.get_role_name role_to_produce)^" is now in production")
         Message.Info
     else
@@ -862,7 +874,12 @@ let rec player_loop ui state_ref =
     | BadInvariant (file,func,err) ->
       failwith (Printf.sprintf "Invariant violation in %s.ml:%s: %s" file func err) in
   if state'.is_quit (* End more gracefully? *)
-  then return ()
+  then
+    (print_endline "here"; return ())
+  else if state'.is_victory
+  then
+    (print_endline (Message.get_text (List.nth (state'.messages) 0));
+    return ())
   else (
     state_ref := state';
     LTerm_ui.draw ui;

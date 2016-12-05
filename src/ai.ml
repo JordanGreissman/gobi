@@ -9,23 +9,24 @@ let select_random_from_list lst =
   List.nth lst x
 
 let attempt_move_entity s civ =
-  if List.length civ.entities = 0 then civ else
+  civ
+  (* if List.length civ.entities = 0 then civ else
   let state = !s in
   let entity = select_random_from_list civ.entities in
   let entity_tile = Mapp.tile_by_pos (Entity.get_pos entity) state.map in
   let tiles = Mapp.get_adjacent_tiles state.map entity_tile in
   let tile = select_random_from_list tiles in
-  let tup = Tile.move_entity entity_tile tile in
-  let map' = Mapp.set_tile (fst tup) state.map in
-  let map' = Mapp.set_tile (snd tup) map' in
-  let entity = Entity.set_pos (Tile.get_pos (snd tup)) entity in
-  s := {state with map=map'};
-  (* Civ.replace_entity entity civ *)
-  let entities = List.filter (fun x ->
-                              (Entity.get_id x) <> (Entity.get_id entity))
-                                civ.entities in
-  let entities = entity::entities in
-  {civ with entities=entities}
+  try (
+    let (from, too) = Tile.move_entity entity_tile tile in
+    let map' = Mapp.set_tile from state.map in
+    let map' = Mapp.set_tile too map' in
+    let entity =
+      if Tile.get_entity from = None then
+        Entity.set_pos (Tile.get_pos too) entity
+        else entity in
+    s := {state with map=map'};
+    Civ.replace_entity entity civ)
+  with _ -> civ *)
 
 let attempt_make_technology s civ =
   let state = !s in
@@ -68,6 +69,7 @@ let attempt_make_entity s civ =
 
 let rec attempt_turn s civ =
   Random.self_init ();
+  try
   let x = Random.int 10 in
   match x with
   | 0 | 1 -> attempt_make_entity s civ
@@ -75,6 +77,7 @@ let rec attempt_turn s civ =
   | 4 | 5 | 6 | 7 -> attempt_move_entity s civ
   | 8 -> attempt_make_technology s civ
   | _ -> civ
+  with _ -> civ
 
 let attempt_turns civs (s:State.t ref) =
   let ai = List.filter (fun x -> not (Civ.get_player_controlled x)) civs in
