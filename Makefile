@@ -5,6 +5,6 @@ clean:
 		ocamlbuild -clean
 
 game:
-		ocamlbuild -pkgs yojson,lwt,camomile,lambda-term src/game.byte && mv game.byte gooby && ./gooby
+		ocamlbuild -pkgs yojson,lwt,camomile,lambda-term src/game.byte && mv game.byte gobi && ./gobi
 
 .PHONY: test
