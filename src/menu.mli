@@ -22,7 +22,14 @@ and menu =
   | ProduceEntityMenu of (Hub.t -> t list)
   | NextResearchMenu of (Research.Research.research_list -> Research.Research.key -> t list)
 
+(** The list of menu items in the main menu *)
 val main_menu : t list
+
+(** The list of menu items in the hub menu *)
 val hub_menu : t list
+
+(** The list of menu items in the enitity menu *)
 val entity_menu : t list
+
+(** The list of menu items in the research menu *)
 val research_menu : t list

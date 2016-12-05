@@ -4,7 +4,6 @@ type tile = Tile.t
 
 type t = tile list list
 
-(* map operations *)
 let tile_by_pos c map =
   let x,y = (Coord.get_x c,Coord.get_y c) in
   let row = try List.nth map y with

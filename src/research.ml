@@ -149,15 +149,4 @@ module Research = struct
                 then (1.0 /. total) +. (frac_unlocked ("", t))
                 else (frac_unlocked ("", t))
 
-(*   let describe_tree key research_list =
->>>>>>> 89f4691b6c133e903bb64a21f99ad63bd2ff95d3
-    let branch = (
-      try List.assoc key research_list with
-      | _ -> raise (Critical ("Research.ml",
-                                    "unlock",
-                                    "Not a valid key for research"))) in
-    let desc = List.fold_right
-      (fun x y -> (Unlockable.name x)^", "^y) branch "" in
-    let desc = key^" branch: "^desc in
-    String.sub desc 0 ((String.length desc) - 2) *)
 end
