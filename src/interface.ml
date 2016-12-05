@@ -55,19 +55,19 @@ let draw_map ctx w h x_offset (s:State.t) =
 
 let draw_tutorial ctx w h =
   let tutorial = [
-    "Gobi is a turn-based strategy game based on Sid Meier's Civilization V.";
+    "Gooby is a turn-based strategy game based on Sid Meier's Civilization V.";
     "Your task is to build a civilization that will stand the test of time. Grow";
     "your citiies, build your armies, and destroy the other civilizations to win";
     "the game!";
     "";
     "Resources fuel your growing civilization. They enable you to conduct research,";
     "build hubs, produce entities, and allow your civilization to grow. There are";
-    "four resources in Gobi: food, gold, iron, and paper. They are produced from";
+    "four resources in Gooby: food, gold, iron, and paper. They are produced from";
     "different hubs and each one is required for a variety of purposes. Discovering";
     "which hubs produce which resources and which resources are required for various";
     "purposes is part of the learning curve of the game and will be left up to you.";
     "";
-    "Entities in Gobi are mobile units. Their primary uses are constructing new";
+    "Entities in Gooby are mobile units. Their primary uses are constructing new";
     "hubs, attacking and defending, and increasing the production of hubs. There";
     "are several types of entities in the game (hereafter called 'roles'). Giving";
     "and order to an entity constitutes an 'action'. Each role has a different";
@@ -94,7 +94,7 @@ let draw_tutorial ctx w h =
   ] in
   let y = ref 1 in
   LTerm_draw.clear ctx;
-  LTerm_draw.draw_string ctx 0 ((w-24)/2) "Welcome to Gobi (Gooby)!";
+  LTerm_draw.draw_string ctx 0 ((w-24)/2) "Welcome to Gooby!";
   List.iter
     (fun s ->
        LTerm_draw.draw_string ctx !y 0 s;
