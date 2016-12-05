@@ -465,7 +465,8 @@ let rec execute (s:State.t) e c : State.t =
           "execute",
           "Research expected Research requirement but got something else")) in
     let civ = State.get_current_civ s in
-    let key = String.sub key 8 ((String.length key) - 8) in
+    let key = String.sub key 9 ((String.length key) - 9) in
+    print_endline key;
     let new_civ = Civ.unlock_if_possible key (Civ.get_tree civ) civ in
     State.update_civ s.current_civ new_civ s
   | DisplayResearch -> (* TEST THIS *)
