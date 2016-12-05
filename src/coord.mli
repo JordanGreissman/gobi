@@ -17,7 +17,7 @@
   *)
 type t
 
-(** the offset coordinate (0,0) *)
+(** Returns the offset coordinate (0,0) *)
 val origin : t
 (** [create x y] is a new offset coordinate that represents ([x],[y]) *)
 val create : int -> int -> t

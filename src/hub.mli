@@ -26,10 +26,10 @@ type production =
   | Resource of Resource.t
   | Entity of Entity.role
 
-(* turns product into resource type *)
+(* Returns the resource type a Resource production, which it must be. *)
 val prod_to_resource : production -> Resource.t
 
-(* Checks if is a valid resource *)
+(* Returns true if a valid production is a valid resource *)
 val is_resource : production -> bool
 
 (** Create and return a hub.
@@ -106,55 +106,82 @@ val extract_to_role :
   entity_role_list:Entity.role list ->
   role
 
-(* Return a role matching the string. "all" returns role_list. Otherwise, Illegal exception *)
+(** Return a role matching the string. The string "all" returns role_list. 
+  * Otherwise, raises an Illegal exception *)
 val find_role : string -> role list -> role list
 
+(** Decreases the cost to make a role by 1 *)
 val tick_cost : t -> t
 
+(** Returns true if the valid hub has no cost to make *)
 val is_done : t -> bool
 
-(* [t] getters and setters *)
-
+(** Returns the role of a valid hub *)
 val get_role : t -> role
 
+(** Returns the production rate of a valid hub. *)
 val get_production_rate : t -> int
 
-(* change hub's production rate by an integer *)
+(** Changes hub's production rate by adding an integer, returns hub *)
 val change_production_rate : int -> t -> t
 
+(** Returns the defensive value of the hub *)
 val get_defense : t -> int
 
-(** change the defense of this hub by a relative amount (positive values increase
-  * the defense, negative values decrease the defense, etc.).
-  *)
+(** Change the defense of this hub by a relative amount 
+  * (positive values increase the defense, negative values 
+  * decrease the defense). Returns the hub *)
 val change_defense : int -> t -> t
 
+(** Returns the coordinate representing the valid hub's position *)
 val get_position : t -> Coord.t
 
-(** [change_position delta h] is the hub whose new position is the hub's old
-  * position plus [delta].)
-  *)
+(** Returns the the hub whose new position is the hub's old
+  * position plus a coordinate *)
 val change_position : Coord.t -> t -> t
 
-(* [role] getters and setters *)
+(** Returns the name of the role of a valid hub *)
 val get_role_name : role -> string
+
+(** Returns the cost to make of a role of a valid hub *)
 val get_role_cost_to_make : role -> int
+
+(** Returns the art of a valid hub *)
 val get_role_art : role -> Art.t
 
+(** Returns the allowed entity roles in a hub's role *)
 val get_role_allowed_roles : role -> Entity.role list
+
+(** Returns a list of production elements a valid hub role produces *)
 val get_role_production : role -> production list
+
+(** Returns the default production rate of a valid hub role *)
 val get_role_default_production_rate : role -> int
+
+(** Returns the default defense of a hub role *)
 val get_role_default_defense : role -> int
 
-(* convenience functions *)
+(** Returns the name of a valid hub *)
 val get_name : t -> string
+
+(** Returns the cost to make of a valid hub *)
 val get_cost_to_make : t -> int
+
+(** Returns the art of a valid entity *)
 val get_art : t -> Art.t
+
+(** Returns the allowed entity roles of a valid hub *)
 val get_allowed_roles : t -> Entity.role list
+
+(** Returns a list of production elements a valid hub produces *)
 val get_production : t -> production list
+
+(** Returns the default production rate of a valid hub *)
 val get_default_production_rate : t -> int
+
+(** Returns the defense of a valid hub *)
 val get_default_defense : t -> int
 
-(* add production to hub's role, return hub *)
+(* Add a production to hub and its role, returning a hub *)
 val addto_role_production : production list -> t -> t
 

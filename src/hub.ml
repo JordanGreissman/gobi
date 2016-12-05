@@ -10,7 +10,6 @@ type production =
   | Resource of resource
   | Entity of entity_role
 
-(* must be a production of type resource *)
 let prod_to_resource = function
   | Resource p -> p
   | _ -> raise (BadInvariant ("hub","prod_to_resource","Expected a resource"))
@@ -107,8 +106,6 @@ let tick_cost t =
 let is_done t =
   t.role.cost_to_make = 0
 
-(* [t] getters and setters *)
-
 let get_role hub = hub.role
 
 let get_production_rate hub = hub.production_rate
@@ -124,8 +121,6 @@ let change_position delta hub =
 let change_production_rate delta hub =
   { hub with production_rate = get_production_rate hub + delta }
 
-(* [role] getters and setters *)
-
 let get_role_name r = r.name
 let get_role_cost_to_make r = r.cost_to_make
 let get_role_art r = r.art
@@ -135,7 +130,6 @@ let get_role_production r = r.production
 let get_role_default_production_rate r = r.default_production_rate
 let get_role_default_defense r = r.default_def
 
-(* convenience functions *)
 let get_name hub = hub.role.name
 let get_cost_to_make hub = hub.role.cost_to_make
 let get_art hub = hub.role.art

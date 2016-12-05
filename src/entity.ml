@@ -89,7 +89,6 @@ let tick_cost t =
 let is_done t =
   t.role.cost_to_make = 0
 
-(* [t] getters and setters *)
 let get_actions_used entity = entity.actions_used
 
 let set_actions_used entity x = {entity with actions_used = x}
@@ -104,17 +103,14 @@ let change_attack amt e = { e with power=(get_attack e + amt,get_defense e) }
 
 let change_defense amt e = { e with power=(get_attack e,get_defense e + amt) }
 
-(* Get total power level of entity, attack + defense *)
 let get_total_power e =
   let (attack, defense) = e.power in
   attack + defense
 
 let get_pos e = e.pos
 
-(** Returns an entity with a new coordinate representing the entity's position *)
 let set_pos position entity = { entity with pos = position }
 
-(* [role] getters and setters *)
 let get_role_name r = r.name
 let get_role_cost_to_make r = r.cost_to_make
 let get_role_art r = r.art
@@ -126,12 +122,10 @@ let get_role_default_power r = r.default_power
 
 let set_actions x t = {t with role = {t.role with actions = x}}
 
-(* convenience functions *)
 let get_actions e = e.role.actions
 let get_name e = e.role.name
 let get_cost_to_make e = e.role.cost_to_make
 let get_art e = e.role.art
 
-(* id getter / setter *)
 let get_id e = e.id
 let set_id id e = { e with id = id }
