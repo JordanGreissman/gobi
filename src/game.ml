@@ -253,17 +253,16 @@ let check_for_win s =
   match conditions_met with
   | (_, No_Win) -> s
   | (civs, condition) when condition = Tie -> (
-      dispatch_message s ("Tie game!") Info)
+      dispatch_message s ("Tie game!") Message.Win)
   | ([(_, player)], condition) -> (
     let msg = if player then "You win " else "You lose " in
     match condition with
-    (* TODO print victory message *)
     | Military -> (
-      dispatch_message s (msg^"by a military victory") Info)
+      dispatch_message s (msg^"by a military victory") Message.Win)
     | Score -> (
-      dispatch_message s (msg^"by a score victory") Info)
+      dispatch_message s (msg^"by a score victory") Message.Win)
     | Tech -> (
-      dispatch_message s (msg^"by a technology victory") Info)
+      dispatch_message s (msg^"by a technology victory") Message.Win)
     | _ -> raise (Critical ("game","check_for_win","Error deciding winner")))(* or here *)
 
 let place_entity_on_map s entity =
