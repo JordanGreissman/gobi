@@ -1,0 +1,8 @@
+PKG oUnit
+PKG yojson
+PKG lwt
+PKG camomile
+PKG lambda-term
+
+S src
+B _build/src
