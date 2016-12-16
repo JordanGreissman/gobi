@@ -58,15 +58,15 @@ type cmd =
   (* these commands automatically execute the pending command. If there is no
    * pending command, they throw an error *)
 
-  (** [SelectTile e] gets the tile at the point selected by the mouse and passes
-    * this as an argument to the pending command *)
-  | SelectTile
-  (** [SelectHub h] gets the hub role called [h] and passes this as an argument
-    * to the pending command *)
-  | SelectHub
-  (** [SelectEntity e] gets the entity role called [e] and passes this as an
-    * argument to the pending command *)
-  | SelectEntity
+  (* (\** [SelectTile e] gets the tile at the point selected by the mouse and passes *)
+  (*   * this as an argument to the pending command *\) *)
+  (* | SelectTile *)
+  (* (\** [SelectHub h] gets the hub role called [h] and passes this as an argument *)
+  (*   * to the pending command *\) *)
+  (* | SelectHub *)
+  (* (\** [SelectEntity e] gets the entity role called [e] and passes this as an *)
+  (*   * argument to the pending command *\) *)
+  (* | SelectEntity *)
 
 (** represents the different requirements that commands can have. These
   * requirements need to be fulfilled before the command can be executed. *)
@@ -91,4 +91,6 @@ val create : cmd -> t
 
 (** [all_all_reqs_satisfied lst] is true if all the requirements in [lst] are
   * satisfied and false otherwise. *)
-(* val are_all_reqs_satisfied : required list -> bool *)
+val are_all_reqs_satisfied : required list -> bool
+
+val execute : State.t -> t -> State.t

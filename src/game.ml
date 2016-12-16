@@ -1,5 +1,4 @@
 open Yojson
-open Lwt
 open CamomileLibrary
 open Civ
 open State
@@ -401,17 +400,6 @@ let parse_event r e (s:State.t) =
     Research (Some menu_for_key.text)
   | (a,_) -> raise (Illegal ("Please " ^ (expected_action a)))
 
-let is_some = function
-  | Some x -> true
-  | None   -> false
-
-let is_satisfied r =
-  match r with
-  | Tile x       -> is_some x
-  | HubRole x    -> is_some x
-  | EntityRole x -> is_some x
-  | Research x   -> is_some x
-
 let rec satisfy_next_req e s = function
   | []   -> raise (BadInvariant (
       "game",
@@ -422,12 +410,9 @@ let rec satisfy_next_req e s = function
     then h::(satisfy_next_req e s t)
     else (parse_event h e s)::t
 
-let are_all_reqs_satisfied lst =
-  List.fold_left (fun a x -> a && (is_satisfied x)) true lst
-
 (* [execute s e c] returns the next state of the game given the current state
  * [s], the input event [e], and the command [c]. *)
-let rec execute (s:State.t) e c : State.t =
+let rec execute (s:State.t) c : State.t =
   match fst c with
   | NoCmd           -> s
   | NextTurn        -> next_turn s
@@ -790,88 +775,104 @@ let rec execute (s:State.t) e c : State.t =
     then execute { s with pending_cmd = None } e (cmd,req_list')
     else { s with pending_cmd=Some (cmd,req_list') }
 
+(* TODO: documentation out of date *)
 (* [get_next_state s e] is the next state of the game, given the current state
  * [s] and the input event [e] *)
-let get_next_state (s:State.t) (e:LTerm_event.t) : State.t = match e with
+let parse_input_event (s:State.t) (pc:Cmd.t option) (e:LTerm_event.t) : State.t * (Cmd.t option) = match e with
   (* ------------------------------------------------------------------------- *)
   (* these keys are not affected by the pending command status *)
   | LTerm_event.Key { code = Up } ->
-    { s with screen_top_left =
-               Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1)) }
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1));
+     },
+     pc)
   | LTerm_event.Key { code = Down } ->
-    { s with screen_top_left =
-               Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1) }
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1)
+     },
+     pc)
   | LTerm_event.Key { code = Left } ->
-    { s with screen_top_left =
-               Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0) }
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0)
+     },
+     pc)
   | LTerm_event.Key { code = Right } ->
-    { s with screen_top_left =
-               Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0) }
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0)
+     },
+     pc)
   | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
-    { s with is_quit = true }
-  | LTerm_event.Key { code = Escape } -> { s with is_tutorial = false }
+    ({ s with is_quit = true },pc)
+  | LTerm_event.Key { code = Escape } -> ({ s with is_tutorial = false },pc)
   (* ------------------------------------------------------------------------ *)
   (* mouse events as well as any key that is not one of the above must check for
    * a pending command *)
   | LTerm_event.Key { code = c } ->
-    let f = function
-      | Some (m:menu) ->
-        let s' = execute s e m.cmd in
+    let f m = match (m,pc) with
+      | (None,_) -> (s,pc)
+      | (Some (m:menu),None) ->
         let next_menu = match m.next_menu with
-          | NoMenu -> s'.menu
+          | NoMenu -> s.menu
           | StaticMenu m -> m
-          | TileMenu f -> f (Mapp.tile_by_pos s'.selected_tile s'.map)
-          | BuildHubMenu f -> f s'.hub_roles
+          | TileMenu f -> f (Mapp.tile_by_pos s.selected_tile s.map)
+          | BuildHubMenu f -> f s.hub_roles
           | ProduceEntityMenu f -> (
-            match Tile.get_hub (Mapp.tile_by_pos s'.selected_tile s'.map) with
+            match Tile.get_hub (Mapp.tile_by_pos s.selected_tile s.map) with
             | Some h -> f h
             | None   -> raise (Illegal "No hub selected!"))
           | NextResearchMenu f ->
             (* The text of the menu item serves to identify the tech tree branch
              * the user selected *)
-            f s'.tech_tree m.text in
-        { s' with menu = next_menu }
-      | None -> s in
+            f s.tech_tree m.text in
+        ({ s with menu = next_menu },Some m.cmd)
+      | (Some (m:menu),Some pc) ->
+        (* TODO: parse the menu item into a satisfied requirement for the pending cmd *)
+        (s,Some pc) in
     let menu_for_key =
       try Some (List.find (fun (x:menu) -> x.key = c) s.menu)
       with Not_found -> None in
     f menu_for_key
   | LTerm_event.Mouse e ->
-    (* let new_msg' = Printf.sprintf "Mouse clicked at (%d,%d)" e.col e.row in *)
-    (* state.ctx.messages <- new_msg'::state.ctx.messages; *)
-    let f c = match (c,s.pending_cmd) with
+    let f c = match (c,pc) with
       | (Coord.Contained c,Some cmd) ->
-        let cmd = Cmd.create Cmd.SelectTile in
-        execute s (LTerm_event.Mouse e) cmd
+        (* TODO: parse the selected tile into a satisfied requirement for the pending cmd *)
+        (s,pc)
       | (Coord.Contained c,None) ->
         (* let s' = dispatch_message *)
         (*     s *)
         (*     (Printf.sprintf "Selected tile is now %s" (Coord.to_string c)) *)
         (*     Message.Info in *)
-        { s with selected_tile = c }
-      | (_,_) -> s in
+        ({ s with selected_tile = c },None)
+      | (_,_) -> (s,pc) in
     s.screen_top_left
     |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
     |> Coord.offset_from_screen
     |> f
-  | _ -> s
+  | _ -> (s,pc)
 
-let rec player_loop ui state_ref =
+open Lwt
+
+let rec player_loop ui state_ref pending_cmd =
   let state = !state_ref in
   LTerm_ui.wait ui >>= fun e ->
-  let state' =
-    try get_next_state state e with
-    | Illegal s -> dispatch_message { state with pending_cmd = None } s Message.Illegal
+  let (state',pending_cmd') =
+    try parse_input_event state pending_cmd e with
+    | Illegal s -> (dispatch_message state s Message.Illegal,pending_cmd)
     | Critical (file,func,err) ->
       failwith (Printf.sprintf "Critical error in %s.ml:%s: %s" file func err)
     | BadInvariant (file,func,err) ->
       failwith (Printf.sprintf "Invariant violation in %s.ml:%s: %s" file func err) in
+  let (state'',pending_cmd'') =
+    if Cmd.are_all_reqs_satisfied pending_cmd'
+    then (Cmd.execute s pending_cmd',None)
+    else (state',Some pending_cmd') in
   if state'.is_quit (* End more gracefully? *)
   then return ()
-  else (
+  else begin
     state_ref := state';
     LTerm_ui.draw ui;
-    player_loop ui state_ref)
+    player_loop ui state_ref pending_cmd''
+  end
 
 let main () =
   let (s:State.t) = init_state "src/game_data.json" in
@@ -879,8 +880,13 @@ let main () =
   Lazy.force LTerm.stdout >>= fun term ->
   LTerm.enable_mouse term >>= fun () ->
   LTerm_ui.create term (Interface.draw state_ref) >>= fun ui ->
-  player_loop ui state_ref >>= fun () ->
+  player_loop ui state_ref None >>= fun () ->
   LTerm.disable_mouse term >>= fun () ->
   LTerm_ui.quit ui
 
 let () = Lwt_main.run (main ())
+
+(* state/menu/cmd cyclic dependency resolution: two options:
+ *  - make each module a functor and mutually recursively declare them
+ *  - resolve the dependency (DAG-ify the MDD)
+ *)
