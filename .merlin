@@ -1,3 +1,4 @@
+PKG core
 PKG oUnit
 PKG yojson
 PKG lwt
