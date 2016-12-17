@@ -20,6 +20,11 @@ type parsed_json = {
 
 type win_state = Military | Tech | Score | Tie | No_Win
 
+(* TODO: values returned from functions which previously did not return an option
+ * before adding Core as a dependency (mostly List functions) have been wrapped
+ * in `Option.value_exn` and marked with "FIXME: option". These should be
+ * reviewed more carefully and refactored if necessary. *)
+
 let dispatch_message (state:State.t) s k =
   let m = Message.create s k in
   { state with messages = m::state.messages }
@@ -117,8 +122,9 @@ let init_civ player_controlled parsed map unlocked civ : civ =
   let tech_tree = parsed.tech_tree in
   let starting_tile = Mapp.get_random_tile !map in
   let tiles = Mapp.get_adjacent_tiles !map starting_tile in
-  let tile = Random.self_init ();
-    List.nth (tiles) (Random.int (List.length tiles)) in
+  Random.self_init ();
+  (* FIXME option *)
+  let tile = Option.value_exn (List.nth (tiles) (Random.int (List.length tiles))) in
   let tup = Cluster.create
       ~name:(fst civ)
       ~descr:"A soon to be booming metropolis"
@@ -145,11 +151,14 @@ let init_civ player_controlled parsed map unlocked civ : civ =
   }
 
 let get_player_start_coords civs =
-  let player = List.find Civ.get_player_controlled civs in
-  let cluster = List.nth player.clusters 0 in
+  (* FIXME: option *)
+  let player = Option.value_exn (List.find civs Civ.get_player_controlled) in
+  (* FIXME: option *)
+  let cluster = Option.value_exn (List.nth player.clusters 0) in
   let c = Tile.get_pos (Cluster.get_town_hall cluster) in
   let coord = Coord.screen_from_offset c in
-  let origin = List.nth (List.nth coord 0) 0 in
+  (* FIXME: option *)
+  let origin = Option.value_exn (List.nth (Option.value_exn (List.nth coord 0)) 0) in
   let offset = Coord.Screen.create (-5) (-2) in
   (c, Coord.Screen.add offset origin)
 
@@ -157,13 +166,17 @@ let init_state json : State.t =
   let json = Basic.from_file json in
   let parsed = init_json json in
   let map = ref (Mapp.generate 42 42) in
-  let unlocked = List.map (fun (k, v) ->
-      Research.Research.get_unlocked k parsed.tech_tree)
-      parsed.tech_tree in
-  let unlocked = List.flatten unlocked in
-  let civs = List.mapi
+  let unlocked =
+    List.map
+      parsed.tech_tree
+      (fun (k, v) -> Research.Research.get_unlocked k parsed.tech_tree) in
+  (* TODO: no List.flatten in core? *)
+  let unlocked = Caml.List.flatten unlocked in
+  let civs =
+    List.mapi
+      parsed.civs 
       (fun i civ -> init_civ (i=0) parsed map unlocked civ)
-      parsed.civs in
+      in
   let coords = get_player_start_coords civs in
   {
     civs = civs;
@@ -179,7 +192,6 @@ let init_state json : State.t =
     is_quit = false;
     is_tutorial = false;
     menu = Menu.main_menu;
-    pending_cmd = None;
     current_civ = 0;
   }
 
@@ -193,7 +205,7 @@ let check_for_win s =
     let civs = State.get_civs s in
     (* TODO *)
     let check_points civs =
-      let points = List.map score civs in
+      let points = List.map civs score in
       let rec fold_points i max lst =
         match lst with
         | [] -> [i]
@@ -201,11 +213,12 @@ let check_for_win s =
                   else if h = max then (i::(fold_points (i + 1) h t))
                   else fold_points i max t in
       let indexes = fold_points 0 0 points in
-      List.map (fun x -> List.nth civs x) indexes
+      (* FIXME: option *)
+      List.map indexes (fun x -> Option.value_exn (List.nth civs x))
     in
 
     let check_tech civs =
-      List.filter (fun x -> Research.Research.check_complete x.techs) civs
+      List.filter civs (fun x -> Research.Research.check_complete x.techs)
     in
 
     let rec get_winners civs =
@@ -219,9 +232,10 @@ let check_for_win s =
       match List.length civs with
       | 0 -> []
       | _ -> List.map
-               (fun (x:Civ.t) -> Some (x.name, x.player_controlled)) civs in
+               civs (fun (x:Civ.t) -> Some (x.name, x.player_controlled)) in
     let military_win = if List.length civs = 1 then
-        (let civ = List.nth civs 0 in
+        (* FIXME: option *)
+        (let civ = Option.value_exn (List.nth civs 0) in
          Some (civ.name, civ.player_controlled))
       else None in
     let score_win = if s.turn = s.total_turns then
@@ -229,7 +243,7 @@ let check_for_win s =
          match List.length civs with
          | 0 -> []
          | _ ->
-           List.map (fun x -> Some (x.name, x.player_controlled)) civs)
+           List.map civs (fun (x:Civ.t) -> Some (x.name, x.player_controlled)))
       else [] in
     match (score_win, military_win, tech_win) with
     | ([], None, []) -> ([], No_Win)
@@ -280,19 +294,18 @@ let place_hub_on_map s hub =
 
 let tick_pending s civ =
   let map = s.map in
-  let ticked = List.map Entity.tick_cost civ.pending_entities in
-  let done_entities = List.filter
-      Entity.is_done ticked in
-  let done_entities = List.map (place_entity_on_map (ref s)) done_entities in
+  let ticked = List.map civ.pending_entities Entity.tick_cost in
+  let done_entities = List.filter ticked Entity.is_done in
+  let done_entities = List.map done_entities (place_entity_on_map (ref s)) in
   let entities = done_entities@civ.entities in
-  let pending_entities = List.filter
-      (fun x -> not (Entity.is_done x)) ticked in
-  let ticked = List.map Hub.tick_cost civ.pending_hubs in
-  let done_hubs = List.map (place_hub_on_map (ref s))
-    (List.filter Hub.is_done civ.pending_hubs) in
+  let pending_entities = List.filter ticked (fun x -> not (Entity.is_done x)) in
+  let ticked = List.map civ.pending_hubs Hub.tick_cost in
+  let done_hubs =
+    List.map
+      (List.filter civ.pending_hubs Hub.is_done)
+      (place_hub_on_map (ref s)) in
   let clusters = add_hubs civ.clusters map done_hubs in
-  let pending_hubs = List.filter
-      (fun x -> not (Hub.is_done x)) ticked in
+  let pending_hubs = List.filter ticked (fun x -> not (Hub.is_done x)) in
   let civ = get_resource_for_turn civ in
   {civ with entities=entities;
             pending_entities=pending_entities;
@@ -304,22 +317,21 @@ let next_turn s =
   let s = (try
     Ai.attempt_turns civs (ref s)
     with _ -> s) in
-  let civs = List.map (tick_pending s) (State.get_civs s) in
+  let civs = List.map (State.get_civs s) (tick_pending s) in
   let s = check_for_win s in
   (* reset the action count of every entity *)
   (* update the civ list *)
   (* TODO: we do not need to keep track of this state twice *)
   let civs = List.map
+    civs 
     (fun (civ:Civ.t) ->
-      let entities = List.map
-        (fun e -> Entity.set_actions_used e 0)
-        civ.entities in
-      { civ with entities = entities })
-    civs in
+      let entities = List.map civ.entities (fun e -> Entity.set_actions_used e 0) in
+      { civ with entities = entities }) in
   (* update the map *)
-  let entities = civs |> List.map (fun (c:Civ.t) -> c.entities) |> List.flatten in
+  let entities = civs |> List.map ~f:(fun (c:Civ.t) -> c.entities) |> Caml.List.flatten in
   let map = ref s.map in
   List.iter
+    entities
     (fun e ->
       let pos = Entity.get_pos e in
       let tile = Mapp.tile_by_pos pos !map in
