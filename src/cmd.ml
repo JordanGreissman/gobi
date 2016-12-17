@@ -18,13 +18,13 @@ type cmd =
   (* | SelectHub *)
   (* | SelectEntity *)
 
-type required =
+type requirement =
   | Tile of Tile.t option
   | HubRole of Hub.role option
   | EntityRole of Entity.role option
   | Research of Research.Research.key option
 
-type t = cmd * required list (* tuple of a cmd and a list of required *)
+type t = cmd * requirement list (* tuple of a cmd and a list of requirement options *)
 
 (* [create c] is a unsatisfied requirements list (every constructor is given
  * None) for the command [c]. *)

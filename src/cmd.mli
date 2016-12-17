@@ -68,29 +68,26 @@ type cmd =
   (*   * argument to the pending command *\) *)
   (* | SelectEntity *)
 
+(* TODO: documentation out of date *)
 (** represents the different requirements that commands can have. These
   * requirements need to be fulfilled before the command can be executed. *)
-type required =
+type requirement =
   | Tile of Tile.t option
   | HubRole of Hub.role option
   | EntityRole of Entity.role option
   | Research of Research.Research.key option
 
 (** a command is a cmd type plus a list of its requirements *)
-type t = cmd * required list
+type t = cmd * requirement list
 
 (** [create c] is a unsatisfied requirements list (every constructor is given
   * None) for the command [c]. *)
 val create : cmd -> t
 
-(** [satisfy_next_req e lst] is [lst] with the first unsatisfied requirement
-  * satisfied. If [e] is not of the correct type tojsatisfy such a requirement,
-  * raises Illegal. If all requirements are already satisfied, evaluates to [lst]
-  *)
-(* val satisfy_next_req : LTerm_event.t -> required list -> required list *)
-
 (** [all_all_reqs_satisfied lst] is true if all the requirements in [lst] are
   * satisfied and false otherwise. *)
-val are_all_reqs_satisfied : required list -> bool
+val are_all_reqs_satisfied : requirement list -> bool
 
-val execute : State.t -> t -> State.t
+(** [get_next_unsatisfied_req reqs] is the first unsatisfied requirement in
+  * [reqs]. If all requirements in [reqs] are satisfied, raises BadInvariant *)
+val get_next_unsatisfied_req : requirement list -> requirement
