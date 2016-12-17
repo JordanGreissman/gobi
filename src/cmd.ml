@@ -1,4 +1,6 @@
+open Core.Std
 open LTerm_event
+open Exception
 
 type cmd =
   | NoCmd
@@ -46,50 +48,21 @@ let create = function
   (* | SelectHub       -> (SelectHub      ,[]) *)
   (* | SelectEntity    -> (SelectEntity   ,[]) *)
 
-let is_some = function
-  | Some x -> true
-  | None   -> false
-
-let is_satisfied r =
-  match r with
-  | Tile x       -> is_some x
-  | HubRole x    -> is_some x
-  | EntityRole x -> is_some x
-  | Research x   -> is_some x
+let is_satisfied = function
+  | Tile x -> Option.is_some x
+  | HubRole x -> Option.is_some x
+  | EntityRole x -> Option.is_some x
+  | Research x -> Option.is_some x
 
 let are_all_reqs_satisfied lst =
-  List.fold_left (fun a x -> a && (is_satisfied x)) true lst
+  List.fold_left lst true (fun a x -> a && (is_satisfied x))
 
-(* ========================= COMMAND IMPLEMENTATIONS ========================= *)
-
-let next_turn s = s
-let describe s = s
-let research s = s
-let display_research s = s
-let skip s = s
-let move s = s
-let attack s = s
-let place_hub s = s
-let clear s = s
-let produce s = s
-let add_entity_to_hub s = s
-
-(* ======================= END COMMAND IMPLEMENTATIONS ======================= *)
-
-let get_execute_f = function
-  | NoCmd           -> (fun s -> s)
-  | NextTurn        -> next_turn
-  | Tutorial        -> (fun s -> { s with is_tutorial = true })
-  | Describe s      -> describe
-  | Research        -> research
-  | DisplayResearch -> display_research
-  | Skip            -> skip
-  | Move            -> move
-  | Attack          -> attack
-  | PlaceHub        -> place_hub
-  | Clear           -> clear
-  | Produce         -> produce
-  | AddEntityToHub  -> add_entity_to_hub
-
-let execute s cmd = (get_execute_f cmd) s
-
+let rec get_next_unsatisfied_req reqs =
+  let (satisfied_reqs,xs) = List.split_while reqs is_satisfied in
+  try
+    let (r,unsatisfied_reqs) = (List.hd_exn xs,List.tl_exn xs) in
+    (satisfied_reqs,r,unsatisfied_reqs)
+  with _ -> raise (BadInvariant (
+    "game",
+    "satisfy_next_req",
+    "All requirements already satisfied!"))
