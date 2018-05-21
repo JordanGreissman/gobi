@@ -429,174 +429,178 @@ let rec execute (s:State.t) (c:Cmd.t) = match c with
   (*   then execute { s with pending_cmd = None } e (cmd,req_list') *)
   (*   else { s with pending_cmd=Some (cmd,req_list') } *)
 
-(* TODO: rename *)
-(* let temp_f =
- *   Cmd.get_next_unsatisfied_req reqs >>= (function
- *   | `HubRole ->
- *     Hub.find_role m.text s.hub_roles >>= fun l ->
- *     List.hd l >>= function
- *     | Ok r -> HubRole r
- *     | Err s -> failwith s
- *   | `EntityRole ->
- *     Entity.find_role m.text s.entity_roles >>= function
- *     | Ok r -> EntityRole r
- *     | Err s -> failwith s
- *   | `Research -> Research m.text
- *   | `Tile -> raise (Illegal ("Please " ^ (expected_action a))))
- *   >>= (function
- *   | Some s -> s
- *   | None -> failwith "Invariant")
- * 
- *   let (satisfied,req,unsatisfied) = Cmd.get_next_unsatisfied_req reqs in
- *   let req' = match req with
- *   | HubRole _ ->
- *     let role_lst = Hub.find_role m.text s.hub_roles in
- *     begin match List.length role_lst with
- *     | 0 -> raise (BadInvariant (
- *         "game",
- *         "parse_event",
- *         "No hub role is associated with the menu item with text: "^m.text))
- *     | 1 -> HubRole (Some (List.hd_exn role_lst))
- *     | n -> raise (Critical (
- *         "game",
- *         "parse_event",
- *         "Duplicate rolls \"" ^ m.text ^ "\"exist!" ))
- *     end
- *   | EntityRole _ ->
- *     let e =
- *       try Entity.find_role m.text s.entity_roles
- *       with Illegal _ -> raise (Critical (
- *           "game",
- *           "parse_event",
- *           "Entity role \"" ^ m.text ^ "\" not found")) in
- *     EntityRole (Some e)
- *   | Research _ -> Research (Some m.text)
- *   (\* here we want to dispatch an error message instead of raising an exception *\)
- *   | Tile _ as a ->  in
- *   (s,Some (cmd,satisfied @ [req'] @ unsatisfied)) in *)
+let satisfy_key_requirement (s:State.t) (cmd_name, unsatisfied_reqs, satisfied_reqs) (m:menu) =
+  match unsatisfied_reqs with
+  | next_req::tl ->
+    let satisfied_req = match next_req with
+      | `HubRole ->
+        let role_lst = Hub.find_role m.text s.hub_roles in
+        begin
+          match List.length role_lst with
+          | 0 -> raise (BadInvariant (
+              "game",
+              "parse_event",
+              "No hub role is associated with the menu item with text: "^m.text))
+          | 1 -> Cmd.HubRole (List.hd_exn role_lst)
+          | n -> raise (Critical (
+              "game",
+              "parse_event",
+              "Duplicate rolls \"" ^ m.text ^ "\"exist!" ))
+        end
+      | `EntityRole ->
+        let e =
+          try Entity.find_role m.text s.entity_roles
+          with Illegal _ -> raise (Critical (
+              "game",
+              "parse_event",
+              "Entity role \"" ^ m.text ^ "\" not found")) in
+        EntityRole e
+      | `ResearchKey -> ResearchKey m.text
+      | `Tile -> raise (Illegal "Can't fulfill tile requirement") in
+    (cmd_name, tl, satisfied_req::satisfied_reqs)
+  | [] -> (cmd_name, unsatisfied_reqs, satisfied_reqs)
 
 (* TODO: documentation out of date *)
 (* [get_next_state s e] is the next state of the game, given the current state
  * [s] and the input event [e] *)
-let parse_input_event s pc e = (s,pc)
-  (* let expected_action = function
-   *   | Tile _ -> "select a tile"
-   *   | HubRole _ -> "select a hub type to build"
-   *   | EntityRole _ -> "select an entity type to produce"
-   *   | Research _ -> "select a research upgrade" in
-   * match e with
-   * (\* ------------------------------------------------------------------------- *\)
-   * (\* these keys are not affected by the pending command status *\)
-   * | LTerm_event.Key { code = Up } ->
-   *   ({ s with
-   *      screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1));
-   *    },
-   *    pc)
-   * | LTerm_event.Key { code = Down } ->
-   *   ({ s with
-   *      screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1)
-   *    },
-   *    pc)
-   * | LTerm_event.Key { code = Left } ->
-   *   ({ s with
-   *      screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0)
-   *    },
-   *    pc)
-   * | LTerm_event.Key { code = Right } ->
-   *   ({ s with
-   *      screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0)
-   *    },
-   *    pc)
-   * | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
-   *   ({ s with is_quit = true },pc)
-   * | LTerm_event.Key { code = Escape } -> ({ s with is_tutorial = false },pc)
-   * (\* ------------------------------------------------------------------------ *\)
-   * (\* mouse events as well as any key that is not one of the above must check for
-   *  * a pending command *\)
-   * | LTerm_event.Key k ->
-   *   List.find s.menu (fun (x:menu) -> x.key = k.code) >>= (fun m ->
-   *   pc >>= (fun (cmd,reqs) ->
-   *   (\* let updated_reqs = temp_f s cmd reqs in *\) (\* TODO *\)
-   *   let next_menu = match m.next_menu with
-   *     | NoMenu -> s.menu
-   *     | StaticMenu m -> m
-   *     | TileMenu f -> f (Mapp.tile_by_pos s.selected_tile s.map)
-   *     | BuildHubMenu f -> f s.hub_roles
-   *     | ProduceEntityMenu f -> (
-   *       match Tile.get_hub (Mapp.tile_by_pos s.selected_tile s.map) with
-   *       | Some h -> f h
-   *       | None   -> raise (Illegal "No hub selected!"))
-   *     | NextResearchMenu f ->
-   *       (\* The text of the menu item serves to identify the tech tree branch
-   *         * the user selected *\)
-   *       f s.tech_tree m.text in
-   *   (\* ({ s with menu = next_menu },(cmd,updated_reqs)))) *\)
-   *   ({ s with menu = next_menu },(cmd,reqs))))
-   *   >>= function
-   *   | Some s -> s
-   *   | None -> (s,pc)
-   *   (\* let parse_key_event (k:LTerm_key.t) f = *\)
-   *   (\*   match List.find s.menu (fun (x:menu) -> x.key = k.code) with *\)
-   *   (\*   | None -> (s,pc) *\)
-   *   (\*   | Some m -> f m in *\)
-   *   (\* parse_key_event k (fun (m:Menu.t) -> *\)
-   *   (\*   let (s',pc') = match pc with *\)
-   *   (\*     | None -> (s,pc) *\)
-   *   (\*     | Some (cmd,reqs) -> (s,pc) in *\)
-   * 
-   *   (\*   let next_menu = match m.next_menu with *\)
-   *   (\*     | NoMenu -> s.menu *\)
-   *   (\*     | StaticMenu m -> m *\)
-   *   (\*     | TileMenu f -> f (Mapp.tile_by_pos s.selected_tile s.map) *\)
-   *   (\*     | BuildHubMenu f -> f s.hub_roles *\)
-   *   (\*     | ProduceEntityMenu f -> ( *\)
-   *   (\*       match Tile.get_hub (Mapp.tile_by_pos s.selected_tile s.map) with *\)
-   *   (\*       | Some h -> f h *\)
-   *   (\*       | None   -> raise (Illegal "No hub selected!")) *\)
-   *   (\*     | NextResearchMenu f -> *\)
-   *   (\*       (\\* The text of the menu item serves to identify the tech tree branch *\)
-   *   (\*        * the user selected *\\) *\)
-   *   (\*       f s.tech_tree m.text in *\)
-   *   (\*   ({ s with menu = next_menu },pc')) *\)
-   * | LTerm_event.Mouse e ->
-   *   s.screen_top_left
-   *   |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
-   *   |> Coord.offset_from_screen
-   *   |> function
-   *     | (Coord.Contained c,Some (cmd,reqs)) ->
-   *       let (satisfied,req,unsatisfied) = Cmd.get_next_unsatisfied_req (cmd,reqs) in
-   *       let req' = match req with
-   *         | Tile _ -> Tile (Some (Mapp.tile_by_pos c s.map))
-   *         (\* here we want to dispatch an error message instead of raising an exception *\)
-   *         | a -> raise (Illegal ("Please " ^ (expected_action a))) in
-   *       ({ s with selected_tile = c },Some (cmd,satisfied @ [req'] @ unsatisfied))
-   *     | (Coord.Contained c,None) ->
-   *       (\* let s' = dispatch_message *\)
-   *       (\*     s *\)
-   *       (\*     (Printf.sprintf "Selected tile is now %s" (Coord.to_string c)) *\)
-   *       (\*     Message.Info in *\)
-   *       ({ s with selected_tile = c },None)
-   *     | (_,_) -> (s,pc)
-   * | _ -> (s,pc) *)
+let parse_input_event (s:State.t) (pc:Cmd.pending) e =
+  match e with
+  (* ------------------------------------------------------------------------- *)
+  (* these keys are not affected by the pending command status *)
+  | LTerm_event.Key { code = Up } ->
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 (-1));
+     },
+     pc)
+  | LTerm_event.Key { code = Down } ->
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 0 1)
+     },
+     pc)
+  | LTerm_event.Key { code = Left } ->
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create (-2) 0)
+     },
+     pc)
+  | LTerm_event.Key { code = Right } ->
+    ({ s with
+       screen_top_left = Coord.Screen.add s.screen_top_left (Coord.Screen.create 2 0)
+     },
+     pc)
+  | LTerm_event.Key { code = Char c } when UChar.char_of c = 'q' ->
+    ({ s with is_quit = true },pc)
+  | LTerm_event.Key { code = Escape } -> ({ s with is_tutorial = false },pc)
+  (* ------------------------------------------------------------------------ *)
+  (* mouse events as well as any key that is not one of the above must check for
+   * a pending command *)
+  | LTerm_event.Key k ->
+    let (m:menu) = List.find_exn s.menu ~f:(fun (x:menu) -> x.key = k.code) in
+    let pc' = satisfy_key_requirement s pc m in
+    let open Menu in
+    let next_menu = match m.next_menu with
+      | NoMenu -> s.menu
+      | StaticMenu m -> m
+      | TileMenu f -> f (Mapp.tile_by_pos s.selected_tile s.map)
+      | BuildHubMenu f -> f s.hub_roles
+      | ProduceEntityMenu f -> begin
+        match Tile.get_hub (Mapp.tile_by_pos s.selected_tile s.map) with
+        | Some h -> f h
+        | None -> raise (Illegal "No hub selected!")
+      end
+      | NextResearchMenu f ->
+        (* The text of the menu item serves to identify the tech tree branch
+          * the user selected *)
+        f s.tech_tree m.text in
+    ({ s with menu = next_menu }, pc')
+
+    (* let expected_action = function
+     * | Cmd.Tile _ -> "select a tile"
+     * | Cmd.HubRole _ -> "select a hub type to build"
+     * | Cmd.EntityRole _ -> "select an entity type to produce"
+     * | Cmd.Research _ -> "select a research upgrade" in *)
+
+    (* List.find s.menu (fun (x:menu) -> x.key = k.code) >>= (fun m ->
+     * pc >>= (fun (cmd_name, unsatisfied_reqs, satisfied_reqs) ->
+     * let pc' = satisfy_requirement s pc in
+     * let next_menu = match m.next_menu with
+     *   | NoMenu -> s.menu
+     *   | StaticMenu m -> m
+     *   | TileMenu f -> f (Mapp.tile_by_pos s.selected_tile s.map)
+     *   | BuildHubMenu f -> f s.hub_roles
+     *   | ProduceEntityMenu f -> (
+     *     match Tile.get_hub (Mapp.tile_by_pos s.selected_tile s.map) with
+     *     | Some h -> f h
+     *     | None   -> raise (Illegal "No hub selected!"))
+     *   | NextResearchMenu f ->
+     *     (\* The text of the menu item serves to identify the tech tree branch
+     *       * the user selected *\)
+     *     f s.tech_tree m.text in
+     * ({ s with menu = next_menu },pc')))
+     * >>= function
+     * | Some s -> s
+     * | None -> (s,pc) *)
+    (* let parse_key_event (k:LTerm_key.t) f = *)
+    (*   match List.find s.menu (fun (x:menu) -> x.key = k.code) with *)
+    (*   | None -> (s,pc) *)
+    (*   | Some m -> f m in *)
+    (* parse_key_event k (fun (m:Menu.t) -> *)
+    (*   let (s',pc') = match pc with *)
+    (*     | None -> (s,pc) *)
+    (*     | Some (cmd,reqs) -> (s,pc) in *)
+  
+    (*   let next_menu = match m.next_menu with *)
+    (*     | NoMenu -> s.menu *)
+    (*     | StaticMenu m -> m *)
+    (*     | TileMenu f -> f (Mapp.tile_by_pos s.selected_tile s.map) *)
+    (*     | BuildHubMenu f -> f s.hub_roles *)
+    (*     | ProduceEntityMenu f -> ( *)
+    (*       match Tile.get_hub (Mapp.tile_by_pos s.selected_tile s.map) with *)
+    (*       | Some h -> f h *)
+    (*       | None   -> raise (Illegal "No hub selected!")) *)
+    (*     | NextResearchMenu f -> *)
+    (*       (\* The text of the menu item serves to identify the tech tree branch *)
+    (*        * the user selected *\) *)
+    (*       f s.tech_tree m.text in *)
+    (*   ({ s with menu = next_menu },pc')) *)
+  | LTerm_event.Mouse e -> begin
+      s.screen_top_left
+      |> Coord.Screen.add (Coord.Screen.create ((LTerm_mouse.col e)-20) (LTerm_mouse.row e))
+      |> Coord.offset_from_screen
+      |> function
+      | Coord.Contained c ->
+        let (cmd_name, unsatisfied_reqs, satisfied_reqs) = pc in
+        let pc' = match unsatisfied_reqs with
+          | next_req::tl ->
+            let satisfied_req = match next_req with
+              | `Tile -> Cmd.Tile (Mapp.tile_by_pos c s.map)
+              | _ -> raise (Illegal "Need tile requirement") in
+            (cmd_name, tl, satisfied_req::satisfied_reqs)
+          | [] -> (cmd_name, unsatisfied_reqs, satisfied_reqs) in
+        ({ s with selected_tile = c }, pc')
+      | _ -> (s,pc)
+    end
+  | _ -> (s,pc)
 
 let rec player_loop ui state_ref pending_cmd =
-  let try_parse_input_event e (state:State.t) (pending_cmd:Cmd.t) : State.t * Cmd.t =
+  let try_parse_input_event e ((state, pending_cmd) : State.t * Cmd.pending) : State.t * Cmd.pending =
     try parse_input_event state pending_cmd e with
     | Illegal s -> (dispatch_message state s Message.Illegal,pending_cmd)
     | Critical (file,func,err) ->
       failwith (Printf.sprintf "Critical error in %s.ml:%s: %s" file func err)
     | BadInvariant (file,func,err) ->
       failwith (Printf.sprintf "Invariant violation in %s.ml:%s: %s" file func err) in
-  let exec_if_reqs_satisifed (state:State.t) (pending_cmd:Cmd.t) = (state, pending_cmd) in
-    (* if Cmd.are_all_reqs_satisfied pending_cmd then
-     *   execute state pending_cmd
-     * else
-     *   (state,pending_cmd) in *)
+  let exec_if_reqs_satisifed ((state, pending_cmd) : State.t * Cmd.pending) : State.t * Cmd.pending =
+    match Cmd.t_of_pending pending_cmd with
+    | Some cmd ->
+      let state' = execute state cmd in
+      (state', Cmd.create `NoCmd)
+    | None -> (state, pending_cmd) in
   let state = !state_ref in
   LTerm_ui.wait ui >>= fun e ->
-  let state = !state_ref in
-  let (state, pending_cmd') = try_parse_input_event e state pending_cmd in
-  let (state, pending_cmd') = exec_if_reqs_satisifed state pending_cmd' in
+  let (state, pending_cmd') =
+    (!state_ref, pending_cmd)
+    |> try_parse_input_event e
+    |> exec_if_reqs_satisifed in
   if state.is_quit (* End more gracefully? *) then
     Lwt.return ()
   else begin
@@ -611,7 +615,7 @@ let main () =
   Lazy.force LTerm.stdout >>= fun term ->
   LTerm.enable_mouse term >>= fun () ->
   LTerm_ui.create term (Interface.draw state_ref) >>= fun ui ->
-  player_loop ui state_ref Cmd.NoCmd >>= fun () ->
+  player_loop ui state_ref (Cmd.create `NoCmd) >>= fun () ->
   LTerm.disable_mouse term >>= fun () ->
   LTerm_ui.quit ui
 

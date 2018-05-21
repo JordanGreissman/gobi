@@ -1,3 +1,5 @@
+open Core_kernel
+
 (** represents the different types of actions that can be bound to keys *)
 type t =
   (* general commands *)
@@ -71,15 +73,17 @@ type t =
 type cmd = [ `NoCmd | `NextTurn | `Tutorial | `Describe of string | `Research |
              `DisplayResearch | `Skip | `Move | `Attack | `PlaceHub | `Clear |
              `Produce | `AddEntityToHub ]
-type unsatisfied_req = [ `Tile | `HubRole | `EntityRole | `Research ]
+type unsatisfied_req = [ `Tile | `HubRole | `EntityRole | `ResearchKey ]
 type satisfied_req =
   | Tile of Tile.t
   | HubRole of Hub.role
   | EntityRole of Entity.role
-  | Research of Research.Research.key
+  | ResearchKey of Research.Research.key
 
 type pending = cmd * unsatisfied_req list * satisfied_req list
 
 val create : cmd -> pending
 
-val t_of_pending : pending -> t
+(** Returns (Some t) if the pending command provided as input has all requirements
+ *  satisfied, and None if not *)
+val t_of_pending : pending -> t Option.t

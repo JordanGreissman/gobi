@@ -13,7 +13,7 @@ val place_hub_on_map: State.t ref -> Hub.t -> Hub.t
 val tick_pending: State.t -> Civ.t -> Civ.t
 val next_turn: State.t -> State.t
 val execute: State.t -> Cmd.t -> State.t
-(* TODO: this might also not be right *)
-val parse_input_event: State.t -> Cmd.t option -> LTerm_event.t -> State.t * Cmd.t option
-val player_loop: LTerm_ui.t -> State.t ref -> Cmd.t -> unit Lwt.t
+val satisfy_key_requirement: State.t -> Cmd.pending -> Menu.t -> Cmd.pending
+val parse_input_event: State.t -> Cmd.pending -> LTerm_event.t -> State.t * Cmd.pending
+val player_loop: LTerm_ui.t -> State.t ref -> Cmd.pending -> unit Lwt.t
 val main: unit -> unit Lwt.t

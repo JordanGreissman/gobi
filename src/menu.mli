@@ -1,3 +1,5 @@
+open Core_kernel
+
 (** the type of a menu item *)
 type t = {
   (** the text of the menu item, displayed next to the key binding *)
@@ -6,7 +8,7 @@ type t = {
   key : LTerm_key.code;
   (** the cmd to execute when this menu item is selected. A value of [None]
     * indicates that this menu item does not execute a command. *)
-  cmd: Cmd.t;
+  cmd: Cmd.t option; (* TODO: this is unused right now, and that can't be right... *)
   (** the menu to display next after executing this command. A value of [None]
     * indicates to keep displaying the same menu. *)
   next_menu: menu;

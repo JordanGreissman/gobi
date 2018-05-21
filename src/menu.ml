@@ -1,10 +1,11 @@
+open Core_kernel
 open CamomileLibrary
 open Exception
 
 type t = {
   text: string;
   key: LTerm_key.code;
-  cmd: Cmd.t;
+  cmd: Cmd.t option;
   next_menu: menu;
 }
 and menu =
@@ -47,7 +48,7 @@ let rec get_tile_menu t =
 
 and get_build_hub_menu roles =
   let alpha = "abcdefghijklmnopqrstuvwxyz" in
-  let hubs = List.mapi (fun i hub -> {
+  let hubs = List.mapi ~f:(fun i hub -> {
     text = Hub.get_role_name hub;
     key = Char (UChar.of_char alpha.[i]);
     (*** commented out so I can get the damn thing to compile ***)
