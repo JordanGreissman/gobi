@@ -1,0 +1,4 @@
+(executable
+ ((name game)
+  (public_name gobi)
+  (libraries (core_kernel lwt camomile lambda-term yojson))))

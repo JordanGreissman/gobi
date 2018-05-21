@@ -11,7 +11,7 @@ type t = cell option list list
 let load name =
   (* open and read the art file *)
   let lines = ref [] in
-  let chan = open_in ("art/"^name) in
+  let chan = open_in ("res/art/"^name) in
   (try
     while true; do
       lines := input_line chan :: !lines

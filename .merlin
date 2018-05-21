@@ -1,3 +1,4 @@
+PKG core_kernel
 PKG oUnit
 PKG yojson
 PKG lwt

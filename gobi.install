@@ -1,0 +1,10 @@
+lib: [
+  "_build/install/default/lib/gobi/META" {"META"}
+  "_build/install/default/lib/gobi/opam" {"opam"}
+]
+bin: [
+  "_build/install/default/bin/gobi" {"gobi"}
+]
+doc: [
+  "_build/install/default/doc/gobi/README.md"
+]
