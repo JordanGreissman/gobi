@@ -1,0 +1,7 @@
+opam-version: "1.2"
+name: "gobi"
+version: "0.1"
+authors: ["Jordan Greissman" "Austin Astorga" "Matt Barker" "David Udelson <david@davidudelson.com>"]
+maintainer: "David Udelson <david@davidudelson.com>"
+homepage: "https://github.com/JordanGreissman/gobi"
+bug-reports: "https://github.com/JordanGreissman/gobi/issues"
