@@ -606,7 +606,7 @@ let rec player_loop ui state_ref pending_cmd =
   end
 
 let main () =
-  let s = init_state "src/game_data.json" in
+  let s = init_state "res/json/game_data.json" in
   let state_ref = ref s in
   Lazy.force LTerm.stdout >>= fun term ->
   LTerm.enable_mouse term >>= fun () ->
