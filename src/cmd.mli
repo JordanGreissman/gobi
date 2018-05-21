@@ -1,5 +1,5 @@
 (** represents the different types of actions that can be bound to keys *)
-type cmd =
+type t =
   (* general commands *)
 
   (** [NoCmd] represents the absence of a command *)
@@ -8,17 +8,17 @@ type cmd =
   | NextTurn
   (** [Tutorial] starts the tutorial *)
   | Tutorial
-  (* [Describe str] describes the currently selected [str], if there is one *)
+  (** [Describe str] describes the currently selected [str], if there is one *)
   | Describe of string
   (** [Research r] begins the process of researching [r] *)
-  | Research
+  | Research of Research.Research.key
   (** [DisplayResearch t] displays the research that has already been completed
     * for research tree [t]. *)
-  | DisplayResearch
+  | DisplayResearch of Research.Research.key
 
   (* entity commands *)
 
-  (** [Skip t] tells the entity on tile [t] to do nothing and expends all of the
+  (** [Skip] tells the entity on the currently selected tile to do nothing and expends all of the
     * entity's remaining movement points *)
   | Skip
   (** [Move (from,to)] moves the entity on tile [from] to tile [to]. [from] and
@@ -26,18 +26,18 @@ type cmd =
     * distance between them is greater than the entity's remaining movement
     * points. *)
   (* NOTE requires second tile to be selected *)
-  | Move
+  | Move of { src: Tile.t; dst: Tile.t }
   (** [Attack o d] commands the entity on tile [o] to attack the hub or entity on
     * tile [d] *)
   (* NOTE requires second tile to be selected *)
-  | Attack
+  | Attack of { attacker: Tile.t; target: Tile.t }
 
   (* tile commands *)
 
   (** [PlaceHub (t,r)] places a hub of role [r] on the tile [t] *)
   (* NOTE requires role to be selected from sub-menu *)
-  | PlaceHub
-  (** [Clear t] clears tile [t] if it is an uncleared Forest tile, and throws an
+  | PlaceHub of { role: Hub.role; pos: Tile.t }
+  (** [Clear] clears the currently selected tile if it is an uncleared Forest tile, and throws an
     * error otherwise. *)
   | Clear
 
@@ -47,12 +47,12 @@ type cmd =
     * When an entity is complete, it sits in the town hall until it gets orders.
     *)
   (* NOTE requires role to be selected from sub-menu *)
-  | Produce
+  | Produce of { role: Entity.role; hub: Tile.t }
   (** [AddEntityToHub (e,h)] deletes the entity on tile [e] and increases the
     * production of the hub on tile [h] by 1 if [e] is allowed to be added to
     * [h]. Otherwise, adds an error message to the message list. *)
   (* NOTE requires hub tile to be selected *)
-  | AddEntityToHub
+  | AddEntityToHub of { entity: Tile.t; hub: Tile.t }
 
   (* dependent commands *)
   (* these commands automatically execute the pending command. If there is no
@@ -68,26 +68,18 @@ type cmd =
   (*   * argument to the pending command *\) *)
   (* | SelectEntity *)
 
-(* TODO: documentation out of date *)
-(** represents the different requirements that commands can have. These
-  * requirements need to be fulfilled before the command can be executed. *)
-type requirement =
-  | Tile of Tile.t option
-  | HubRole of Hub.role option
-  | EntityRole of Entity.role option
-  | Research of Research.Research.key option
+type cmd = [ `NoCmd | `NextTurn | `Tutorial | `Describe of string | `Research |
+             `DisplayResearch | `Skip | `Move | `Attack | `PlaceHub | `Clear |
+             `Produce | `AddEntityToHub ]
+type unsatisfied_req = [ `Tile | `HubRole | `EntityRole | `Research ]
+type satisfied_req =
+  | Tile of Tile.t
+  | HubRole of Hub.role
+  | EntityRole of Entity.role
+  | Research of Research.Research.key
 
-(** a command is a cmd type plus a list of its requirements *)
-type t = cmd * requirement list
+type pending = cmd * unsatisfied_req list * satisfied_req list
 
-(** [create c] is a unsatisfied requirements list (every constructor is given
-  * None) for the command [c]. *)
-val create : cmd -> t
+val create : cmd -> pending
 
-(** [all_all_reqs_satisfied lst] is true if all the requirements in [lst] are
-  * satisfied and false otherwise. *)
-val are_all_reqs_satisfied : requirement list -> bool
-
-(** [get_next_unsatisfied_req reqs] is the first unsatisfied requirement in
-  * [reqs]. If all requirements in [reqs] are satisfied, raises BadInvariant *)
-val get_next_unsatisfied_req : requirement list -> requirement
+val t_of_pending : pending -> t

@@ -1,6 +1,9 @@
+open Core_kernel
+
 (** represents the state of the game *)
 type t = {
-  civs : Civ.t list;
+  civs : Civ.t Array.t;
+  current_civ : Civ.t;
   turn : int;
   total_turns : int;
   (** a list of all the possible kinds of hubs that the player can make and
@@ -30,18 +33,6 @@ type t = {
   is_quit : bool;
   (** whether the player is viewing the tutorial *)
   is_tutorial : bool;
-  current_civ : int;
 }
 
-(** Returns the current civilization of a valid state *)
-val get_current_civ : t -> Civ.t
-
-(** Add a civ to an index in a valid state *)
-val update_civ : int -> Civ.t -> t -> t
-
-(** Returns the list of civs in a valid state *)
-val get_civs : t -> Civ.t list
-
-(** Returns the tech_tree, list of a key and list of unlockables, in a
-  * valid state *)
-val get_tree : t -> Research.Research.research_list
+val update_current_civ : Civ.t -> t -> t

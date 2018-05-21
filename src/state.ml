@@ -1,5 +1,8 @@
+open Core_kernel
+
 type t = {
-  civs : Civ.t list;
+  civs : Civ.t Array.t;
+  current_civ : Civ.t;
   turn : int;
   total_turns : int;
   hub_roles : Hub.role list;
@@ -13,19 +16,9 @@ type t = {
   (* pending_cmd : Cmd.t option; *)
   is_quit : bool;
   is_tutorial : bool;
-  current_civ : int;
 }
 
-let get_current_civ s =
-  List.nth s.civs s.current_civ
-
-let update_civ i civ s =
-  let arr = Array.of_list s.civs in
-  arr.(i) <- civ;
-  let civs = Array.to_list arr in
-  {s with civs = civs}
-
-let get_civs s =
-  s.civs
-
-let get_tree s = s.tech_tree
+let update_current_civ new_civ s =
+  let (i,_) = Array.findi_exn ~f:(fun i c -> (phys_equal c s.current_civ)) s.civs in
+  Array.set s.civs i new_civ;
+  s
